@@ -4,6 +4,8 @@ import javafx.stage.Stage;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+
 @Component
 public class CntrctmgmtUIInitializer implements ApplicationListener<UILoaderEvent> {
     @Override
@@ -12,5 +14,7 @@ public class CntrctmgmtUIInitializer implements ApplicationListener<UILoaderEven
         // show the ui
         Stage stage = event.getStage();
         stage.show();
+
+        System.out.println(LocalDateTime.now());
     }
 }
