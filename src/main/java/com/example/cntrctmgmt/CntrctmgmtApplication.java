@@ -1,5 +1,6 @@
 package com.example.cntrctmgmt;
 
+import javafx.application.Application;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -7,7 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class CntrctmgmtApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(CntrctmgmtApplication.class, args);
+		Application.launch(UILoader.class, args);
 	}
 
 }
