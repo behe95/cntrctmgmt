@@ -1,3 +1,14 @@
 #remove the .example suffix from the file name
 #fill out the following properties
 
+spring.main.web-application-type=none
+spring.jpa.database-platform=org.hibernate.community.dialect.SQLiteDialect
+# Customize Hibernate naming strategy
+spring.jpa.hibernate.naming.physical-strategy=org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+
+#Database constants
+spring.application.db.driverClassname=
+spring.application.db.dataSourceURL=
+
+#Application constants
+spring.application.ui.title=Client Application
