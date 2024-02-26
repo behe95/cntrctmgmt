@@ -21,7 +21,11 @@ public class ApplicationConfig implements CommandLineRunner {
     }
 
     private void createDatabaseTableIfNotExist() {
+//        this.jdbcTemplate.execute("PRAGMA foreign_keys=ON;");
+//        this.jdbcTemplate.execute("PRAGMA recursive_triggers = OFF;");
         // create category table;
         this.jdbcTemplate.execute(DBCategoryConst._DB_CREATE_CATEGORY_TABLE_IF_NOT_EXISTS);
+        this.jdbcTemplate.execute(DBCategoryConst._DB_CREATE_CATEGORY_TABLE_DATE_UPDATE_TRIGGER_IF_NOT_EXISTS);
+        this.jdbcTemplate.execute(DBCategoryConst._DB_CREATE_CATEGORY_TABLE_MODIFIED_DATE_UPDATE_TRIGGER_IF_NOT_EXISTS);
     }
 }
