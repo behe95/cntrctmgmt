@@ -77,4 +77,17 @@ public class CategoryService {
     public void deleteCategory(Category category) {
         this.categoryRepository.delete(category);
     }
+
+
+    public void deleteAllCategories() {
+        this.categoryRepository.deleteAll();
+    }
+
+    /**
+     * TODO:    Not working properly!!!
+     * @param categories
+     */
+    public void deleteCategories(List<Category> categories) {
+        this.categoryRepository.deleteAll(categories);
+    }
 }

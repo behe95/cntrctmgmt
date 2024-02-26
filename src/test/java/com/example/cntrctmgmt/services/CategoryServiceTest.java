@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -92,5 +93,31 @@ class CategoryServiceTest {
 
     @Test
     void deleteCategory() {
+        Category category = new Category();
+        category.setTitle("Meal");
+        category.setSoftCost(false);
+        category.setPkcmCategory(1);
+        this.categoryService.deleteCategory(category);
+    }
+
+    @Test
+    void deleteAllCategories() {
+        this.categoryService.deleteAllCategories();
+    }
+
+    @Test
+    void deleteCategories() {
+        Category category1 = new Category("Cnstrctn",false);
+        category1.setPkcmCategory(4);
+
+
+        Category category2 = new Category("Amazon",false);
+        category1.setPkcmCategory(6);
+
+        List<Category> categories = new ArrayList<>();
+        categories.add(category1);
+        categories.add(category2);
+
+        this.categoryService.deleteCategories(categories);
     }
 }
