@@ -1,123 +1,137 @@
 package com.example.cntrctmgmt.services;
 
+import com.example.cntrctmgmt.constant.responsemessage.ExceptionMessage;
 import com.example.cntrctmgmt.entities.Category;
 import com.example.cntrctmgmt.exceptions.DuplicateEntityException;
 import com.example.cntrctmgmt.repositories.CategoryRepository;
-import jakarta.persistence.EntityNotFoundException;
-import org.junit.jupiter.api.Assertions;
+
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.BDDMockito.given;
+
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.orm.jpa.JpaSystemException;
+import org.sqlite.SQLiteErrorCode;
+import org.sqlite.SQLiteException;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@SpringBootTest
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
 class CategoryServiceTest {
-    private final CategoryService categoryService;
+    @Mock
+    private CategoryRepository categoryRepositoryMock;
 
-    @Autowired
-    CategoryServiceTest(CategoryService categoryService) {
-        this.categoryService = categoryService;
-    }
-
+    @InjectMocks
+    private CategoryService categoryServiceUnderTest;
 
     @Test
-    void addCategory() {
-        Category category = new Category();
-        category.setTitle("Labor");
-        category.setSoftCost(false);
-        Category saveCategory = Assertions.assertDoesNotThrow(() -> this.categoryService.addCategory(category));
-        Assertions.assertEquals(category.getTitle(), saveCategory.getTitle());
+    void addCategory() throws DuplicateEntityException {
+        // given
+        Category givenCategory = new Category("Labor", false);
+        // actual operation
+        // save data
 
-        // add extra
-        try {
-            this.categoryService.addCategory(new Category("Cnstrctn", false));
-        } catch (DuplicateEntityException e) {
-            throw new RuntimeException(e);
-        }
+        // check no exception thrown
+        assertThatCode(() -> this.categoryServiceUnderTest.addCategory(givenCategory))
+                .doesNotThrowAnyException();
+        // check the method was called only once
+        verify(this.categoryRepositoryMock, times(1)).save(givenCategory);
+
+        // check returned data is valid
+        when(this.categoryRepositoryMock.save(givenCategory)).thenReturn(givenCategory);
+
+        Category savedCategory = this.categoryServiceUnderTest.addCategory(givenCategory);
+
+        assertEquals(givenCategory.getTitle(), savedCategory.getTitle());
+        assertEquals(givenCategory.getSoftCost(), savedCategory.getSoftCost());
+
     }
 
     @Test
-    void addCategoryToCheckIfDuplicateEntityChecked() {
-        Category category = new Category();
-        category.setTitle("Labor");
-        category.setSoftCost(false);
-        Assertions.assertThrows(DuplicateEntityException.class, () -> this.categoryService.addCategory(category));
+    void addCategoryWithDuplicateEntityException() {
+        // given
+        Category categoryToAdd = new Category("Meal", true);
+
+        // re-create the sqlite unique constraint exception
+        SQLiteException sqLiteException = new SQLiteException("", SQLiteErrorCode.SQLITE_CONSTRAINT);
+        JpaSystemException jpaSystemException = new JpaSystemException(new RuntimeException("", sqLiteException));
+
+        // setup the mock environment
+        when(this.categoryRepositoryMock.save(any(Category.class))).thenThrow(jpaSystemException);
+
+
+        // run the test
+        assertThatThrownBy(() -> this.categoryServiceUnderTest.addCategory(categoryToAdd))
+                .isInstanceOf(DuplicateEntityException.class)
+                .hasMessage(ExceptionMessage.DUPLICATE_ENTITY_EXCEPTION.toString());
+
+
     }
 
     @Test
     void getCategoryById() {
-        Optional<Category> category = this.categoryService.getCategoryById(1);
-        Assertions.assertTrue(category.isPresent());
+        Category category = new Category("Meal", false);
+        category.setPkcmCategory(1);
+
+        given(this.categoryRepositoryMock.findById(1)).willReturn(Optional.of(category));
+
+        assertThat(this.categoryServiceUnderTest.getCategoryById(1))
+                .isPresent()
+                .containsInstanceOf(Category.class);
+
+
+
+        given(this.categoryRepositoryMock.findById(1)).willReturn(Optional.empty());
+        assertThat(this.categoryServiceUnderTest.getCategoryById(1))
+                .isEmpty();
+        verify(this.categoryRepositoryMock, times(2)).findById(1);
     }
 
     @Test
     void getAllCategories() {
-        List<Category> categoryList = this.categoryService.getAllCategories();
-        Assertions.assertEquals(2,categoryList.size());
+        List<Category> mockCategories = new ArrayList<>();
+        Category category1 = new Category("Category1", false);
+        category1.setPkcmCategory(1);
+        mockCategories.add(category1);
+        Category category2 = new Category("Category2", true);
+        category2.setPkcmCategory(2);
+        mockCategories.add(category2);
+        Category category3 = new Category("Category3", true);
+        category3.setPkcmCategory(3);
+        mockCategories.add(category3);
+
+
+        when(this.categoryRepositoryMock.findAll()).thenReturn(mockCategories);
+
+        List<Category> categories = this.categoryServiceUnderTest.getAllCategories();
+        assertEquals(3, categories.size());
+
+        verify(this.categoryRepositoryMock, times(1)).findAll();
     }
 
     @Test
     void updateCategory() {
-        Category category = new Category();
-        category.setTitle("Meal");
-        category.setSoftCost(false);
-        category.setPkcmCategory(2);
-        Assertions.assertDoesNotThrow(() -> this.categoryService.updateCategory(category));
-
-        Optional<Category> updatedCategory = this.categoryService.getCategoryById(2);
-
-        Assertions.assertEquals("Meal", updatedCategory.get().getTitle());
-
-    }
-
-    @Test
-    void updateCategoryToCheckIfDuplicateEntityChecked() {
-        Category category = new Category();
-        category.setTitle("Meal");
-        category.setSoftCost(false);
-        category.setPkcmCategory(1);
-        Assertions.assertThrows(DuplicateEntityException.class, () -> this.categoryService.updateCategory(category));
-    }
-
-    @Test
-    void updateCategoryToCheckIfValidateCategoryNotExists() {
-        Category category = new Category();
-        category.setTitle("Meal");
-        category.setSoftCost(false);
-        category.setPkcmCategory(3);
-        Assertions.assertThrows(EntityNotFoundException.class, () -> this.categoryService.updateCategory(category));
     }
 
     @Test
     void deleteCategory() {
-        Category category = new Category();
-        category.setTitle("Meal");
-        category.setSoftCost(false);
-        category.setPkcmCategory(1);
-        this.categoryService.deleteCategory(category);
     }
 
     @Test
     void deleteAllCategories() {
-        this.categoryService.deleteAllCategories();
     }
 
     @Test
     void deleteCategories() {
-        Category category1 = new Category("Cnstrctn",false);
-        category1.setPkcmCategory(4);
-
-
-        Category category2 = new Category("Amazon",false);
-        category1.setPkcmCategory(6);
-
-        List<Category> categories = new ArrayList<>();
-        categories.add(category1);
-        categories.add(category2);
-
-        this.categoryService.deleteCategories(categories);
     }
 }

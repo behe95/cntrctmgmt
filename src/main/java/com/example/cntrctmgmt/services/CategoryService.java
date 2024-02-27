@@ -29,7 +29,6 @@ public class CategoryService {
     public Category addCategory(Category category) throws DuplicateEntityException {
         Category saveCategory = null;
         try {
-            this.categoryRepository.save(category);
             saveCategory = this.categoryRepository.save(category);
         }catch (JpaSystemException jpaSystemException) {
             if (jpaSystemException.getRootCause() instanceof SQLiteException) {
