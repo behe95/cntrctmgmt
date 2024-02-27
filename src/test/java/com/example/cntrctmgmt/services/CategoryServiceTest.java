@@ -80,25 +80,32 @@ class CategoryServiceTest {
 
     @Test
     void getCategoryById() {
+        // given data
         Category category = new Category("Meal", false);
         category.setPkcmCategory(1);
 
+        // set up mock env that returns data
         given(this.categoryRepositoryMock.findById(1)).willReturn(Optional.of(category));
 
+        // run tests
         assertThat(this.categoryServiceUnderTest.getCategoryById(1))
                 .isPresent()
                 .containsInstanceOf(Category.class);
 
 
-
+        // set up another mock env that returns nothing
         given(this.categoryRepositoryMock.findById(1)).willReturn(Optional.empty());
+        // test
         assertThat(this.categoryServiceUnderTest.getCategoryById(1))
                 .isEmpty();
+
+        // verify the database call
         verify(this.categoryRepositoryMock, times(2)).findById(1);
     }
 
     @Test
     void getAllCategories() {
+        // given mock data
         List<Category> mockCategories = new ArrayList<>();
         Category category1 = new Category("Category1", false);
         category1.setPkcmCategory(1);
@@ -111,11 +118,14 @@ class CategoryServiceTest {
         mockCategories.add(category3);
 
 
+        // setup mock rep env
         when(this.categoryRepositoryMock.findAll()).thenReturn(mockCategories);
 
+        // get the the data and run the test
         List<Category> categories = this.categoryServiceUnderTest.getAllCategories();
         assertEquals(3, categories.size());
 
+        // verify that database was called once
         verify(this.categoryRepositoryMock, times(1)).findAll();
     }
 
