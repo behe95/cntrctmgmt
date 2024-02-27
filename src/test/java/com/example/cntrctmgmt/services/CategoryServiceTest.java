@@ -254,13 +254,52 @@ class CategoryServiceTest {
 
     @Test
     void deleteCategory() {
+        // given
+        Category mockCategory = new Category("Meal", true);
+
+        // call the method
+        this.categoryServiceUnderTest.deleteCategory(mockCategory);
+
+        // capture data and verify
+        ArgumentCaptor<Category> argumentCaptor = ArgumentCaptor.forClass(Category.class);
+
+        verify(this.categoryRepositoryMock, times(1)).delete(argumentCaptor.capture());
+
+        Category capturedCategory = argumentCaptor.getValue();
+
+        assertEquals(mockCategory, capturedCategory);
     }
 
     @Test
     void deleteAllCategories() {
+        this.categoryServiceUnderTest.deleteAllCategories();
+        verify(this.categoryRepositoryMock, times(1)).deleteAll();
     }
 
     @Test
     void deleteCategories() {
+        // given mock data
+        List<Category> mockCategories = new ArrayList<>();
+        Category category1 = new Category("Category1", false);
+        category1.setPkcmCategory(1);
+        mockCategories.add(category1);
+        Category category2 = new Category("Category2", true);
+        category2.setPkcmCategory(2);
+        mockCategories.add(category2);
+        Category category3 = new Category("Category3", true);
+        category3.setPkcmCategory(3);
+        mockCategories.add(category3);
+
+
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<List<Category>> argumentCaptor = ArgumentCaptor.forClass(List.class);
+
+        this.categoryServiceUnderTest.deleteCategories(mockCategories);
+
+        verify(this.categoryRepositoryMock, times(1)).deleteAll(argumentCaptor.capture());
+
+        List<Category> categoryList = argumentCaptor.getValue();
+
+        assertEquals(mockCategories.size(), categoryList.size());
     }
 }

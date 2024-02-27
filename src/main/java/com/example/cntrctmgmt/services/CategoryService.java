@@ -6,6 +6,7 @@ import com.example.cntrctmgmt.exceptions.DuplicateEntityException;
 import com.example.cntrctmgmt.repositories.CategoryRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.RollbackException;
+import jakarta.transaction.Transactional;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.jpa.JpaSystemException;
@@ -53,6 +54,7 @@ public class CategoryService {
         return this.categoryRepository.findAll();
     }
 
+
     public void updateCategory(Category category) throws DuplicateEntityException, EntityNotFoundException  {
         Category savedCategory = this.categoryRepository.findById(category.getPkcmCategory()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.ENTITY_NOT_FOUND.toString()));
 
@@ -78,14 +80,18 @@ public class CategoryService {
     }
 
 
+    @Transactional
     public void deleteAllCategories() {
         this.categoryRepository.deleteAll();
     }
 
     /**
-     * TODO:    Not working properly!!!
+     * TODO:    May be Not working properly!!!
+     *          Need to test with real data and in memory database
+     *          Issue: skip few records when some records are deleted thorugh
      * @param categories
      */
+    @Transactional
     public void deleteCategories(List<Category> categories) {
         this.categoryRepository.deleteAll(categories);
     }
