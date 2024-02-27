@@ -7,11 +7,13 @@ import com.example.cntrctmgmt.repositories.CategoryRepository;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.BDDMockito.given;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -94,9 +96,9 @@ class CategoryServiceTest {
 
 
         // set up another mock env that returns nothing
-        given(this.categoryRepositoryMock.findById(1)).willReturn(Optional.empty());
+        given(this.categoryRepositoryMock.findById(2)).willReturn(Optional.empty());
         // test
-        assertThat(this.categoryServiceUnderTest.getCategoryById(1))
+        assertThat(this.categoryServiceUnderTest.getCategoryById(2))
                 .isEmpty();
 
         // verify the database call
@@ -130,7 +132,47 @@ class CategoryServiceTest {
     }
 
     @Test
-    void updateCategory() {
+    void updateCategory() throws DuplicateEntityException {
+        // given
+        Category mockDataToBeUpdated = new Category("Construction", false);
+        mockDataToBeUpdated.setPkcmCategory(1);
+
+        // set up mock env so that category is found by id
+        given(this.categoryRepositoryMock.findById(any())).willReturn(Optional.of(mockDataToBeUpdated));
+
+        // call the actual method
+        this.categoryServiceUnderTest.updateCategory(mockDataToBeUpdated);
+
+        // check the passed argument as id is same as the mock data's id
+        ArgumentCaptor<Integer> IdArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
+
+        // verify that mock repo was used to find the id
+        // and called only once
+        verify(this.categoryRepositoryMock, times(1)).findById(IdArgumentCaptor.capture());
+
+        int capturedId = IdArgumentCaptor.getValue();
+
+        assertEquals(mockDataToBeUpdated.getPkcmCategory(), capturedId);
+
+
+        // check the passed argument if the properties are same
+        ArgumentCaptor<Category> categoryArgumentCaptor = ArgumentCaptor.forClass(Category.class);
+
+        // verify that mock was used to save the updated data
+        // and called only once
+        verify(this.categoryRepositoryMock, times(1)).save(categoryArgumentCaptor.capture());
+
+        Category capturedCategory = categoryArgumentCaptor.getValue();
+
+        // verify the data
+        assertNotNull(capturedCategory);
+        assertEquals(mockDataToBeUpdated.getPkcmCategory(), capturedCategory.getPkcmCategory());
+        assertEquals(mockDataToBeUpdated.getTitle(), capturedCategory.getTitle());
+        assertEquals(mockDataToBeUpdated.getSoftCost(), capturedCategory.getSoftCost());
+
+
+
+
     }
 
     @Test
