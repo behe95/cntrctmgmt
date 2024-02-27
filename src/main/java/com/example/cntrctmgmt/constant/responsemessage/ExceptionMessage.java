@@ -1,7 +1,8 @@
 package com.example.cntrctmgmt.constant.responsemessage;
 
 public enum ExceptionMessage {
-    DUPLICATE_ENTITY_EXCEPTION("Record already exists!");
+    DUPLICATE_ENTITY_EXCEPTION("Record already exists!"),
+    ENTITY_NOT_FOUND("Not found!");
 
     private final String message;
 

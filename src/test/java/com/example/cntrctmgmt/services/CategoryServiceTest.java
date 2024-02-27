@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.BDDMockito.given;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -102,7 +103,7 @@ class CategoryServiceTest {
                 .isEmpty();
 
         // verify the database call
-        verify(this.categoryRepositoryMock, times(2)).findById(1);
+        verify(this.categoryRepositoryMock, times(1)).findById(1);
     }
 
     @Test
@@ -170,6 +171,82 @@ class CategoryServiceTest {
         assertEquals(mockDataToBeUpdated.getTitle(), capturedCategory.getTitle());
         assertEquals(mockDataToBeUpdated.getSoftCost(), capturedCategory.getSoftCost());
 
+    }
+
+    @Test
+    void updateCategoryWithEntityNotFoundException() {
+        // given
+        Category mockDataToBeUpdated = new Category("Construction", false);
+        mockDataToBeUpdated.setPkcmCategory(1);
+
+        // set up mock env so that category is found by id
+        given(this.categoryRepositoryMock.findById(any())).willReturn(Optional.empty());
+
+        // call the actual method
+        assertThatThrownBy(() -> this.categoryServiceUnderTest.updateCategory(mockDataToBeUpdated))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage(ExceptionMessage.ENTITY_NOT_FOUND.toString());
+
+        // check the passed argument as id is same as the mock data's id
+        ArgumentCaptor<Integer> IdArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
+
+        // verify that mock repo was used to find the id
+        // and called only once
+        verify(this.categoryRepositoryMock, times(1)).findById(IdArgumentCaptor.capture());
+
+        int capturedId = IdArgumentCaptor.getValue();
+
+        assertEquals(mockDataToBeUpdated.getPkcmCategory(), capturedId);
+
+        // verify nothing was saved
+        verify(this.categoryRepositoryMock, never()).save(any());
+    }
+
+
+    @Test
+    void updateCategoryWithDuplicateEntityException() {
+        // given
+        Category categoryToUpdate = new Category("Meal", true);
+
+        // re-create the sqlite unique constraint exception
+        SQLiteException sqLiteException = new SQLiteException("", SQLiteErrorCode.SQLITE_CONSTRAINT);
+        JpaSystemException jpaSystemException = new JpaSystemException(new RuntimeException("", sqLiteException));
+
+        // setup the mock environment
+        when(this.categoryRepositoryMock.findById(any())).thenReturn(Optional.of(categoryToUpdate));
+        when(this.categoryRepositoryMock.save(any(Category.class))).thenThrow(jpaSystemException);
+
+        // run the test
+        assertThatThrownBy(() -> this.categoryServiceUnderTest.updateCategory(categoryToUpdate))
+                .isInstanceOf(DuplicateEntityException.class)
+                .hasMessage(ExceptionMessage.DUPLICATE_ENTITY_EXCEPTION.toString());
+
+
+        // check the passed argument as id is same as the mock data's id
+        ArgumentCaptor<Integer> IdArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
+
+        // verify that mock repo was used to find the id
+        // and called only once
+        verify(this.categoryRepositoryMock, times(1)).findById(IdArgumentCaptor.capture());
+
+        int capturedId = IdArgumentCaptor.getValue();
+
+        assertEquals(categoryToUpdate.getPkcmCategory(), capturedId);
+
+        // check the passed argument if the properties are same
+        ArgumentCaptor<Category> categoryArgumentCaptor = ArgumentCaptor.forClass(Category.class);
+
+        // verify that mock was used to save the updated data
+        // and called only once
+        verify(this.categoryRepositoryMock, times(1)).save(categoryArgumentCaptor.capture());
+
+        Category capturedCategory = categoryArgumentCaptor.getValue();
+
+        // verify the data
+        assertNotNull(capturedCategory);
+        assertEquals(categoryToUpdate.getPkcmCategory(), capturedCategory.getPkcmCategory());
+        assertEquals(categoryToUpdate.getTitle(), capturedCategory.getTitle());
+        assertEquals(categoryToUpdate.getSoftCost(), capturedCategory.getSoftCost());
 
 
 

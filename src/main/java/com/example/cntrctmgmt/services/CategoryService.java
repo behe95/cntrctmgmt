@@ -54,7 +54,7 @@ public class CategoryService {
     }
 
     public void updateCategory(Category category) throws DuplicateEntityException, EntityNotFoundException  {
-        Category savedCategory = this.categoryRepository.findById(category.getPkcmCategory()).orElseThrow(() -> new EntityNotFoundException("Category not found"));
+        Category savedCategory = this.categoryRepository.findById(category.getPkcmCategory()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.ENTITY_NOT_FOUND.toString()));
 
         try {
             savedCategory.setTitle(category.getTitle());
