@@ -33,9 +33,9 @@ public class SubCategoryService {
                 int errorCode = ((SQLiteException) jpaSystemException.getRootCause()).getErrorCode();
                 if (errorCode == 19) //SQLITE_CONSTRAINT
                 {
-                    throw new DuplicateEntityException(ExceptionMessage.DUPLICATE_ENTITY_EXCEPTION);
+                    throw new DuplicateEntityException(ExceptionMessage.DUPLICATE_ENTITY_EXCEPTION.getMessage());
                 } else {
-                    throw new UnknownException(ExceptionMessage.UNKNOWN_EXCEPTION);
+                    throw new UnknownException(ExceptionMessage.UNKNOWN_EXCEPTION.getMessage());
                 }
 
             }
@@ -55,7 +55,7 @@ public class SubCategoryService {
 
     @Transactional
     public void updateSubCategory(SubCategory subCategory) throws DuplicateEntityException, EntityNotFoundException, UnknownException {
-        SubCategory savedSubCategory = this.subCategoryRepository.findById(subCategory.getId()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.ENTITY_NOT_FOUND.toString()));
+        SubCategory savedSubCategory = this.subCategoryRepository.findById(subCategory.getId()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.ENTITY_NOT_FOUND.getMessage()));
 
         try {
             savedSubCategory.setTitle(subCategory.getTitle());
@@ -66,9 +66,9 @@ public class SubCategoryService {
                 int errorCode = ((SQLiteException) jpaSystemException.getRootCause()).getErrorCode();
                 if (errorCode == 19) //SQLITE_CONSTRAINT
                 {
-                    throw new DuplicateEntityException(ExceptionMessage.DUPLICATE_ENTITY_EXCEPTION);
+                    throw new DuplicateEntityException(ExceptionMessage.DUPLICATE_ENTITY_EXCEPTION.getMessage());
                 } else {
-                    throw new UnknownException(ExceptionMessage.UNKNOWN_EXCEPTION);
+                    throw new UnknownException(ExceptionMessage.UNKNOWN_EXCEPTION.getMessage());
                 }
 
             }

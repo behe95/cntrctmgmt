@@ -76,7 +76,7 @@ class CategoryServiceTest {
         // run the test
         assertThatThrownBy(() -> this.categoryServiceUnderTest.addCategory(categoryToAdd))
                 .isInstanceOf(DuplicateEntityException.class)
-                .hasMessage(ExceptionMessage.DUPLICATE_ENTITY_EXCEPTION.toString());
+                .hasMessage(ExceptionMessage.DUPLICATE_ENTITY_EXCEPTION.getMessage());
 
 
     }
@@ -185,7 +185,7 @@ class CategoryServiceTest {
         // call the actual method
         assertThatThrownBy(() -> this.categoryServiceUnderTest.updateCategory(mockDataToBeUpdated))
                 .isInstanceOf(EntityNotFoundException.class)
-                .hasMessage(ExceptionMessage.ENTITY_NOT_FOUND.toString());
+                .hasMessage(ExceptionMessage.ENTITY_NOT_FOUND.getMessage());
 
         // check the passed argument as id is same as the mock data's id
         ArgumentCaptor<Integer> IdArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
@@ -219,7 +219,7 @@ class CategoryServiceTest {
         // run the test
         assertThatThrownBy(() -> this.categoryServiceUnderTest.updateCategory(categoryToUpdate))
                 .isInstanceOf(DuplicateEntityException.class)
-                .hasMessage(ExceptionMessage.DUPLICATE_ENTITY_EXCEPTION.toString());
+                .hasMessage(ExceptionMessage.DUPLICATE_ENTITY_EXCEPTION.getMessage());
 
 
         // check the passed argument as id is same as the mock data's id

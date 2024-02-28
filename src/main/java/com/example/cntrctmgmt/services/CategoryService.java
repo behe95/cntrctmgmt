@@ -36,7 +36,7 @@ public class CategoryService {
                 int errorCode = ((SQLiteException) jpaSystemException.getRootCause()).getErrorCode();
                 if (errorCode == 19) //SQLITE_CONSTRAINT
                 {
-                    throw new DuplicateEntityException(ExceptionMessage.DUPLICATE_ENTITY_EXCEPTION);
+                    throw new DuplicateEntityException(ExceptionMessage.DUPLICATE_ENTITY_EXCEPTION.getMessage());
                 }
 
             }
@@ -56,7 +56,7 @@ public class CategoryService {
 
 
     public void updateCategory(Category category) throws DuplicateEntityException, EntityNotFoundException  {
-        Category savedCategory = this.categoryRepository.findById(category.getPkcmCategory()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.ENTITY_NOT_FOUND.toString()));
+        Category savedCategory = this.categoryRepository.findById(category.getPkcmCategory()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.ENTITY_NOT_FOUND.getMessage()));
 
         try {
             savedCategory.setTitle(category.getTitle());
@@ -68,7 +68,7 @@ public class CategoryService {
                 int errorCode = ((SQLiteException) jpaSystemException.getRootCause()).getErrorCode();
                 if (errorCode == 19) //SQLITE_CONSTRAINT
                 {
-                    throw new DuplicateEntityException(ExceptionMessage.DUPLICATE_ENTITY_EXCEPTION);
+                    throw new DuplicateEntityException(ExceptionMessage.DUPLICATE_ENTITY_EXCEPTION.getMessage());
                 }
 
             }

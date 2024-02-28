@@ -6,7 +6,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 public class DuplicateEntityException extends Exception {
 
 
-    public DuplicateEntityException(ExceptionMessage exceptionMessage) {
-        super(exceptionMessage.name());
+    public DuplicateEntityException(String exceptionMessage) {
+        super(exceptionMessage);
     }
 }

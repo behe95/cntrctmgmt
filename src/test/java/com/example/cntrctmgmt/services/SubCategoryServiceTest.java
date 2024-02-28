@@ -5,6 +5,7 @@ import com.example.cntrctmgmt.entities.SubCategory;
 import com.example.cntrctmgmt.exceptions.DuplicateEntityException;
 import com.example.cntrctmgmt.exceptions.UnknownException;
 import com.example.cntrctmgmt.repositories.SubCategoryRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,6 +13,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 
@@ -64,7 +66,7 @@ class SubCategoryServiceTest {
     }
 
     @Test
-    void addCategoryTestForDuplicateEntityException() {
+    void addSubCategoryTestForDuplicateEntityException() {
         SubCategory subCategory = new SubCategory("Banking");
 
 
@@ -81,13 +83,13 @@ class SubCategoryServiceTest {
         // then
         assertThatThrownBy(() -> this.subCategoryServiceUnderTest.addSubCategory(subCategory))
                 .isInstanceOf(DuplicateEntityException.class)
-                .hasMessage(ExceptionMessage.DUPLICATE_ENTITY_EXCEPTION.name());
+                .hasMessage(ExceptionMessage.DUPLICATE_ENTITY_EXCEPTION.getMessage());
 
 
     }
 
     @Test
-    void addCategoryTestForUnknownException() {
+    void addSubCategoryTestForUnknownException() {
         SubCategory subCategory = new SubCategory("Banking");
 
 
@@ -104,7 +106,7 @@ class SubCategoryServiceTest {
         // then
         assertThatThrownBy(() -> this.subCategoryServiceUnderTest.addSubCategory(subCategory))
                 .isInstanceOf(UnknownException.class)
-                .hasMessage(ExceptionMessage.UNKNOWN_EXCEPTION.name());
+                .hasMessage(ExceptionMessage.UNKNOWN_EXCEPTION.getMessage());
 
     }
 
@@ -214,11 +216,189 @@ class SubCategoryServiceTest {
 
     }
 
+
+    @Test
+    void updateSubCategoryTestForEntityNotFoundException() {
+        // argument data
+        SubCategory argSubCategory = new SubCategory("Crops");
+        argSubCategory.setId(1);
+
+
+        // given
+        given(this.subCategoryRepositoryMock.findById(argSubCategory.getId())).willThrow(new EntityNotFoundException(ExceptionMessage.ENTITY_NOT_FOUND.getMessage()));
+
+        // when
+        assertThatThrownBy(() -> this.subCategoryServiceUnderTest.updateSubCategory(argSubCategory))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage(ExceptionMessage.ENTITY_NOT_FOUND.getMessage());
+
+        // then
+
+        /**
+         * verify repository called method only once
+         * check if the passed id is the same id
+         * to find the subcateogory
+         */
+        ArgumentCaptor<Integer> argumentCaptorId = ArgumentCaptor.forClass(Integer.class);
+        then(this.subCategoryRepositoryMock)
+                .should(times(1))
+                .findById(argumentCaptorId.capture());
+
+        assertEquals(argSubCategory.getId(), argumentCaptorId.getValue());
+
+        /**
+         * verify that program doesn't
+         * proceed further
+         */
+        then(this.subCategoryRepositoryMock).should(never()).save(any());
+
+    }
+
+    @Test
+    void updateSubCategoryTestForDuplicateEntityException() {
+        // argument data
+        SubCategory argSubCategory = new SubCategory("Crops");
+        argSubCategory.setId(1);
+
+        /**
+         * mock data returned
+         * when called findById(...)
+         */
+        SubCategory mockSubCategory = new SubCategory("Livestock");
+        argSubCategory.setId(1);
+
+        // given
+        given(this.subCategoryRepositoryMock.findById(argSubCategory.getId())).willReturn(Optional.of(mockSubCategory));
+
+
+        // re-create the sqlite unique constraint exception
+        SQLiteException sqLiteException = new SQLiteException("", SQLiteErrorCode.SQLITE_CONSTRAINT);
+        JpaSystemException jpaSystemException = new JpaSystemException(new RuntimeException("", sqLiteException));
+
+        given(this.subCategoryRepositoryMock.save(any())).willThrow(jpaSystemException);
+
+        // when
+        assertThatThrownBy(() -> this.subCategoryServiceUnderTest.updateSubCategory(argSubCategory))
+                .isInstanceOf(DuplicateEntityException.class)
+                .hasMessage(ExceptionMessage.DUPLICATE_ENTITY_EXCEPTION.getMessage());
+
+        // then
+        /**
+         * verify repository called method only once
+         * check if the passed id is the same id
+         * to find the subcateogory
+         */
+        ArgumentCaptor<Integer> argumentCaptorId = ArgumentCaptor.forClass(Integer.class);
+        then(this.subCategoryRepositoryMock)
+                .should(times(1))
+                .findById(argumentCaptorId.capture());
+
+        assertEquals(argSubCategory.getId(), argumentCaptorId.getValue());
+
+        /**
+         * verify repository called the save method only once
+         * verify that the object that was passed into the
+         * save method has the following properties
+         *          - same title as the argument sub-category
+         *          - same id as the subcategory that was return by findByID
+         */
+        ArgumentCaptor<SubCategory> subCategoryArgumentCaptor = ArgumentCaptor.forClass(SubCategory.class);
+        then(this.subCategoryRepositoryMock).should(times((1))).save(subCategoryArgumentCaptor.capture());
+
+        assertEquals(argSubCategory.getTitle(), subCategoryArgumentCaptor.getValue().getTitle());
+        assertEquals(mockSubCategory.getId(), subCategoryArgumentCaptor.getValue().getId());
+
+
+    }
+
+
+    @Test
+    void updateSubCategoryTestForUnknownException() {
+        // argument data
+        SubCategory argSubCategory = new SubCategory("Crops");
+        argSubCategory.setId(1);
+
+        /**
+         * mock data returned
+         * when called findById(...)
+         */
+        SubCategory mockSubCategory = new SubCategory("Livestock");
+        argSubCategory.setId(1);
+
+        // given
+        given(this.subCategoryRepositoryMock.findById(argSubCategory.getId())).willReturn(Optional.of(mockSubCategory));
+
+
+
+        // re-create any exception but sqlite unique constraint exception
+        SQLiteException sqLiteException = new SQLiteException("", SQLiteErrorCode.SQLITE_ABORT);
+        JpaSystemException jpaSystemException = new JpaSystemException(new RuntimeException("", sqLiteException));
+
+        given(this.subCategoryRepositoryMock.save(any())).willThrow(jpaSystemException);
+
+        // when
+        assertThatThrownBy(() -> this.subCategoryServiceUnderTest.updateSubCategory(argSubCategory))
+                .isInstanceOf(UnknownException.class)
+                .hasMessage(ExceptionMessage.UNKNOWN_EXCEPTION.getMessage());
+
+        // then
+        /**
+         * verify repository called method only once
+         * check if the passed id is the same id
+         * to find the subcateogory
+         */
+        ArgumentCaptor<Integer> argumentCaptorId = ArgumentCaptor.forClass(Integer.class);
+        then(this.subCategoryRepositoryMock)
+                .should(times(1))
+                .findById(argumentCaptorId.capture());
+
+        assertEquals(argSubCategory.getId(), argumentCaptorId.getValue());
+
+        /**
+         * verify repository called the save method only once
+         * verify that the object that was passed into the
+         * save method has the following properties
+         *          - same title as the argument sub-category
+         *          - same id as the subcategory that was return by findByID
+         */
+        ArgumentCaptor<SubCategory> subCategoryArgumentCaptor = ArgumentCaptor.forClass(SubCategory.class);
+        then(this.subCategoryRepositoryMock).should(times((1))).save(subCategoryArgumentCaptor.capture());
+
+        assertEquals(argSubCategory.getTitle(), subCategoryArgumentCaptor.getValue().getTitle());
+        assertEquals(mockSubCategory.getId(), subCategoryArgumentCaptor.getValue().getId());
+
+
+    }
+
     @Test
     void deleteSubCategory() {
+        // arg sub category to delete
+        SubCategory subCategory = new SubCategory("Materials");
+        subCategory.setId(1);
+
+        /**
+         * when
+         * check that no exception was thrown       -- not required JPA doesn't throw any exception
+         * check the delete method was called only once
+         * check that the passed args is the same as
+         * the {@Code subCategory}
+         */
+        ArgumentCaptor<SubCategory> subCategoryArgumentCaptor = ArgumentCaptor.forClass(SubCategory.class);
+        this.subCategoryServiceUnderTest.deleteSubCategory(subCategory);
+//        assertThatNoException().isThrownBy(() -> this.subCategoryServiceUnderTest.deleteSubCategory(subCategory));
+
+        then(this.subCategoryRepositoryMock).should(times(1)).delete(subCategoryArgumentCaptor.capture());
+
+        assertEquals(subCategory, subCategoryArgumentCaptor.getValue());
     }
 
     @Test
     void deleteAllSubCategories() {
+        /**
+         * when
+         * check the delete method was called only once
+         */
+        this.subCategoryServiceUnderTest.deleteAllSubCategories();
+        then(this.subCategoryRepositoryMock).should(times(1)).deleteAll();
     }
 }
