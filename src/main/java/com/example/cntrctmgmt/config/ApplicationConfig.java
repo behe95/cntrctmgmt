@@ -3,6 +3,7 @@ package com.example.cntrctmgmt.config;
 import com.example.cntrctmgmt.constant.db.DBCategoryConst;
 import com.example.cntrctmgmt.constant.db.DBContractConst;
 import com.example.cntrctmgmt.constant.db.DBSubCategoryConst;
+import com.example.cntrctmgmt.constant.db.DBSubContractConst;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
@@ -40,6 +41,11 @@ public class ApplicationConfig implements CommandLineRunner {
         this.jdbcTemplate.execute(DBContractConst._DB_CREATE_CONTRACT_TABLE_IF_NOT_EXISTS);
         this.jdbcTemplate.execute(DBContractConst._DB_CREATE_CONTRACT_TABLE_DATE_UPDATE_TRIGGER_IF_NOT_EXISTS);
         this.jdbcTemplate.execute(DBContractConst._DB_CREATE_CONTRACT_TABLE_MODIFIED_DATE_UPDATE_TRIGGER_IF_NOT_EXISTS);
+
+        //sub contract table
+        this.jdbcTemplate.execute(DBSubContractConst._DB_CREATE_SUBCONTRACT_TABLE_IF_NOT_EXISTS);
+        this.jdbcTemplate.execute(DBSubContractConst._DB_CREATE_SUBCONTRACT_TABLE_DATE_UPDATE_TRIGGER_IF_NOT_EXISTS);
+        this.jdbcTemplate.execute(DBSubContractConst._DB_CREATE_SUBCONTRACT_TABLE_MODIFIED_DATE_UPDATE_TRIGGER_IF_NOT_EXISTS);
 
     }
 }
