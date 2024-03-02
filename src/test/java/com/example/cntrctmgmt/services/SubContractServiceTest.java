@@ -1,0 +1,329 @@
+package com.example.cntrctmgmt.services;
+
+import com.example.cntrctmgmt.entities.SubContract;
+import com.example.cntrctmgmt.repositories.SubContractRepository;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.Test;
+import com.example.cntrctmgmt.constant.responsemessage.ExceptionMessage;
+import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.LocalDateTime;
+
+import static org.junit.jupiter.api.Assertions.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.BDDMockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class SubContractServiceTest {
+
+    @Mock
+    private SubContractRepository subContractRepositoryMock;
+
+    @InjectMocks
+    private SubContractService subContractServiceUnderTest;
+
+    @Test
+    void addSubContract() {
+        // args subcontract
+        SubContract subContract = new SubContract();
+        subContract.setTitle("Security improvement");
+        subContract.setOrderNumber(1);
+        subContract.setSubContractNumber("A10212");
+        subContract.setTransactionType(1);
+        subContract.setDescription("Need to improve the overall security across the platform");
+        subContract.setAmount(100000.00);
+        subContract.setStartDate(LocalDateTime.now());
+        subContract.setEndDate(null);       // not ended
+
+        // mock contract
+        SubContract mockSubContract = new SubContract();
+        mockSubContract.setId(1);
+        mockSubContract.setTitle("Security improvement");
+        mockSubContract.setOrderNumber(1);
+        mockSubContract.setSubContractNumber("A10212");
+        mockSubContract.setTransactionType(1);
+        mockSubContract.setDescription("Need to improve the overall security across the platform");
+        mockSubContract.setAmount(100000.00);
+        mockSubContract.setStartDate(LocalDateTime.now());
+        mockSubContract.setEndDate(null);       // not ended
+
+        // given
+        given(this.subContractRepositoryMock.save(subContract)).willReturn(mockSubContract);
+
+        // when
+        SubContract savedSubContract = this.subContractServiceUnderTest.addSubContract(subContract);
+
+        /**
+         * then
+         * verify the save method was called only once
+         * return data after save has the following properties
+         *      - id same as {@code mockSubContract}
+         *      - rest of the properties are as same as the {@code subContract}
+         * check if the passed args used to call the {@code save(...)} method
+         */
+        ArgumentCaptor<SubContract> subContractArgumentCaptor = ArgumentCaptor.forClass(SubContract.class);
+        then(this.subContractRepositoryMock).should(times(1)).save(subContractArgumentCaptor.capture());
+        assertEquals(mockSubContract.getId(), savedSubContract.getId());
+        assertEquals(subContract.getTitle(), savedSubContract.getTitle());
+        assertEquals(subContract.getOrderNumber(), savedSubContract.getOrderNumber());
+        assertEquals(subContract.getSubContractNumber(), savedSubContract.getSubContractNumber());
+        assertEquals(subContract.getTransactionType(), savedSubContract.getTransactionType());
+        assertEquals(subContract.getDescription(), savedSubContract.getDescription());
+        assertEquals(subContract.getAmount(), savedSubContract.getAmount());
+        assertEquals(subContract.getStartDate(), savedSubContract.getStartDate());
+        assertEquals(subContract.getEndDate(), savedSubContract.getEndDate());
+        assertEquals(subContract, subContractArgumentCaptor.getValue());
+
+
+    }
+
+    @Test
+    void getSubContractById() {
+        // args subcontract
+        SubContract subContract = new SubContract();
+        subContract.setId(1);
+        subContract.setTitle("Security improvement");
+        subContract.setOrderNumber(1);
+        subContract.setSubContractNumber("A10212");
+        subContract.setTransactionType(1);
+        subContract.setDescription("Need to improve the overall security across the platform");
+        subContract.setAmount(100000.00);
+        subContract.setStartDate(LocalDateTime.now());
+        subContract.setEndDate(null);       // not ended
+
+        // given
+        given(this.subContractRepositoryMock.findById(1)).willReturn(Optional.of(subContract));
+
+        // when
+        Optional<SubContract> returnedSubContract = this.subContractServiceUnderTest.getSubContractById(1);
+
+        /**
+         * then
+         * check if the returned data is present and not null
+         * check if the returned data's id same as
+         * the passed id
+         * verify the {@code findById(...)} method was called only once
+         * verify if the passed arg used in the {@code findById(...)}
+         * was the same as the passed id
+         */
+        ArgumentCaptor<Integer> idArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
+        assertTrue(returnedSubContract.isPresent());
+        assertEquals(1, returnedSubContract.get().getId());
+        verify(this.subContractRepositoryMock, times(1)).findById(idArgumentCaptor.capture());
+        assertEquals(1, idArgumentCaptor.getValue());
+
+    }
+
+    @Test
+    void updateSubContract() {
+        // args subcontract
+        SubContract subContract = new SubContract();
+        subContract.setId(1);
+        subContract.setTitle("Security improvement");
+        subContract.setOrderNumber(1);
+        subContract.setSubContractNumber("A10212");
+        subContract.setTransactionType(1);
+        subContract.setDescription("Need to improve the overall security across the platform");
+        subContract.setAmount(100000.00);
+        subContract.setStartDate(LocalDateTime.now());
+        subContract.setEndDate(LocalDateTime.now());       // modified here
+
+        // mock contract
+        SubContract mockSubContract = new SubContract();
+        mockSubContract.setId(1);
+        mockSubContract.setTitle("Security improvement");
+        mockSubContract.setOrderNumber(1);
+        mockSubContract.setSubContractNumber("A10212");
+        mockSubContract.setTransactionType(1);
+        mockSubContract.setDescription("Need to improve the overall security across the platform");
+        mockSubContract.setAmount(100000.00);
+        mockSubContract.setStartDate(LocalDateTime.now());
+        mockSubContract.setEndDate(null);       // not ended
+
+
+        // given
+        given(this.subContractRepositoryMock.findById(subContract.getId())).willReturn(Optional.of(mockSubContract));
+
+        // when
+        this.subContractServiceUnderTest.updateSubContract(subContract);
+
+        /**
+         * verify repository called method only once
+         * check if the passed id is the same id that were received
+         * to find the subcontract
+         */
+        ArgumentCaptor<Integer> integerArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
+        then(this.subContractRepositoryMock)
+                .should(times(1))
+                .findById(integerArgumentCaptor.capture());
+
+        assertEquals(subContract.getId(), integerArgumentCaptor.getValue());
+
+        /**
+         * verify repository called the {@code save(...)} method only once
+         * verify that the object that was passed into the
+         * {@code save(...)} method has the following properties
+         *      - same properties as the argment subcontract
+         *      - same id as the {@code subContract} that was return by {@code findById(...)} method
+         */
+        ArgumentCaptor<SubContract> subContractArgumentCaptor = ArgumentCaptor.forClass(SubContract.class);
+        then(this.subContractRepositoryMock).should(times(1)).save(subContractArgumentCaptor.capture());
+
+        assertEquals(subContract, subContractArgumentCaptor.getValue());
+    }
+
+    @Test
+    void updateSubContractTestForEntityNotFoundException() {
+
+        // args subcontract
+        SubContract subContract = new SubContract();
+        subContract.setId(1);
+        subContract.setTitle("Security improvement");
+        subContract.setOrderNumber(1);
+        subContract.setSubContractNumber("A10212");
+        subContract.setTransactionType(1);
+        subContract.setDescription("Need to improve the overall security across the platform");
+        subContract.setAmount(100000.00);
+        subContract.setStartDate(LocalDateTime.now());
+        subContract.setEndDate(LocalDateTime.now());       // modified here
+
+        // given
+        given(this.subContractRepositoryMock.findById(subContract.getId()))
+                .willThrow(new EntityNotFoundException(ExceptionMessage.ENTITY_NOT_FOUND.getMessage()));
+
+        // when
+        assertThatThrownBy(() -> this.subContractServiceUnderTest.updateSubContract(subContract))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage(ExceptionMessage.ENTITY_NOT_FOUND.getMessage());
+
+        // then
+
+        /**
+         * verify repository called method only once
+         * check if the passed id is the same id as the {@code subContract}
+         * to find the subContract
+         */
+        ArgumentCaptor<Integer> integerArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
+        then(this.subContractRepositoryMock)
+                .should(times(1))
+                .findById(integerArgumentCaptor.capture());
+        assertEquals(subContract.getId(), integerArgumentCaptor.getValue());
+
+        /**
+         * verify that program doesn't proceed further
+         * to call the method {@code save(...)}
+         */
+        then(this.subContractRepositoryMock).should(never()).save(subContract);
+    }
+
+    @Test
+    void deleteSubContract() {
+        // args subcontract
+        SubContract subContract = new SubContract();
+        subContract.setId(1);
+        subContract.setTitle("Security improvement");
+        subContract.setOrderNumber(1);
+        subContract.setSubContractNumber("A10212");
+        subContract.setTransactionType(1);
+        subContract.setDescription("Need to improve the overall security across the platform");
+        subContract.setAmount(100000.00);
+        subContract.setStartDate(LocalDateTime.now());
+        subContract.setEndDate(null);       // not ended
+
+        /**
+         * when
+         * check if the delete method was called only once
+         * checck that the passed args is the same as
+         * the {@code subContract}
+         */
+        ArgumentCaptor<SubContract> subContractArgumentCaptor = ArgumentCaptor.forClass(SubContract.class);
+        this.subContractServiceUnderTest.deleteSubContract(subContract);
+
+        // then
+        then(this.subContractRepositoryMock)
+                .should(times(1))
+                .delete(subContractArgumentCaptor.capture());
+        assertEquals(subContract, subContractArgumentCaptor.getValue());
+    }
+
+    @Test
+    void deleteAllSubContract() {
+        /**
+         * when
+         * check if the {@code deleteAll(...)} method
+         * was called only once by the repos
+         */
+        // when
+        this.subContractServiceUnderTest.deleteAllSubContract();
+        //then
+        then(this.subContractRepositoryMock)
+                .should(times(1))
+                .deleteAll();
+    }
+
+    @Test
+    void deleteSubContracts() {
+        List<SubContract> subContractsList = new ArrayList<>();
+
+        // args subcontract
+        SubContract subContract1 = new SubContract();
+        subContract1.setId(1);
+        subContract1.setTitle("Security improvement");
+        subContract1.setOrderNumber(1);
+        subContract1.setSubContractNumber("A10212");
+        subContract1.setTransactionType(1);
+        subContract1.setDescription("Need to improve the overall security across the platform");
+        subContract1.setAmount(100000.00);
+        subContract1.setStartDate(LocalDateTime.now());
+        subContract1.setEndDate(LocalDateTime.now());
+
+
+        SubContract subContract2 = new SubContract();
+        subContract2.setId(2);
+        subContract2.setTitle("Include a new feature");
+        subContract2.setOrderNumber(1);
+        subContract2.setSubContractNumber("B12312");
+        subContract2.setTransactionType(1);
+        subContract2.setDescription("Need to include a button to delete everything by id");
+        subContract2.setAmount(5000.00);
+        subContract2.setStartDate(LocalDateTime.now());
+        subContract2.setEndDate(LocalDateTime.now());
+
+
+        subContractsList.add(subContract1);
+        subContractsList.add(subContract2);
+
+        // when
+        this.subContractServiceUnderTest.deleteSubContracts(subContractsList);
+
+        /**
+         * then
+         * verify that {@code deleteAll(...)} got called once
+         * verify the passed args same as
+         * args used in {@code deleteAll(...)} method
+         */
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<List<SubContract>> listArgumentCaptor = ArgumentCaptor.forClass(List.class);
+
+        verify(this.subContractRepositoryMock, times(1))
+                .deleteAll(listArgumentCaptor.capture());
+        assertEquals(subContractsList, listArgumentCaptor.getValue());
+        assertEquals(subContractsList.size(), listArgumentCaptor.getValue().size());
+    }
+}

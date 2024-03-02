@@ -31,7 +31,7 @@ public class SubContractService {
 
     @Transactional
     public void updateSubContract(SubContract subContract) {
-        this.subContractRepository.findById(subContract.getId())
+         this.subContractRepository.findById(subContract.getId())
                 .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.ENTITY_NOT_FOUND.getMessage()));
 
         this.subContractRepository.save(subContract);
