@@ -1,32 +1,23 @@
 package com.example.cntrctmgmt.services;
 
 import com.example.cntrctmgmt.entities.SubContract;
+import com.example.cntrctmgmt.entities.TransactionType;
 import com.example.cntrctmgmt.repositories.SubContractRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.junit.jupiter.api.Test;
 import com.example.cntrctmgmt.constant.responsemessage.ExceptionMessage;
 import jakarta.persistence.EntityNotFoundException;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-
-import org.mockito.junit.jupiter.MockitoExtension;
-
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -40,15 +31,24 @@ class SubContractServiceTest {
 
     @Test
     void addSubContract() {
+        // transaction type
+        TransactionType transactionType = new TransactionType();
+        transactionType.setId(1);
+        transactionType.setTitle("Credit");
+        transactionType.setMultiplier(-1);
+
+        // Local date time of contract start
+        LocalDateTime subContractStartDate = LocalDateTime.now();
+
         // args subcontract
         SubContract subContract = new SubContract();
         subContract.setTitle("Security improvement");
         subContract.setOrderNumber(1);
         subContract.setSubContractNumber("A10212");
-        subContract.setTransactionType(1);
+        subContract.setTransactionType(transactionType);
         subContract.setDescription("Need to improve the overall security across the platform");
         subContract.setAmount(100000.00);
-        subContract.setStartDate(LocalDateTime.now());
+        subContract.setStartDate(subContractStartDate);
         subContract.setEndDate(null);       // not ended
 
         // mock contract
@@ -57,10 +57,10 @@ class SubContractServiceTest {
         mockSubContract.setTitle("Security improvement");
         mockSubContract.setOrderNumber(1);
         mockSubContract.setSubContractNumber("A10212");
-        mockSubContract.setTransactionType(1);
+        mockSubContract.setTransactionType(transactionType);
         mockSubContract.setDescription("Need to improve the overall security across the platform");
         mockSubContract.setAmount(100000.00);
-        mockSubContract.setStartDate(LocalDateTime.now());
+        mockSubContract.setStartDate(subContractStartDate);
         mockSubContract.setEndDate(null);       // not ended
 
         // given
@@ -95,16 +95,25 @@ class SubContractServiceTest {
 
     @Test
     void getSubContractById() {
+        // transaction type
+        TransactionType transactionType = new TransactionType();
+        transactionType.setId(1);
+        transactionType.setTitle("Credit");
+        transactionType.setMultiplier(-1);
+
+        // Local date time of contract start
+        LocalDateTime subContractStartDate = LocalDateTime.now();
+
         // args subcontract
         SubContract subContract = new SubContract();
         subContract.setId(1);
         subContract.setTitle("Security improvement");
         subContract.setOrderNumber(1);
         subContract.setSubContractNumber("A10212");
-        subContract.setTransactionType(1);
+        subContract.setTransactionType(transactionType);
         subContract.setDescription("Need to improve the overall security across the platform");
         subContract.setAmount(100000.00);
-        subContract.setStartDate(LocalDateTime.now());
+        subContract.setStartDate(subContractStartDate);
         subContract.setEndDate(null);       // not ended
 
         // given
@@ -132,17 +141,27 @@ class SubContractServiceTest {
 
     @Test
     void updateSubContract() {
+        // transaction type
+        TransactionType transactionType = new TransactionType();
+        transactionType.setId(1);
+        transactionType.setTitle("Credit");
+        transactionType.setMultiplier(-1);
+
+        // Local date time of contract start
+        LocalDateTime subContractStartDate = LocalDateTime.now();
+        LocalDateTime subContractEndDate = LocalDateTime.now();
+
         // args subcontract
         SubContract subContract = new SubContract();
         subContract.setId(1);
         subContract.setTitle("Security improvement");
         subContract.setOrderNumber(1);
         subContract.setSubContractNumber("A10212");
-        subContract.setTransactionType(1);
+        subContract.setTransactionType(transactionType);
         subContract.setDescription("Need to improve the overall security across the platform");
         subContract.setAmount(100000.00);
-        subContract.setStartDate(LocalDateTime.now());
-        subContract.setEndDate(LocalDateTime.now());       // modified here
+        subContract.setStartDate(subContractStartDate);
+        subContract.setEndDate(subContractEndDate);       // modified here
 
         // mock contract
         SubContract mockSubContract = new SubContract();
@@ -150,10 +169,10 @@ class SubContractServiceTest {
         mockSubContract.setTitle("Security improvement");
         mockSubContract.setOrderNumber(1);
         mockSubContract.setSubContractNumber("A10212");
-        mockSubContract.setTransactionType(1);
+        mockSubContract.setTransactionType(transactionType);
         mockSubContract.setDescription("Need to improve the overall security across the platform");
         mockSubContract.setAmount(100000.00);
-        mockSubContract.setStartDate(LocalDateTime.now());
+        mockSubContract.setStartDate(subContractStartDate);
         mockSubContract.setEndDate(null);       // not ended
 
 
@@ -190,6 +209,15 @@ class SubContractServiceTest {
 
     @Test
     void updateSubContractTestForEntityNotFoundException() {
+        // transaction type
+        TransactionType transactionType = new TransactionType();
+        transactionType.setId(1);
+        transactionType.setTitle("Credit");
+        transactionType.setMultiplier(-1);
+
+        // Local date time of contract start
+        LocalDateTime subContractStartDate = LocalDateTime.now();
+        LocalDateTime subContractEndDate = LocalDateTime.now();
 
         // args subcontract
         SubContract subContract = new SubContract();
@@ -197,11 +225,11 @@ class SubContractServiceTest {
         subContract.setTitle("Security improvement");
         subContract.setOrderNumber(1);
         subContract.setSubContractNumber("A10212");
-        subContract.setTransactionType(1);
+        subContract.setTransactionType(transactionType);
         subContract.setDescription("Need to improve the overall security across the platform");
         subContract.setAmount(100000.00);
-        subContract.setStartDate(LocalDateTime.now());
-        subContract.setEndDate(LocalDateTime.now());       // modified here
+        subContract.setStartDate(subContractStartDate);
+        subContract.setEndDate(subContractEndDate);       // modified here
 
         // given
         given(this.subContractRepositoryMock.findById(subContract.getId()))
@@ -234,16 +262,25 @@ class SubContractServiceTest {
 
     @Test
     void deleteSubContract() {
+        // transaction type
+        TransactionType transactionType = new TransactionType();
+        transactionType.setId(1);
+        transactionType.setTitle("Credit");
+        transactionType.setMultiplier(-1);
+
+        // Local date time of contract start
+        LocalDateTime subContractStartDate = LocalDateTime.now();
+
         // args subcontract
         SubContract subContract = new SubContract();
         subContract.setId(1);
         subContract.setTitle("Security improvement");
         subContract.setOrderNumber(1);
         subContract.setSubContractNumber("A10212");
-        subContract.setTransactionType(1);
+        subContract.setTransactionType(transactionType);
         subContract.setDescription("Need to improve the overall security across the platform");
         subContract.setAmount(100000.00);
-        subContract.setStartDate(LocalDateTime.now());
+        subContract.setStartDate(subContractStartDate);
         subContract.setEndDate(null);       // not ended
 
         /**
@@ -279,6 +316,17 @@ class SubContractServiceTest {
 
     @Test
     void deleteSubContracts() {
+        // transaction type
+        TransactionType transactionType = new TransactionType();
+        transactionType.setId(1);
+        transactionType.setTitle("Credit");
+        transactionType.setMultiplier(-1);
+
+        // Local date time of contract start
+        LocalDateTime subContractStartDate = LocalDateTime.now();
+        LocalDateTime subContractEndDate = LocalDateTime.now();
+
+
         List<SubContract> subContractsList = new ArrayList<>();
 
         // args subcontract
@@ -287,11 +335,11 @@ class SubContractServiceTest {
         subContract1.setTitle("Security improvement");
         subContract1.setOrderNumber(1);
         subContract1.setSubContractNumber("A10212");
-        subContract1.setTransactionType(1);
+        subContract1.setTransactionType(transactionType);
         subContract1.setDescription("Need to improve the overall security across the platform");
         subContract1.setAmount(100000.00);
-        subContract1.setStartDate(LocalDateTime.now());
-        subContract1.setEndDate(LocalDateTime.now());
+        subContract1.setStartDate(subContractStartDate);
+        subContract1.setEndDate(subContractEndDate);
 
 
         SubContract subContract2 = new SubContract();
@@ -299,11 +347,11 @@ class SubContractServiceTest {
         subContract2.setTitle("Include a new feature");
         subContract2.setOrderNumber(1);
         subContract2.setSubContractNumber("B12312");
-        subContract2.setTransactionType(1);
+        subContract2.setTransactionType(transactionType);
         subContract2.setDescription("Need to include a button to delete everything by id");
         subContract2.setAmount(5000.00);
-        subContract2.setStartDate(LocalDateTime.now());
-        subContract2.setEndDate(LocalDateTime.now());
+        subContract2.setStartDate(subContractStartDate);
+        subContract2.setEndDate(subContractEndDate);
 
 
         subContractsList.add(subContract1);

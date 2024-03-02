@@ -1,6 +1,7 @@
 package com.example.cntrctmgmt.entities;
 
 import com.example.cntrctmgmt.constant.db.DBSubContractConst;
+import com.example.cntrctmgmt.constant.db.DBTransactionTypeConst;
 import jakarta.persistence.*;
 import javafx.beans.property.*;
 
@@ -13,11 +14,10 @@ public class SubContract {
     private StringProperty title = new SimpleStringProperty();
     private IntegerProperty orderNumber = new SimpleIntegerProperty();
     private StringProperty subContractNumber = new SimpleStringProperty();
-    /**
-     * The following needs to be replaced with a new entity
-     * named TransactionType
-     */
-    private IntegerProperty transactionType = new SimpleIntegerProperty();
+
+    @OneToMany
+    @JoinColumn(name = DBTransactionTypeConst.DB_TABLE_COLUMN_TRANSACTIONTYPE_PK)
+    private ObjectProperty<TransactionType> transactionType = new SimpleObjectProperty<>();
 
     private StringProperty description = new SimpleStringProperty();
     private DoubleProperty amount = new SimpleDoubleProperty();
@@ -89,16 +89,16 @@ public class SubContract {
     }
 
     @Column(name = DBSubContractConst.DB_TABLE_COLUMN_SUBCONTRACT_TRANSACTIONTYPE)
-    public int getTransactionType() {
+    public TransactionType getTransactionType() {
         return transactionType.get();
     }
 
     @Transient
-    public IntegerProperty transactionTypeProperty() {
+    public ObjectProperty<TransactionType> transactionTypeProperty() {
         return transactionType;
     }
 
-    public void setTransactionType(int transactionType) {
+    public void setTransactionType(TransactionType transactionType) {
         this.transactionType.set(transactionType);
     }
 
