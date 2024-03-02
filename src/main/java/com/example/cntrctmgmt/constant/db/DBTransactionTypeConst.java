@@ -52,7 +52,7 @@ public interface DBTransactionTypeConst {
 
 
     String _DB_INSERT_INTO_TRANSACTIONTYPE_TABLE_DEFAULT_VALUES =
-            "INSERT INTO "+DB_TABLE_TRANSACTIONTYPE+" ("
+            "INSERT OR IGNORE INTO "+DB_TABLE_TRANSACTIONTYPE+" ("
                     +DB_TABLE_COLUMN_TRANSACTIONTYPETITLE+", "
                     +DB_TABLE_COLUMN_TRANSACTIONMULTIPLIER+")\n" +
                     "VALUES " +

@@ -15,8 +15,6 @@ public class SubContract {
     private IntegerProperty orderNumber = new SimpleIntegerProperty();
     private StringProperty subContractNumber = new SimpleStringProperty();
 
-    @OneToMany
-    @JoinColumn(name = DBTransactionTypeConst.DB_TABLE_COLUMN_TRANSACTIONTYPE_PK)
     private ObjectProperty<TransactionType> transactionType = new SimpleObjectProperty<>();
 
     private StringProperty description = new SimpleStringProperty();
@@ -88,7 +86,9 @@ public class SubContract {
         this.subContractNumber.set(subContractNumber);
     }
 
-    @Column(name = DBSubContractConst.DB_TABLE_COLUMN_SUBCONTRACT_TRANSACTIONTYPE)
+
+    @OneToOne
+    @JoinColumn(name = DBSubContractConst.DB_TABLE_COLUMN_SUBCONTRACT_TRANSACTIONTYPE)
     public TransactionType getTransactionType() {
         return transactionType.get();
     }

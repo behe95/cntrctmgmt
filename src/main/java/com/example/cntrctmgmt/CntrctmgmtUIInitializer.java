@@ -1,8 +1,11 @@
 package com.example.cntrctmgmt;
 
 import com.example.cntrctmgmt.entities.Category;
+import com.example.cntrctmgmt.entities.SubContract;
+import com.example.cntrctmgmt.entities.TransactionType;
 import com.example.cntrctmgmt.exceptions.DuplicateEntityException;
 import com.example.cntrctmgmt.services.CategoryService;
+import com.example.cntrctmgmt.services.SubContractService;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -23,12 +26,7 @@ public class CntrctmgmtUIInitializer implements ApplicationListener<UILoaderEven
         Stage stage = event.getStage();
         stage.show();
 
-        CategoryService categoryService = this.applicationContext.getBean(CategoryService.class);
-        try {
-            categoryService.addCategory(new Category("Construction", false));
-        } catch (DuplicateEntityException e) {
-            System.out.println(e.getMessage());
-        }
-        System.out.println(LocalDateTime.now());
+
+
     }
 }
