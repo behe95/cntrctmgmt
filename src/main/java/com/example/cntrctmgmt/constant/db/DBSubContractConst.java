@@ -6,7 +6,7 @@ public interface DBSubContractConst {
     String DB_TABLE_COLUMN_SUBCONTRACTTITLE = "title";
     String DB_TABLE_COLUMN_SUBCONTRACT_ORDERNUMBER = "orderNumber";
     String DB_TABLE_COLUMN_SUBCONTRACT_SUBCONTRACTNUMBER = "subContractNumber";
-    String DB_TABLE_COLUMN_SUBCONTRACT_TRANSACTIONTYPE = "transactionType";
+    String DB_TABLE_COLUMN_SUBCONTRACT_TRANSACTIONTYPE = "fkcmtransactionType";
     String DB_TABLE_COLUMN_SUBCONTRACT_DESCRIPTION = "description";
     String DB_TABLE_COLUMN_SUBCONTRACT_AMOUNT = "amount";
     String DB_TABLE_COLUMN_SUBCONTRACT_STARTDATE = "startDate";
@@ -27,7 +27,7 @@ public interface DBSubContractConst {
                     "    "+DB_TABLE_COLUMN_SUBCONTRACTTITLE+" VARCHAR(255) UNIQUE,\n" +
                     "    "+DB_TABLE_COLUMN_SUBCONTRACT_ORDERNUMBER+" INTEGER,\n" +
                     "    "+DB_TABLE_COLUMN_SUBCONTRACT_SUBCONTRACTNUMBER+" INTEGER,\n" +
-                    "    "+DB_TABLE_COLUMN_SUBCONTRACT_TRANSACTIONTYPE+" INTEGER,\n" +
+                    "    "+DB_TABLE_COLUMN_SUBCONTRACT_TRANSACTIONTYPE+" INTEGER NOT NULL,\n" +
                     "    "+DB_TABLE_COLUMN_SUBCONTRACT_DESCRIPTION+" VARCHAR(255),\n" +
                     "    "+DB_TABLE_COLUMN_SUBCONTRACT_AMOUNT+" DECIMAL,\n" +
                     "    "+DB_TABLE_COLUMN_SUBCONTRACT_STARTDATE +" TEXT,\n" +
