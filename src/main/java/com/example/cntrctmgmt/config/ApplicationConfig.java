@@ -1,9 +1,6 @@
 package com.example.cntrctmgmt.config;
 
-import com.example.cntrctmgmt.constant.db.DBCategoryConst;
-import com.example.cntrctmgmt.constant.db.DBContractConst;
-import com.example.cntrctmgmt.constant.db.DBSubCategoryConst;
-import com.example.cntrctmgmt.constant.db.DBSubContractConst;
+import com.example.cntrctmgmt.constant.db.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
@@ -47,5 +44,13 @@ public class ApplicationConfig implements CommandLineRunner {
         this.jdbcTemplate.execute(DBSubContractConst._DB_CREATE_SUBCONTRACT_TABLE_DATE_UPDATE_TRIGGER_IF_NOT_EXISTS);
         this.jdbcTemplate.execute(DBSubContractConst._DB_CREATE_SUBCONTRACT_TABLE_MODIFIED_DATE_UPDATE_TRIGGER_IF_NOT_EXISTS);
 
+
+        // transaction type table
+        this.jdbcTemplate.execute(DBTransactionTypeConst._DB_CREATE_TRANSACTIONTYPE_TABLE_IF_NOT_EXISTS);
+        this.jdbcTemplate.execute(DBTransactionTypeConst._DB_CREATE_TRANSACTIONTYPE_TABLE_DATE_UPDATE_TRIGGER_IF_NOT_EXISTS);
+        this.jdbcTemplate.execute(DBTransactionTypeConst._DB_CREATE_TRANSACTIONTYPE_TABLE_MODIFIED_DATE_UPDATE_TRIGGER_IF_NOT_EXISTS);
+
+        // insert default value to the transaction type table
+        this.jdbcTemplate.execute(DBTransactionTypeConst._DB_INSERT_INTO_TRANSACTIONTYPE_TABLE_DEFAULT_VALUES);
     }
 }
