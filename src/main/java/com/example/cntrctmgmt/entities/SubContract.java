@@ -25,6 +25,7 @@ public class SubContract {
     private ObjectProperty<LocalDateTime> created = new SimpleObjectProperty<>();
     private ObjectProperty<LocalDateTime> modified = new SimpleObjectProperty<>();
 
+    @Transient
     private ObjectProperty<Contract> contract = new SimpleObjectProperty<>();
 
     public SubContract() {

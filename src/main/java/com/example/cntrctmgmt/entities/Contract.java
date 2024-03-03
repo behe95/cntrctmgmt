@@ -86,7 +86,7 @@ public class Contract {
     }
 
 
-    @OneToMany(mappedBy = "contract")
+    @OneToMany(mappedBy = "contract", cascade = {CascadeType.PERSIST})
     public List<SubContract> getSubContracts() {
         return subContracts;
     }

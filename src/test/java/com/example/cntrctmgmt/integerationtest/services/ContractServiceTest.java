@@ -4,10 +4,12 @@ import com.example.cntrctmgmt.entities.Contract;
 import com.example.cntrctmgmt.entities.SubContract;
 import com.example.cntrctmgmt.entities.TransactionType;
 import com.example.cntrctmgmt.services.ContractService;
+import com.example.cntrctmgmt.services.SubContractService;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Commit;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.Rollback;
 
@@ -19,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
+@Rollback
 //@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class ContractServiceTest {
 
@@ -27,8 +30,10 @@ class ContractServiceTest {
     @Autowired
     private ContractService contractService;
 
+    @Autowired
+    private SubContractService subContractService;
+
     @Test
-    @Rollback
     void addContract() {
 
         // given
@@ -42,7 +47,6 @@ class ContractServiceTest {
     }
 
     @Test
-    @Rollback
     void getContractById() {
 
 
@@ -59,7 +63,6 @@ class ContractServiceTest {
     }
 
     @Test
-    @Rollback
     void updateContract() {
 
         // given
@@ -109,11 +112,11 @@ class ContractServiceTest {
         assertTrue(updatedContract.isPresent());
         assertEquals(1, updatedContract.get().getSubContracts().size());
 
+        System.out.println(this.contractService.getAllContracts().size());
 
     }
 
     @Test
-    @Rollback
     void deleteContract() {
 
         // given
@@ -131,7 +134,6 @@ class ContractServiceTest {
     }
 
     @Test
-    @Rollback
     void deleteAllContracts() {
         // given
         Contract newContract = new Contract("Insurance Policy for Property Coverage");
@@ -147,11 +149,28 @@ class ContractServiceTest {
     }
 
     @Test
-    @Rollback
-    void deleteCategories() {
+    void deleteContracts() {
 
         // given
         Contract newContract1 = new Contract("Insurance Policy for Property Coverage");
+        // transaction type
+        TransactionType transactionType1 = new TransactionType();
+        transactionType1.setTitle("Credit");
+        transactionType1.setMultiplier(-1);
+
+        SubContract subContract1 = new SubContract();
+        subContract1.setTitle("Security improvement");
+        subContract1.setOrderNumber(1);
+        subContract1.setSubContractNumber("A10212");
+        subContract1.setTransactionType(transactionType1);
+        subContract1.setDescription("Need to improve the overall security across the platform");
+        subContract1.setAmount(100000.00);
+        subContract1.setStartDate(LocalDateTime.now());
+        subContract1.setEndDate(null);       // not ended
+
+        newContract1.setSubContracts(List.of(subContract1));
+
+
         Contract savedContract1 = this.contractService.addContract(newContract1);
 
         Contract newContract2 = new Contract("Upgrade system");
@@ -179,5 +198,8 @@ class ContractServiceTest {
         assertEquals(savedContract2.getTitle(), contracts.get(0).getTitle());
         assertEquals(savedContract2.getCreated(), contracts.get(0).getCreated());
         assertEquals(savedContract2.getModified(), contracts.get(0).getModified());
+
+
+
     }
 }

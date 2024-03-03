@@ -25,6 +25,10 @@ public class SubContractService {
         return this.subContractRepository.save(subContract);
     }
 
+//    public List<SubContract> getAllSubContractsByContractId(int id) {
+////        return this.subContractRepository.fin
+//    }
+
     public Optional<SubContract> getSubContractById(int id) {
         return this.subContractRepository.findById(id);
     }
