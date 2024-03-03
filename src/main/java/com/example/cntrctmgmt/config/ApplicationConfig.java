@@ -44,6 +44,9 @@ public class ApplicationConfig implements CommandLineRunner {
         this.jdbcTemplate.execute(DBSubContractConst._DB_CREATE_SUBCONTRACT_TABLE_DATE_UPDATE_TRIGGER_IF_NOT_EXISTS);
         this.jdbcTemplate.execute(DBSubContractConst._DB_CREATE_SUBCONTRACT_TABLE_MODIFIED_DATE_UPDATE_TRIGGER_IF_NOT_EXISTS);
 
+        // join table for contract and subContract
+        this.jdbcTemplate.execute(DBCategorySubCategoryConst._DB_CREATE_CATEGORYSUBCATEGORYJOINER_TABLE_IF_NOT_EXISTS);
+
 
         // transaction type table
         this.jdbcTemplate.execute(DBTransactionTypeConst._DB_CREATE_TRANSACTIONTYPE_TABLE_IF_NOT_EXISTS);

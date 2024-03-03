@@ -1,12 +1,15 @@
 package com.example.cntrctmgmt.entities;
 
 import com.example.cntrctmgmt.constant.db.DBCategoryConst;
+import com.example.cntrctmgmt.constant.db.DBCategorySubCategoryConst;
 import com.example.cntrctmgmt.constant.db.DBCommonTableColumnConstant;
 import com.example.cntrctmgmt.util.DatabaseDateTimeConverter;
 import jakarta.persistence.*;
 import javafx.beans.property.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = DBCategoryConst.DB_TABLE_CATEGORY)
@@ -20,6 +23,9 @@ public class Category {
     private ObjectProperty<LocalDateTime> created = new SimpleObjectProperty<>();
 
     private ObjectProperty<LocalDateTime> modified = new SimpleObjectProperty<>();
+
+    @Transient
+    private List<SubCategory> subCategoryList = new ArrayList<>();
 
 
     /**
@@ -105,6 +111,21 @@ public class Category {
 
     public void setModified(LocalDateTime modified) {
         this.modified.set(modified);
+    }
+
+
+    @ManyToMany
+    @JoinTable(
+            name = DBCategorySubCategoryConst.DB_TABLE_JOINER_CATEGORY_SUBCATEGORY
+            ,joinColumns = @JoinColumn(name = DBCategorySubCategoryConst.DB_TABLE_COLUMN_CATEGORY_FK)
+            ,inverseJoinColumns = @JoinColumn(name = DBCategorySubCategoryConst.DB_TABLE_COLUMN_SUBCATEGORY_FK)
+    )
+    public List<SubCategory> getSubCategoryList() {
+        return subCategoryList;
+    }
+
+    public void setSubCategoryList(List<SubCategory> subCategoryList) {
+        this.subCategoryList = subCategoryList;
     }
 
     @Override
