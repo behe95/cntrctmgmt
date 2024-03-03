@@ -25,6 +25,9 @@ public class SubContract {
     private ObjectProperty<LocalDateTime> created = new SimpleObjectProperty<>();
     private ObjectProperty<LocalDateTime> modified = new SimpleObjectProperty<>();
 
+    private ObjectProperty<Category> category = new SimpleObjectProperty<>();
+    private ObjectProperty<SubCategory> subCategory = new SimpleObjectProperty<>();
+
     @Transient
     private ObjectProperty<Contract> contract = new SimpleObjectProperty<>();
 
@@ -205,5 +208,35 @@ public class SubContract {
 
     public void setContract(Contract contract) {
         this.contract.set(contract);
+    }
+
+    @OneToOne
+    @JoinColumn(name = DBSubContractConst.DB_TABLE_COLUMN_SUBCONTRACT_CATEGORY_FK)
+    public Category getCategory() {
+        return category.get();
+    }
+
+    @Transient
+    public ObjectProperty<Category> categoryProperty() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category.set(category);
+    }
+
+    @OneToOne
+    @JoinColumn(name = DBSubContractConst.DB_TABLE_COLUMN_SUBCONTRACT_SUBCATEGORY_FK)
+    public SubCategory getSubCategory() {
+        return subCategory.get();
+    }
+
+    @Transient
+    public ObjectProperty<SubCategory> subCategoryProperty() {
+        return subCategory;
+    }
+
+    public void setSubCategory(SubCategory subCategory) {
+        this.subCategory.set(subCategory);
     }
 }
