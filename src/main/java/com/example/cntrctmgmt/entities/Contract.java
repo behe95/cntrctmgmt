@@ -10,6 +10,7 @@ import javafx.collections.ObservableList;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = DBContractConst.DB_TABLE_CONTRACT)
@@ -20,7 +21,7 @@ public class Contract {
     private ObjectProperty<LocalDateTime> modified = new SimpleObjectProperty<>();
 
     @Transient  // ignore , use getter instead
-    private ObservableList<SubContract> subContracts = FXCollections.observableList(new ArrayList<SubContract>());
+    private List<SubContract> subContracts = new ArrayList<SubContract>();
 
     public Contract() {}
 
@@ -86,11 +87,13 @@ public class Contract {
 
 
     @OneToMany(mappedBy = "contract")
-    public ObservableList<SubContract> getSubContracts() {
+    public List<SubContract> getSubContracts() {
         return subContracts;
     }
 
-    public void setSubContracts(ObservableList<SubContract> subContracts) {
+    public void setSubContracts(List<SubContract> subContracts) {
         this.subContracts = subContracts;
     }
+
+    public void addSubContract(SubContract subContract) {this.subContracts.add(subContract);}
 }

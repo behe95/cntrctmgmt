@@ -14,6 +14,8 @@ import java.util.Optional;
 
 @Service
 public class ContractService {
+
+
     private final ContractRepository contractRepository;
 
     @Autowired
@@ -24,6 +26,8 @@ public class ContractService {
     public Contract addContract(Contract contract) {
         return this.contractRepository.save(contract);
     }
+
+    public List<Contract> getAllContracts() {return this.contractRepository.findAll();}
 
     public Optional<Contract> getContractById(int id) {
         return this.contractRepository.findById(id);
@@ -50,7 +54,7 @@ public class ContractService {
     }
 
     @Transactional
-    public void deleteCategories(List<Contract> contracts) {
+    public void deleteContracts(List<Contract> contracts) {
         this.contractRepository.deleteAll(contracts);
     }
 

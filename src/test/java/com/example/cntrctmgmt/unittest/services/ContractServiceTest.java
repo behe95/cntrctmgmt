@@ -240,7 +240,7 @@ class ContractServiceTest {
         contracts.add(contract2);
 
         // when
-        this.contractServiceUnderTest.deleteCategories(contracts);
+        this.contractServiceUnderTest.deleteContracts(contracts);
 
         /**
          * verify {@code deleteAll(...)} got called once
