@@ -1,14 +1,17 @@
 package com.example.cntrctmgmt.integerationtest.services;
 
+import com.example.cntrctmgmt.TestConfig;
 import com.example.cntrctmgmt.entities.Contract;
 import com.example.cntrctmgmt.entities.SubContract;
 import com.example.cntrctmgmt.entities.TransactionType;
 import com.example.cntrctmgmt.services.ContractService;
 import com.example.cntrctmgmt.services.SubContractService;
 import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.Commit;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.Rollback;
@@ -33,6 +36,14 @@ class ContractServiceTest {
     @Autowired
     private SubContractService subContractService;
 
+
+    @BeforeAll
+    static void beforeAll(@Autowired JdbcTemplate jdbcTemplate) {
+        // transaction type table
+        // insert default value
+        TestConfig.configTransactionTypeTable(jdbcTemplate);
+    }
+
     @Test
     void addContract() {
 
@@ -43,7 +54,9 @@ class ContractServiceTest {
         Contract savedContract = this.contractService.addContract(contract);
 
         // then
-        assertEquals(1, savedContract.getId());
+        assertNotNull(savedContract);
+        assertEquals(0, savedContract.getSubContracts().size());
+        assertEquals(contract.getTitle(), savedContract.getTitle());
     }
 
     @Test
@@ -80,11 +93,7 @@ class ContractServiceTest {
         // Local date time of contract start
         LocalDateTime subContractStartDate = LocalDateTime.now();
 
-        Contract contract = new Contract();
-        contract.setId(1);
-        contract.setTitle("Software upgrade");
-        contract.setCreated(LocalDateTime.of(2024,1,1,0,0));
-        contract.setModified(LocalDateTime.of(2024,2,1,0,0));
+
 
         SubContract subContract = new SubContract();
         subContract.setTitle("Security improvement");
@@ -95,9 +104,8 @@ class ContractServiceTest {
         subContract.setAmount(100000.00);
         subContract.setStartDate(subContractStartDate);
         subContract.setEndDate(null);       // not ended
-        subContract.setContract(contract);
 
-
+        subContract.setContract(savedContract);
         savedContract.addSubContract(subContract);
 
 
@@ -109,10 +117,11 @@ class ContractServiceTest {
 
         Optional<Contract> updatedContract = this.contractService.getContractById(savedContract.getId());
 
+
         assertTrue(updatedContract.isPresent());
         assertEquals(1, updatedContract.get().getSubContracts().size());
-
-        System.out.println(this.contractService.getAllContracts().size());
+        assertNotNull(updatedContract.get().getSubContracts().get(0).getTransactionType());
+        assertEquals(1,updatedContract.get().getSubContracts().get(0).getTransactionType().getId());
 
     }
 
@@ -171,6 +180,7 @@ class ContractServiceTest {
         newContract1.setSubContracts(List.of(subContract1));
 
 
+        subContract1.setContract(newContract1);
         Contract savedContract1 = this.contractService.addContract(newContract1);
 
         Contract newContract2 = new Contract("Upgrade system");

@@ -78,6 +78,7 @@ class SubContractRepositoryTest {
         // then
         assertEquals(1, subContracts.size());
         assertEquals(savedContract.getId(), subContracts.get(0).getContract().getId());
+        assertEquals(transactionType1.getTitle(), subContracts.get(0).getTransactionType().getTitle());
 
     }
 }

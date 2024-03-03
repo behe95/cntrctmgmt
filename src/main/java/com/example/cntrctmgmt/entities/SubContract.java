@@ -192,8 +192,8 @@ public class SubContract {
         this.modified.set(modified);
     }
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = DBSubContractConst.DB_TABLE_COLUMN_SUBCONTRACT_CONTRACT_FK, nullable = false)
+    @ManyToOne
+    @JoinColumn(name = DBSubContractConst.DB_TABLE_COLUMN_SUBCONTRACT_CONTRACT_FK)
     public Contract getContract() {
         return contract.get();
     }

@@ -34,12 +34,11 @@ public class ContractService {
     }
 
     public void updateContract(Contract contract) throws EntityNotFoundException {
-        Contract savedContract = this.contractRepository.findById(contract.getId())
+        this.contractRepository.findById(contract.getId())
                 .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.ENTITY_NOT_FOUND.getMessage()));
 
-        savedContract.setTitle(contract.getTitle());
 
-        this.contractRepository.save(savedContract);
+        this.contractRepository.save(contract);
 
     }
 
