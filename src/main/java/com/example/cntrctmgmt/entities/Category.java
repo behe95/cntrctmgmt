@@ -1,9 +1,7 @@
 package com.example.cntrctmgmt.entities;
 
 import com.example.cntrctmgmt.constant.db.DBCategoryConst;
-import com.example.cntrctmgmt.constant.db.DBCategorySubCategoryConst;
-import com.example.cntrctmgmt.constant.db.DBCommonTableColumnConstant;
-import com.example.cntrctmgmt.util.DatabaseDateTimeConverter;
+import com.example.cntrctmgmt.constant.db.DBTableJoinerCategorySubCategoryConst;
 import jakarta.persistence.*;
 import javafx.beans.property.*;
 
@@ -116,9 +114,9 @@ public class Category {
 
     @ManyToMany
     @JoinTable(
-            name = DBCategorySubCategoryConst.DB_TABLE_JOINER_CATEGORY_SUBCATEGORY
-            ,joinColumns = @JoinColumn(name = DBCategorySubCategoryConst.DB_TABLE_COLUMN_CATEGORY_FK)
-            ,inverseJoinColumns = @JoinColumn(name = DBCategorySubCategoryConst.DB_TABLE_COLUMN_SUBCATEGORY_FK)
+            name = DBTableJoinerCategorySubCategoryConst.DB_TABLE_JOINER_CATEGORY_SUBCATEGORY
+            ,joinColumns = @JoinColumn(name = DBTableJoinerCategorySubCategoryConst.DB_TABLE_COLUMN_CATEGORY_FK)
+            ,inverseJoinColumns = @JoinColumn(name = DBTableJoinerCategorySubCategoryConst.DB_TABLE_COLUMN_SUBCATEGORY_FK)
     )
     public List<SubCategory> getSubCategoryList() {
         return subCategoryList;
