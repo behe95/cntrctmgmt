@@ -1,13 +1,14 @@
 package com.example.cntrctmgmt.integerationtest.services;
 
 import com.example.cntrctmgmt.TestConfig;
-import com.example.cntrctmgmt.entities.Contract;
-import com.example.cntrctmgmt.entities.SubContract;
-import com.example.cntrctmgmt.entities.TransactionType;
+import com.example.cntrctmgmt.entities.*;
+import com.example.cntrctmgmt.services.CategoryService;
 import com.example.cntrctmgmt.services.ContractService;
+import com.example.cntrctmgmt.services.SubCategoryService;
 import com.example.cntrctmgmt.services.SubContractService;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,6 +29,10 @@ import static org.junit.jupiter.api.Assertions.*;
 //@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class ContractServiceTest {
 
+    @Autowired
+    private CategoryService categoryService;
+    @Autowired
+    private SubCategoryService subCategoryService;
 
 
     @Autowired
@@ -36,12 +41,26 @@ class ContractServiceTest {
     @Autowired
     private SubContractService subContractService;
 
+    Category category;
+    SubCategory subCategory;
+
 
     @BeforeAll
     static void beforeAll(@Autowired JdbcTemplate jdbcTemplate) {
         // transaction type table
         // insert default value
         TestConfig.configTransactionTypeTable(jdbcTemplate);
+        TestConfig.configCategorySubCategoryTable(jdbcTemplate);
+    }
+
+    @BeforeEach
+    void setUp() {
+        Optional<Category> c = this.categoryService.getCategoryById(1);
+        Optional<SubCategory> sc = this.subCategoryService.getSubCategoryById(1);
+
+        c.ifPresent(value -> this.category = value);
+        sc.ifPresent(value -> this.subCategory = value);
+
     }
 
     @Test
@@ -104,6 +123,8 @@ class ContractServiceTest {
         subContract.setAmount(100000.00);
         subContract.setStartDate(subContractStartDate);
         subContract.setEndDate(null);       // not ended
+        subContract.setCategory(this.category);
+        subContract.setSubCategory(this.subCategory);
 
         subContract.setContract(savedContract);
         savedContract.addSubContract(subContract);
@@ -117,11 +138,16 @@ class ContractServiceTest {
 
         Optional<Contract> updatedContract = this.contractService.getContractById(savedContract.getId());
 
+        List<SubContract> savedSubContractList = this.subContractService.getAllSubContractsByContract(savedContract);
+
 
         assertTrue(updatedContract.isPresent());
         assertEquals(1, updatedContract.get().getSubContracts().size());
+        assertEquals(1, savedSubContractList.size());
         assertNotNull(updatedContract.get().getSubContracts().get(0).getTransactionType());
         assertEquals(1,updatedContract.get().getSubContracts().get(0).getTransactionType().getId());
+        assertEquals(this.category.getId(), updatedContract.get().getSubContracts().get(0).getCategory().getId());
+        assertEquals(this.subCategory.getId(), updatedContract.get().getSubContracts().get(0).getSubCategory().getId());
 
     }
 
@@ -148,6 +174,8 @@ class ContractServiceTest {
         subContract.setAmount(100000.00);
         subContract.setStartDate(subContractStartDate);
         subContract.setEndDate(null);       // not ended
+        subContract.setCategory(this.category);
+        subContract.setSubCategory(this.subCategory);
 
         subContract.setContract(newContract);
         newContract.addSubContract(subContract);
@@ -191,6 +219,8 @@ class ContractServiceTest {
         subContract1.setAmount(100000.00);
         subContract1.setStartDate(subContractStartDate);
         subContract1.setEndDate(null);       // not ended
+        subContract1.setCategory(this.category);
+        subContract1.setSubCategory(this.subCategory);
 
         subContract1.setContract(newContract1);
         newContract1.addSubContract(subContract1);
@@ -235,6 +265,8 @@ class ContractServiceTest {
         subContract1.setAmount(100000.00);
         subContract1.setStartDate(LocalDateTime.now());
         subContract1.setEndDate(null);       // not ended
+        subContract1.setCategory(this.category);
+        subContract1.setSubCategory(this.subCategory);
 
         newContract1.setSubContracts(List.of(subContract1));
 

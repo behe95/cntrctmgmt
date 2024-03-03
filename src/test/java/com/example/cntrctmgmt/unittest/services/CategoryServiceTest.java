@@ -12,14 +12,12 @@ import static org.mockito.BDDMockito.given;
 
 import com.example.cntrctmgmt.services.CategoryService;
 import jakarta.persistence.EntityNotFoundException;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.sqlite.SQLiteErrorCode;
 import org.sqlite.SQLiteException;
@@ -86,7 +84,7 @@ class CategoryServiceTest {
     void getCategoryById() {
         // given data
         Category category = new Category("Meal", false);
-        category.setPkcmCategory(1);
+        category.setId(1);
 
         // set up mock env that returns data
         given(this.categoryRepositoryMock.findById(1)).willReturn(Optional.of(category));
@@ -112,13 +110,13 @@ class CategoryServiceTest {
         // given mock data
         List<Category> mockCategories = new ArrayList<>();
         Category category1 = new Category("Category1", false);
-        category1.setPkcmCategory(1);
+        category1.setId(1);
         mockCategories.add(category1);
         Category category2 = new Category("Category2", true);
-        category2.setPkcmCategory(2);
+        category2.setId(2);
         mockCategories.add(category2);
         Category category3 = new Category("Category3", true);
-        category3.setPkcmCategory(3);
+        category3.setId(3);
         mockCategories.add(category3);
 
 
@@ -137,7 +135,7 @@ class CategoryServiceTest {
     void updateCategory() throws DuplicateEntityException {
         // given
         Category mockDataToBeUpdated = new Category("Construction", false);
-        mockDataToBeUpdated.setPkcmCategory(1);
+        mockDataToBeUpdated.setId(1);
 
         // set up mock env so that category is found by id
         given(this.categoryRepositoryMock.findById(any())).willReturn(Optional.of(mockDataToBeUpdated));
@@ -154,7 +152,7 @@ class CategoryServiceTest {
 
         int capturedId = IdArgumentCaptor.getValue();
 
-        assertEquals(mockDataToBeUpdated.getPkcmCategory(), capturedId);
+        assertEquals(mockDataToBeUpdated.getId(), capturedId);
 
 
         // check the passed argument if the properties are same
@@ -168,7 +166,7 @@ class CategoryServiceTest {
 
         // verify the data
         assertNotNull(capturedCategory);
-        assertEquals(mockDataToBeUpdated.getPkcmCategory(), capturedCategory.getPkcmCategory());
+        assertEquals(mockDataToBeUpdated.getId(), capturedCategory.getId());
         assertEquals(mockDataToBeUpdated.getTitle(), capturedCategory.getTitle());
         assertEquals(mockDataToBeUpdated.getSoftCost(), capturedCategory.getSoftCost());
 
@@ -178,7 +176,7 @@ class CategoryServiceTest {
     void updateCategoryWithEntityNotFoundException() {
         // given
         Category mockDataToBeUpdated = new Category("Construction", false);
-        mockDataToBeUpdated.setPkcmCategory(1);
+        mockDataToBeUpdated.setId(1);
 
         // set up mock env so that category is found by id
         given(this.categoryRepositoryMock.findById(any())).willReturn(Optional.empty());
@@ -197,7 +195,7 @@ class CategoryServiceTest {
 
         int capturedId = IdArgumentCaptor.getValue();
 
-        assertEquals(mockDataToBeUpdated.getPkcmCategory(), capturedId);
+        assertEquals(mockDataToBeUpdated.getId(), capturedId);
 
         // verify nothing was saved
         verify(this.categoryRepositoryMock, never()).save(any());
@@ -232,7 +230,7 @@ class CategoryServiceTest {
 
         int capturedId = IdArgumentCaptor.getValue();
 
-        assertEquals(categoryToUpdate.getPkcmCategory(), capturedId);
+        assertEquals(categoryToUpdate.getId(), capturedId);
 
         // check the passed argument if the properties are same
         ArgumentCaptor<Category> categoryArgumentCaptor = ArgumentCaptor.forClass(Category.class);
@@ -245,7 +243,7 @@ class CategoryServiceTest {
 
         // verify the data
         assertNotNull(capturedCategory);
-        assertEquals(categoryToUpdate.getPkcmCategory(), capturedCategory.getPkcmCategory());
+        assertEquals(categoryToUpdate.getId(), capturedCategory.getId());
         assertEquals(categoryToUpdate.getTitle(), capturedCategory.getTitle());
         assertEquals(categoryToUpdate.getSoftCost(), capturedCategory.getSoftCost());
 
@@ -282,13 +280,13 @@ class CategoryServiceTest {
         // given mock data
         List<Category> mockCategories = new ArrayList<>();
         Category category1 = new Category("Category1", false);
-        category1.setPkcmCategory(1);
+        category1.setId(1);
         mockCategories.add(category1);
         Category category2 = new Category("Category2", true);
-        category2.setPkcmCategory(2);
+        category2.setId(2);
         mockCategories.add(category2);
         Category category3 = new Category("Category3", true);
-        category3.setPkcmCategory(3);
+        category3.setId(3);
         mockCategories.add(category3);
 
 

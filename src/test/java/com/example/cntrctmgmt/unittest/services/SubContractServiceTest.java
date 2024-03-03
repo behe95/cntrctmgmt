@@ -1,8 +1,6 @@
 package com.example.cntrctmgmt.unittest.services;
 
-import com.example.cntrctmgmt.entities.Contract;
-import com.example.cntrctmgmt.entities.SubContract;
-import com.example.cntrctmgmt.entities.TransactionType;
+import com.example.cntrctmgmt.entities.*;
 import com.example.cntrctmgmt.repositories.SubContractRepository;
 import com.example.cntrctmgmt.services.SubContractService;
 import org.junit.jupiter.api.Test;
@@ -43,6 +41,12 @@ class SubContractServiceTest {
         LocalDateTime subContractStartDate = LocalDateTime.now();
 
         // args subcontract
+
+        Category category = new Category("Technology", true);
+        category.setId(1);
+        SubCategory subCategory = new SubCategory("Software");
+        subCategory.setId(1);
+
         Contract contract = new Contract();
         contract.setId(1);
         contract.setTitle("Software upgrade");
@@ -59,8 +63,15 @@ class SubContractServiceTest {
         subContract.setStartDate(subContractStartDate);
         subContract.setEndDate(null);       // not ended
         subContract.setContract(contract);
+        subContract.setCategory(category);
+        subContract.setSubCategory(subCategory);
 
         // mock contract
+        Category mockCategory = new Category("Technology", true);
+        mockCategory.setId(1);
+        SubCategory mockSubCategory = new SubCategory("Software");
+        mockSubCategory.setId(1);
+
         Contract mockContract = new Contract();
         mockContract.setId(1);
         mockContract.setTitle("Software upgrade");
@@ -78,6 +89,8 @@ class SubContractServiceTest {
         mockSubContract.setStartDate(subContractStartDate);
         mockSubContract.setEndDate(null);       // not ended
         mockSubContract.setContract(mockContract);
+        mockSubContract.setCategory(mockCategory);
+        mockSubContract.setSubCategory(mockSubCategory);
 
         // given
         given(this.subContractRepositoryMock.save(subContract)).willReturn(mockSubContract);
@@ -105,6 +118,9 @@ class SubContractServiceTest {
         assertEquals(subContract.getStartDate(), savedSubContract.getStartDate());
         assertEquals(subContract.getEndDate(), savedSubContract.getEndDate());
         assertEquals(subContract, subContractArgumentCaptor.getValue());
+        assertEquals(subContract.getCategory().getId(),savedSubContract.getCategory().getId());
+        assertEquals(subContract.getSubCategory().getId(), savedSubContract.getSubCategory().getId());
+
 
 
     }
@@ -121,6 +137,11 @@ class SubContractServiceTest {
         LocalDateTime subContractStartDate = LocalDateTime.now();
 
         // args subcontract
+        Category category = new Category("Technology", true);
+        category.setId(1);
+        SubCategory subCategory = new SubCategory("Software");
+        subCategory.setId(1);
+
         Contract contract = new Contract();
         contract.setId(1);
         contract.setTitle("Software upgrade");
@@ -138,6 +159,8 @@ class SubContractServiceTest {
         subContract.setStartDate(subContractStartDate);
         subContract.setEndDate(null);       // not ended
         subContract.setContract(contract);
+        subContract.setCategory(category);
+        subContract.setSubCategory(subCategory);
 
         // given
         given(this.subContractRepositoryMock.findById(1)).willReturn(Optional.of(subContract));
@@ -175,6 +198,11 @@ class SubContractServiceTest {
         LocalDateTime subContractEndDate = LocalDateTime.now();
 
         // args subcontract
+        Category category = new Category("Technology", true);
+        category.setId(1);
+        SubCategory subCategory = new SubCategory("Software");
+        subCategory.setId(1);
+
         Contract contract = new Contract();
         contract.setId(1);
         contract.setTitle("Software upgrade");
@@ -192,8 +220,15 @@ class SubContractServiceTest {
         subContract.setStartDate(subContractStartDate);
         subContract.setEndDate(subContractEndDate);       // modified here
         subContract.setContract(contract);
+        subContract.setCategory(category);
+        subContract.setSubCategory(subCategory);
 
         // mock contract
+        Category mockCategory = new Category("Technology", true);
+        mockCategory.setId(1);
+        SubCategory mockSubCategory = new SubCategory("Software");
+        mockSubCategory.setId(1);
+
         Contract mockContract = new Contract();
         mockContract.setId(1);
         mockContract.setTitle("Software upgrade");
@@ -211,6 +246,8 @@ class SubContractServiceTest {
         mockSubContract.setStartDate(subContractStartDate);
         mockSubContract.setEndDate(null);       // not ended
         mockSubContract.setContract(contract);
+        mockSubContract.setCategory(mockCategory);
+        mockSubContract.setSubCategory(mockSubCategory);
 
 
         // given
@@ -257,6 +294,11 @@ class SubContractServiceTest {
         LocalDateTime subContractEndDate = LocalDateTime.now();
 
         // args subcontract
+        Category category = new Category("Technology", true);
+        category.setId(1);
+        SubCategory subCategory = new SubCategory("Software");
+        subCategory.setId(1);
+
         Contract contract = new Contract();
         contract.setId(1);
         contract.setTitle("Software upgrade");
@@ -274,6 +316,8 @@ class SubContractServiceTest {
         subContract.setStartDate(subContractStartDate);
         subContract.setEndDate(subContractEndDate);       // modified here
         subContract.setContract(contract);
+        subContract.setCategory(category);
+        subContract.setSubCategory(subCategory);
 
         // given
         given(this.subContractRepositoryMock.findById(subContract.getId()))
@@ -316,6 +360,11 @@ class SubContractServiceTest {
         LocalDateTime subContractStartDate = LocalDateTime.now();
 
         // args subcontract
+        Category category = new Category("Technology", true);
+        category.setId(1);
+        SubCategory subCategory = new SubCategory("Software");
+        subCategory.setId(1);
+
         Contract contract = new Contract();
         contract.setId(1);
         contract.setTitle("Software upgrade");
@@ -333,6 +382,8 @@ class SubContractServiceTest {
         subContract.setStartDate(subContractStartDate);
         subContract.setEndDate(null);       // not ended
         subContract.setContract(contract);
+        subContract.setCategory(category);
+        subContract.setSubCategory(subCategory);
 
         /**
          * when
@@ -381,6 +432,11 @@ class SubContractServiceTest {
         List<SubContract> subContractsList = new ArrayList<>();
 
         // args subcontract
+        Category category = new Category("Technology", true);
+        category.setId(1);
+        SubCategory subCategory = new SubCategory("Software");
+        subCategory.setId(1);
+
         Contract contract = new Contract();
         contract.setId(1);
         contract.setTitle("Software upgrade");
@@ -398,6 +454,8 @@ class SubContractServiceTest {
         subContract1.setStartDate(subContractStartDate);
         subContract1.setEndDate(subContractEndDate);
         subContract1.setContract(contract);
+        subContract1.setCategory(category);
+        subContract1.setSubCategory(subCategory);
 
 
         SubContract subContract2 = new SubContract();
@@ -411,6 +469,8 @@ class SubContractServiceTest {
         subContract2.setStartDate(subContractStartDate);
         subContract2.setEndDate(subContractEndDate);
         subContract2.setContract(contract);
+        subContract2.setCategory(category);
+        subContract2.setSubCategory(subCategory);
 
 
         subContractsList.add(subContract1);

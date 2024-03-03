@@ -5,16 +5,13 @@ import com.example.cntrctmgmt.entities.Category;
 import com.example.cntrctmgmt.exceptions.DuplicateEntityException;
 import com.example.cntrctmgmt.repositories.CategoryRepository;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.RollbackException;
 import jakarta.transaction.Transactional;
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Service;
 import org.sqlite.SQLiteException;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -56,7 +53,7 @@ public class CategoryService {
 
 
     public void updateCategory(Category category) throws DuplicateEntityException, EntityNotFoundException  {
-        Category savedCategory = this.categoryRepository.findById(category.getPkcmCategory()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.ENTITY_NOT_FOUND.getMessage()));
+        Category savedCategory = this.categoryRepository.findById(category.getId()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.ENTITY_NOT_FOUND.getMessage()));
 
         try {
             savedCategory.setTitle(category.getTitle());

@@ -12,7 +12,7 @@ import java.util.List;
 @Entity
 @Table(name = DBCategoryConst.DB_TABLE_CATEGORY)
 public class Category {
-    private IntegerProperty pkcmCategory = new SimpleIntegerProperty();
+    private IntegerProperty id = new SimpleIntegerProperty();
     private StringProperty title = new SimpleStringProperty();
     private BooleanProperty softCost = new SimpleBooleanProperty();
 
@@ -40,17 +40,17 @@ public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = DBCategoryConst.DB_TABLE_COLUMN_CATEGORY_PK)
-    public int getPkcmCategory() {
-        return pkcmCategory.get();
+    public int getId() {
+        return id.get();
     }
 
     @Transient
-    public IntegerProperty pkcmCategoryProperty() {
-        return pkcmCategory;
+    public IntegerProperty idProperty() {
+        return id;
     }
 
-    public void setPkcmCategory(int pkcmCategory) {
-        this.pkcmCategory.set(pkcmCategory);
+    public void setId(int id) {
+        this.id.set(id);
     }
 
     @Column(name = DBCategoryConst.DB_TABLE_COLUMN_CATEGORYTITLE)
@@ -129,7 +129,7 @@ public class Category {
     @Override
     public String toString() {
         return "Category{" +
-                "pkcmCategory=" + pkcmCategory +
+                "pkcmCategory=" + id +
                 ", title=" + title +
                 ", softCost=" + softCost +
                 ", created=" + created +
