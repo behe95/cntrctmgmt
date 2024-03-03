@@ -130,6 +130,29 @@ class ContractServiceTest {
 
         // given
         Contract newContract = new Contract("Insurance Policy for Property Coverage");
+
+        TransactionType transactionType = new TransactionType();
+        transactionType.setId(1);
+        transactionType.setTitle("Credit");
+        transactionType.setMultiplier(-1);
+
+        // Local date time of contract start
+        LocalDateTime subContractStartDate = LocalDateTime.now();
+
+        SubContract subContract = new SubContract();
+        subContract.setTitle("Security improvement");
+        subContract.setOrderNumber(1);
+        subContract.setSubContractNumber("A10212");
+        subContract.setTransactionType(transactionType);
+        subContract.setDescription("Need to improve the overall security across the platform");
+        subContract.setAmount(100000.00);
+        subContract.setStartDate(subContractStartDate);
+        subContract.setEndDate(null);       // not ended
+
+        subContract.setContract(newContract);
+        newContract.addSubContract(subContract);
+
+
         Contract savedContract = this.contractService.addContract(newContract);
 
         // when
@@ -137,24 +160,60 @@ class ContractServiceTest {
 
 
         // then
-        Optional<Contract> deletedContract = this.contractService.getContractById(1);
+        Optional<Contract> deletedContract = this.contractService.getContractById(savedContract.getId());
         assertFalse(deletedContract.isPresent());
+
+        // also check the child subContracts are deleted too
+        List<SubContract> subContractList = this.subContractService.getAllSubContractsByContract(savedContract);
+        assertEquals(0, subContractList.size());
 
     }
 
     @Test
     void deleteAllContracts() {
         // given
-        Contract newContract = new Contract("Insurance Policy for Property Coverage");
-        Contract savedContract = this.contractService.addContract(newContract);
+        Contract newContract1 = new Contract("Insurance Policy for Property Coverage");
+
+        TransactionType transactionType = new TransactionType();
+        transactionType.setId(1);
+        transactionType.setTitle("Credit");
+        transactionType.setMultiplier(-1);
+
+        // Local date time of contract start
+        LocalDateTime subContractStartDate = LocalDateTime.now();
+
+        SubContract subContract1 = new SubContract();
+        subContract1.setTitle("Security improvement");
+        subContract1.setOrderNumber(1);
+        subContract1.setSubContractNumber("A10212");
+        subContract1.setTransactionType(transactionType);
+        subContract1.setDescription("Need to improve the overall security across the platform");
+        subContract1.setAmount(100000.00);
+        subContract1.setStartDate(subContractStartDate);
+        subContract1.setEndDate(null);       // not ended
+
+        subContract1.setContract(newContract1);
+        newContract1.addSubContract(subContract1);
+
+
+        Contract savedContract1 = this.contractService.addContract(newContract1);
+
+
+        Contract newContract2 = new Contract("Upgrade system");
+        Contract savedContract2 = this.contractService.addContract(newContract2);
 
         // when
         this.contractService.deleteAllContracts();
 
 
         // then
-        Optional<Contract> deletedContract = this.contractService.getContractById(1);
-        assertFalse(deletedContract.isPresent());
+        List<Contract> contractsList = this.contractService.getAllContracts();
+        assertEquals(0, contractsList.size());
+
+
+        // also check the child subContracts are deleted too
+        List<SubContract> subContractList = this.subContractService.getAllSubContractsByContract(savedContract1);
+        assertEquals(0, subContractList.size());
     }
 
     @Test
@@ -211,5 +270,8 @@ class ContractServiceTest {
 
 
 
+        // also check the child subContracts are deleted too
+        List<SubContract> subContractList = this.subContractService.getAllSubContractsByContract(savedContract1);
+        assertEquals(0, subContractList.size());
     }
 }

@@ -2,6 +2,7 @@ package com.example.cntrctmgmt.services;
 
 
 import com.example.cntrctmgmt.constant.responsemessage.ExceptionMessage;
+import com.example.cntrctmgmt.entities.Contract;
 import com.example.cntrctmgmt.entities.SubContract;
 import com.example.cntrctmgmt.repositories.SubContractRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -25,9 +26,9 @@ public class SubContractService {
         return this.subContractRepository.save(subContract);
     }
 
-//    public List<SubContract> getAllSubContractsByContractId(int id) {
-////        return this.subContractRepository.fin
-//    }
+    public List<SubContract> getAllSubContractsByContract(Contract contract) {
+        return this.subContractRepository.findAllByContract(contract);
+    }
 
     public Optional<SubContract> getSubContractById(int id) {
         return this.subContractRepository.findById(id);
