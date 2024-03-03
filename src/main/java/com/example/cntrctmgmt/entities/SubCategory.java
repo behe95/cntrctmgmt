@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import javafx.beans.property.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = DBSubCategoryConst.DB_TABLE_SUBCATEGORY)
@@ -13,6 +15,8 @@ public class SubCategory {
     private StringProperty title = new SimpleStringProperty();
     private ObjectProperty<LocalDateTime> created = new SimpleObjectProperty<>();
     private ObjectProperty<LocalDateTime> modified = new SimpleObjectProperty<>();
+
+    private List<Category> categoryList = new ArrayList<>();
 
     /**
      * Default constructor for JPA
@@ -79,5 +83,14 @@ public class SubCategory {
 
     public void setModified(LocalDateTime modified) {
         this.modified.set(modified);
+    }
+
+    @ManyToMany(mappedBy = "subCategoryList")
+    public List<Category> getCategoryList() {
+        return categoryList;
+    }
+
+    public void setCategoryList(List<Category> categoryList) {
+        this.categoryList = categoryList;
     }
 }
