@@ -1,9 +1,10 @@
-package com.example.cntrctmgmt.services;
+package com.example.cntrctmgmt.unittest.services;
 
 import com.example.cntrctmgmt.entities.Category;
 import com.example.cntrctmgmt.entities.Contract;
 import com.example.cntrctmgmt.repositories.CategoryRepository;
 import com.example.cntrctmgmt.repositories.ContractRepository;
+import com.example.cntrctmgmt.services.ContractService;
 import org.junit.jupiter.api.Test;
 
 

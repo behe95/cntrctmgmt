@@ -1,4 +1,4 @@
-package com.example.cntrctmgmt.services;
+package com.example.cntrctmgmt.unittest.services;
 
 import com.example.cntrctmgmt.constant.responsemessage.ExceptionMessage;
 import com.example.cntrctmgmt.entities.Category;
@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.BDDMockito.given;
 
+import com.example.cntrctmgmt.services.CategoryService;
 import jakarta.persistence.EntityNotFoundException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;

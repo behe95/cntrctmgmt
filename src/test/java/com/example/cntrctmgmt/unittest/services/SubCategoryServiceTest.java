@@ -1,10 +1,11 @@
-package com.example.cntrctmgmt.services;
+package com.example.cntrctmgmt.unittest.services;
 
 import com.example.cntrctmgmt.constant.responsemessage.ExceptionMessage;
 import com.example.cntrctmgmt.entities.SubCategory;
 import com.example.cntrctmgmt.exceptions.DuplicateEntityException;
 import com.example.cntrctmgmt.exceptions.UnknownException;
 import com.example.cntrctmgmt.repositories.SubCategoryRepository;
+import com.example.cntrctmgmt.services.SubCategoryService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

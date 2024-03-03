@@ -5,8 +5,11 @@ import com.example.cntrctmgmt.constant.db.DBContractConst;
 import com.example.cntrctmgmt.constant.db.DBSubCategoryConst;
 import jakarta.persistence.*;
 import javafx.beans.property.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 @Entity
 @Table(name = DBContractConst.DB_TABLE_CONTRACT)
@@ -15,6 +18,9 @@ public class Contract {
     private StringProperty title = new SimpleStringProperty();
     private ObjectProperty<LocalDateTime> created = new SimpleObjectProperty<>();
     private ObjectProperty<LocalDateTime> modified = new SimpleObjectProperty<>();
+
+    @Transient  // ignore , use getter instead
+    private ObservableList<SubContract> subContracts = FXCollections.observableList(new ArrayList<SubContract>());
 
     public Contract() {}
 
@@ -76,5 +82,15 @@ public class Contract {
 
     public void setModified(LocalDateTime modified) {
         this.modified.set(modified);
+    }
+
+
+    @OneToMany(mappedBy = "contract")
+    public ObservableList<SubContract> getSubContracts() {
+        return subContracts;
+    }
+
+    public void setSubContracts(ObservableList<SubContract> subContracts) {
+        this.subContracts = subContracts;
     }
 }

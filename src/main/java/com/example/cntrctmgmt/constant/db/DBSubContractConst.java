@@ -6,7 +6,8 @@ public interface DBSubContractConst {
     String DB_TABLE_COLUMN_SUBCONTRACTTITLE = "title";
     String DB_TABLE_COLUMN_SUBCONTRACT_ORDERNUMBER = "orderNumber";
     String DB_TABLE_COLUMN_SUBCONTRACT_SUBCONTRACTNUMBER = "subContractNumber";
-    String DB_TABLE_COLUMN_SUBCONTRACT_TRANSACTIONTYPE = "fkcmtransactionType";
+    String DB_TABLE_COLUMN_SUBCONTRACT_TRANSACTIONTYPE_FK = "fkcmtransactionType";
+    String DB_TABLE_COLUMN_SUBCONTRACT_CONTRACT_FK = "fkcmContract";
     String DB_TABLE_COLUMN_SUBCONTRACT_DESCRIPTION = "description";
     String DB_TABLE_COLUMN_SUBCONTRACT_AMOUNT = "amount";
     String DB_TABLE_COLUMN_SUBCONTRACT_STARTDATE = "startDate";
@@ -27,7 +28,8 @@ public interface DBSubContractConst {
                     "    "+DB_TABLE_COLUMN_SUBCONTRACTTITLE+" VARCHAR(255) UNIQUE,\n" +
                     "    "+DB_TABLE_COLUMN_SUBCONTRACT_ORDERNUMBER+" INTEGER,\n" +
                     "    "+DB_TABLE_COLUMN_SUBCONTRACT_SUBCONTRACTNUMBER+" VARCHAR(255),\n" +
-                    "    "+DB_TABLE_COLUMN_SUBCONTRACT_TRANSACTIONTYPE+" INTEGER NOT NULL,\n" +
+                    "    "+DB_TABLE_COLUMN_SUBCONTRACT_TRANSACTIONTYPE_FK+" INTEGER NOT NULL,\n" +
+                    "    "+DB_TABLE_COLUMN_SUBCONTRACT_CONTRACT_FK+" INTEGER NOT NULL,\n" +
                     "    "+DB_TABLE_COLUMN_SUBCONTRACT_DESCRIPTION+" VARCHAR(255),\n" +
                     "    "+DB_TABLE_COLUMN_SUBCONTRACT_AMOUNT+" DECIMAL,\n" +
                     "    "+DB_TABLE_COLUMN_SUBCONTRACT_STARTDATE +" TEXT,\n" +
@@ -53,7 +55,7 @@ public interface DBSubContractConst {
                     "AFTER UPDATE OF "+ DB_TABLE_COLUMN_SUBCONTRACTTITLE
                     +"," + DB_TABLE_COLUMN_SUBCONTRACT_ORDERNUMBER
                     +"," + DB_TABLE_COLUMN_SUBCONTRACT_SUBCONTRACTNUMBER
-                    +"," + DB_TABLE_COLUMN_SUBCONTRACT_TRANSACTIONTYPE
+                    +"," + DB_TABLE_COLUMN_SUBCONTRACT_TRANSACTIONTYPE_FK
                     +"," + DB_TABLE_COLUMN_SUBCONTRACT_DESCRIPTION
                     +"," + DB_TABLE_COLUMN_SUBCONTRACT_AMOUNT
                     +"," + DB_TABLE_COLUMN_SUBCONTRACT_STARTDATE

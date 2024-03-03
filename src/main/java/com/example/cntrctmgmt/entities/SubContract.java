@@ -1,5 +1,6 @@
 package com.example.cntrctmgmt.entities;
 
+import com.example.cntrctmgmt.constant.db.DBContractConst;
 import com.example.cntrctmgmt.constant.db.DBSubContractConst;
 import com.example.cntrctmgmt.constant.db.DBTransactionTypeConst;
 import jakarta.persistence.*;
@@ -23,6 +24,8 @@ public class SubContract {
     private ObjectProperty<LocalDateTime> endDate = new SimpleObjectProperty<>();
     private ObjectProperty<LocalDateTime> created = new SimpleObjectProperty<>();
     private ObjectProperty<LocalDateTime> modified = new SimpleObjectProperty<>();
+
+    private ObjectProperty<Contract> contract = new SimpleObjectProperty<>();
 
     public SubContract() {
     }
@@ -88,7 +91,7 @@ public class SubContract {
 
 
     @OneToOne
-    @JoinColumn(name = DBSubContractConst.DB_TABLE_COLUMN_SUBCONTRACT_TRANSACTIONTYPE)
+    @JoinColumn(name = DBSubContractConst.DB_TABLE_COLUMN_SUBCONTRACT_TRANSACTIONTYPE_FK)
     public TransactionType getTransactionType() {
         return transactionType.get();
     }
@@ -186,5 +189,20 @@ public class SubContract {
 
     public void setModified(LocalDateTime modified) {
         this.modified.set(modified);
+    }
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = DBSubContractConst.DB_TABLE_COLUMN_SUBCONTRACT_CONTRACT_FK, nullable = false)
+    public Contract getContract() {
+        return contract.get();
+    }
+
+    @Transient
+    public ObjectProperty<Contract> contractProperty() {
+        return contract;
+    }
+
+    public void setContract(Contract contract) {
+        this.contract.set(contract);
     }
 }

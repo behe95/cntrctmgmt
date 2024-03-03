@@ -1,8 +1,10 @@
-package com.example.cntrctmgmt.services;
+package com.example.cntrctmgmt.unittest.services;
 
+import com.example.cntrctmgmt.entities.Contract;
 import com.example.cntrctmgmt.entities.SubContract;
 import com.example.cntrctmgmt.entities.TransactionType;
 import com.example.cntrctmgmt.repositories.SubContractRepository;
+import com.example.cntrctmgmt.services.SubContractService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -41,6 +43,12 @@ class SubContractServiceTest {
         LocalDateTime subContractStartDate = LocalDateTime.now();
 
         // args subcontract
+        Contract contract = new Contract();
+        contract.setId(1);
+        contract.setTitle("Software upgrade");
+        contract.setCreated(LocalDateTime.of(2024,1,1,0,0));
+        contract.setModified(LocalDateTime.of(2024,2,1,0,0));
+
         SubContract subContract = new SubContract();
         subContract.setTitle("Security improvement");
         subContract.setOrderNumber(1);
@@ -50,8 +58,15 @@ class SubContractServiceTest {
         subContract.setAmount(100000.00);
         subContract.setStartDate(subContractStartDate);
         subContract.setEndDate(null);       // not ended
+        subContract.setContract(contract);
 
         // mock contract
+        Contract mockContract = new Contract();
+        mockContract.setId(1);
+        mockContract.setTitle("Software upgrade");
+        mockContract.setCreated(LocalDateTime.of(2024,1,1,0,0));
+        mockContract.setModified(LocalDateTime.of(2024,2,1,0,0));
+
         SubContract mockSubContract = new SubContract();
         mockSubContract.setId(1);
         mockSubContract.setTitle("Security improvement");
@@ -62,6 +77,7 @@ class SubContractServiceTest {
         mockSubContract.setAmount(100000.00);
         mockSubContract.setStartDate(subContractStartDate);
         mockSubContract.setEndDate(null);       // not ended
+        mockSubContract.setContract(mockContract);
 
         // given
         given(this.subContractRepositoryMock.save(subContract)).willReturn(mockSubContract);
@@ -105,6 +121,12 @@ class SubContractServiceTest {
         LocalDateTime subContractStartDate = LocalDateTime.now();
 
         // args subcontract
+        Contract contract = new Contract();
+        contract.setId(1);
+        contract.setTitle("Software upgrade");
+        contract.setCreated(LocalDateTime.of(2024,1,1,0,0));
+        contract.setModified(LocalDateTime.of(2024,2,1,0,0));
+
         SubContract subContract = new SubContract();
         subContract.setId(1);
         subContract.setTitle("Security improvement");
@@ -115,6 +137,7 @@ class SubContractServiceTest {
         subContract.setAmount(100000.00);
         subContract.setStartDate(subContractStartDate);
         subContract.setEndDate(null);       // not ended
+        subContract.setContract(contract);
 
         // given
         given(this.subContractRepositoryMock.findById(1)).willReturn(Optional.of(subContract));
@@ -152,6 +175,12 @@ class SubContractServiceTest {
         LocalDateTime subContractEndDate = LocalDateTime.now();
 
         // args subcontract
+        Contract contract = new Contract();
+        contract.setId(1);
+        contract.setTitle("Software upgrade");
+        contract.setCreated(LocalDateTime.of(2024,1,1,0,0));
+        contract.setModified(LocalDateTime.of(2024,2,1,0,0));
+
         SubContract subContract = new SubContract();
         subContract.setId(1);
         subContract.setTitle("Security improvement");
@@ -162,8 +191,15 @@ class SubContractServiceTest {
         subContract.setAmount(100000.00);
         subContract.setStartDate(subContractStartDate);
         subContract.setEndDate(subContractEndDate);       // modified here
+        subContract.setContract(contract);
 
         // mock contract
+        Contract mockContract = new Contract();
+        mockContract.setId(1);
+        mockContract.setTitle("Software upgrade");
+        mockContract.setCreated(LocalDateTime.of(2024,1,1,0,0));
+        mockContract.setModified(LocalDateTime.of(2024,2,1,0,0));
+
         SubContract mockSubContract = new SubContract();
         mockSubContract.setId(1);
         mockSubContract.setTitle("Security improvement");
@@ -174,6 +210,7 @@ class SubContractServiceTest {
         mockSubContract.setAmount(100000.00);
         mockSubContract.setStartDate(subContractStartDate);
         mockSubContract.setEndDate(null);       // not ended
+        mockSubContract.setContract(contract);
 
 
         // given
@@ -220,6 +257,12 @@ class SubContractServiceTest {
         LocalDateTime subContractEndDate = LocalDateTime.now();
 
         // args subcontract
+        Contract contract = new Contract();
+        contract.setId(1);
+        contract.setTitle("Software upgrade");
+        contract.setCreated(LocalDateTime.of(2024,1,1,0,0));
+        contract.setModified(LocalDateTime.of(2024,2,1,0,0));
+
         SubContract subContract = new SubContract();
         subContract.setId(1);
         subContract.setTitle("Security improvement");
@@ -230,6 +273,7 @@ class SubContractServiceTest {
         subContract.setAmount(100000.00);
         subContract.setStartDate(subContractStartDate);
         subContract.setEndDate(subContractEndDate);       // modified here
+        subContract.setContract(contract);
 
         // given
         given(this.subContractRepositoryMock.findById(subContract.getId()))
@@ -272,6 +316,12 @@ class SubContractServiceTest {
         LocalDateTime subContractStartDate = LocalDateTime.now();
 
         // args subcontract
+        Contract contract = new Contract();
+        contract.setId(1);
+        contract.setTitle("Software upgrade");
+        contract.setCreated(LocalDateTime.of(2024,1,1,0,0));
+        contract.setModified(LocalDateTime.of(2024,2,1,0,0));
+
         SubContract subContract = new SubContract();
         subContract.setId(1);
         subContract.setTitle("Security improvement");
@@ -282,6 +332,7 @@ class SubContractServiceTest {
         subContract.setAmount(100000.00);
         subContract.setStartDate(subContractStartDate);
         subContract.setEndDate(null);       // not ended
+        subContract.setContract(contract);
 
         /**
          * when
@@ -330,6 +381,12 @@ class SubContractServiceTest {
         List<SubContract> subContractsList = new ArrayList<>();
 
         // args subcontract
+        Contract contract = new Contract();
+        contract.setId(1);
+        contract.setTitle("Software upgrade");
+        contract.setCreated(LocalDateTime.of(2024,1,1,0,0));
+        contract.setModified(LocalDateTime.of(2024,2,1,0,0));
+
         SubContract subContract1 = new SubContract();
         subContract1.setId(1);
         subContract1.setTitle("Security improvement");
@@ -340,6 +397,7 @@ class SubContractServiceTest {
         subContract1.setAmount(100000.00);
         subContract1.setStartDate(subContractStartDate);
         subContract1.setEndDate(subContractEndDate);
+        subContract1.setContract(contract);
 
 
         SubContract subContract2 = new SubContract();
@@ -352,6 +410,7 @@ class SubContractServiceTest {
         subContract2.setAmount(5000.00);
         subContract2.setStartDate(subContractStartDate);
         subContract2.setEndDate(subContractEndDate);
+        subContract2.setContract(contract);
 
 
         subContractsList.add(subContract1);
