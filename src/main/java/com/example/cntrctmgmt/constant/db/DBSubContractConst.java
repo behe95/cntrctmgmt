@@ -1,7 +1,14 @@
 package com.example.cntrctmgmt.constant.db;
 
 public interface DBSubContractConst {
+    /**
+     * Table name
+     */
     String DB_TABLE_SUBCONTRACT = "cmSubContract";
+
+    /**
+     * Table columns
+     */
     String DB_TABLE_COLUMN_SUBCONTRACT_PK = "pkcmSubContract";
     String DB_TABLE_COLUMN_SUBCONTRACTTITLE = "title";
     String DB_TABLE_COLUMN_SUBCONTRACT_ORDERNUMBER = "orderNumber";
@@ -19,8 +26,12 @@ public interface DBSubContractConst {
     String DB_TABLE_COLUMN_DATECREATED = "created";
     String DB_TABLE_COLUMN_DATEMODIFIED = "modified";
 
+    /**
+     * Trigger name
+     */
     String DB_TABLE_TRIGGER_UPDATE_DATE_AFTER_RECORD_INSERTION = "cmSubContract_update_date_after_insertion";
     String DB_TABLE_TRIGGER_UPDATE_DATE_AFTER_RECORD_UPDATE = "cmSubContract_update_date_after_update";
+
 
     String _DB_TABLE_FK_CONSTRAINT_SUBCONTRACT_TO_CONTRACT =
             "CONSTRAINT fkConstraint_" +
@@ -29,6 +40,9 @@ public interface DBSubContractConst {
                     "FOREIGN KEY (" + DBSubContractConst.DB_TABLE_COLUMN_SUBCONTRACT_CONTRACT_FK + ")" +
                     " REFERENCES " + DBContractConst.DB_TABLE_CONTRACT + "(" + DBContractConst.DB_TABLE_COLUMN_CONTRACT_PK + ")";
 
+    /**
+     * Table column constraint definitions
+     */
     String _DB_TABLE_FK_CONSTRAINT_SUBCONTRACT_TO_TRANSACTIONTYPE =
             "CONSTRAINT fkConstraint_" +
                     DBSubContractConst.DB_TABLE_SUBCONTRACT + "_" +
@@ -51,6 +65,9 @@ public interface DBSubContractConst {
                     " REFERENCES " + DBSubCategoryConst.DB_TABLE_SUBCATEGORY + "(" + DBSubCategoryConst.DB_TABLE_COLUMN_SUBCATEGORY_PK + ")";
 
 
+    /**
+     * SQL script to create database table if not exists
+     */
     String _DB_CREATE_SUBCONTRACT_TABLE_IF_NOT_EXISTS =
             "CREATE TABLE IF NOT EXISTS " + DB_TABLE_SUBCONTRACT + " (\n" +
                     "    " + DB_TABLE_COLUMN_SUBCONTRACT_PK + " INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
@@ -73,6 +90,9 @@ public interface DBSubContractConst {
                     "    " + _DB_TABLE_FK_CONSTRAINT_SUBCONTRACT_TO_SUBCATEGORY + "\n" +
                     ");";
 
+    /**
+     * SQL script to create trigger if not exists
+     */
 
     String _DB_CREATE_SUBCONTRACT_TABLE_DATE_UPDATE_TRIGGER_IF_NOT_EXISTS =
             "CREATE TRIGGER IF NOT EXISTS " + DB_TABLE_TRIGGER_UPDATE_DATE_AFTER_RECORD_INSERTION + "\n" +

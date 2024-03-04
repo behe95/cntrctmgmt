@@ -113,7 +113,7 @@ public class Category {
     }
 
 
-    @ManyToMany(cascade = CascadeType.REFRESH)
+    @ManyToMany
     @JoinTable(
             name = DBTableJoinerCategorySubCategoryConst.DB_TABLE_JOINER_CATEGORY_SUBCATEGORY
             , joinColumns = @JoinColumn(name = DBTableJoinerCategorySubCategoryConst.DB_TABLE_COLUMN_CATEGORY_FK)
@@ -131,14 +131,4 @@ public class Category {
         this.subCategoryList.add(subCategory);
     }
 
-    @Override
-    public String toString() {
-        return "Category{" +
-                "pkcmCategory=" + id +
-                ", title=" + title +
-                ", softCost=" + softCost +
-                ", created=" + created +
-                ", modified=" + modified +
-                '}';
-    }
 }

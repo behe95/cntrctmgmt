@@ -1,7 +1,14 @@
 package com.example.cntrctmgmt.constant.db;
 
 public interface DBTransactionTypeConst {
+    /**
+     * Table name
+     */
     String DB_TABLE_TRANSACTIONTYPE = "cmTransactionType";
+
+    /**
+     * Table columns
+     */
     String DB_TABLE_COLUMN_TRANSACTIONTYPE_PK = "pkcmTransactionType";
     String DB_TABLE_COLUMN_TRANSACTIONTYPETITLE = "title";
     String DB_TABLE_COLUMN_TRANSACTIONMULTIPLIER = "transactionMultiplier";
@@ -10,10 +17,15 @@ public interface DBTransactionTypeConst {
     String DB_TABLE_COLUMN_DATECREATED = "created";
     String DB_TABLE_COLUMN_DATEMODIFIED = "modified";
 
+    /**
+     * Trigger name
+     */
     String DB_TABLE_TRIGGER_UPDATE_DATE_AFTER_RECORD_INSERTION = "cmTransactionType_update_date_after_insertion";
     String DB_TABLE_TRIGGER_UPDATE_DATE_AFTER_RECORD_UPDATE = "cmTransactionType_update_date_after_update";
 
-
+    /**
+     * Table column constraint definitions
+     */
     String _DB_CREATE_TRANSACTIONTYPE_TABLE_IF_NOT_EXISTS =
             "CREATE TABLE IF NOT EXISTS " + DB_TABLE_TRANSACTIONTYPE + " (\n" +
                     "    " + DB_TABLE_COLUMN_TRANSACTIONTYPE_PK + " INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
@@ -23,7 +35,9 @@ public interface DBTransactionTypeConst {
                     "    " + DB_TABLE_COLUMN_DATEMODIFIED + " TEXT\n" +
                     ");";
 
-
+    /**
+     * SQL script to create database table if not exists
+     */
     String _DB_CREATE_TRANSACTIONTYPE_TABLE_DATE_UPDATE_TRIGGER_IF_NOT_EXISTS =
             "CREATE TRIGGER IF NOT EXISTS " + DB_TABLE_TRIGGER_UPDATE_DATE_AFTER_RECORD_INSERTION + "\n" +
                     "AFTER INSERT ON " + DB_TABLE_TRANSACTIONTYPE + "\n" +
@@ -35,6 +49,10 @@ public interface DBTransactionTypeConst {
                     "        ," + DB_TABLE_COLUMN_DATEMODIFIED + " = strftime('%Y-%m-%d %H:%M:%f', 'now', 'localtime')\n" +
                     "    WHERE " + DB_TABLE_TRANSACTIONTYPE + "." + DB_TABLE_COLUMN_TRANSACTIONTYPE_PK + " = NEW." + DB_TABLE_COLUMN_TRANSACTIONTYPE_PK + ";\n" +
                     "END;\n";
+
+    /**
+     * SQL script to create trigger if not exists
+     */
     String _DB_CREATE_TRANSACTIONTYPE_TABLE_MODIFIED_DATE_UPDATE_TRIGGER_IF_NOT_EXISTS =
             "CREATE TRIGGER IF NOT EXISTS " + DB_TABLE_TRIGGER_UPDATE_DATE_AFTER_RECORD_UPDATE + "\n" +
                     "AFTER UPDATE OF "
@@ -49,7 +67,9 @@ public interface DBTransactionTypeConst {
                     "    WHERE " + DB_TABLE_TRANSACTIONTYPE + "." + DB_TABLE_COLUMN_TRANSACTIONTYPE_PK + " = NEW." + DB_TABLE_COLUMN_TRANSACTIONTYPE_PK + ";\n" +
                     "END;\n";
 
-
+    /**
+     * SQL script to insert default table values
+     */
     String _DB_INSERT_INTO_TRANSACTIONTYPE_TABLE_DEFAULT_VALUES =
             "INSERT OR IGNORE INTO " + DB_TABLE_TRANSACTIONTYPE + " ("
                     + DB_TABLE_COLUMN_TRANSACTIONTYPETITLE + ", "

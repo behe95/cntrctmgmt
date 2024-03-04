@@ -1,7 +1,14 @@
 package com.example.cntrctmgmt.constant.db;
 
 public interface DBSubCategoryConst {
+    /**
+     * table name
+     */
     String DB_TABLE_SUBCATEGORY = "cmSubCategory";
+
+    /**
+     * Table columns
+     */
     String DB_TABLE_COLUMN_SUBCATEGORY_PK = "pkcmSubCategory";
     String DB_TABLE_COLUMN_SUBCATEGORYTITLE = "title";
 
@@ -9,10 +16,16 @@ public interface DBSubCategoryConst {
     String DB_TABLE_COLUMN_DATECREATED = "created";
     String DB_TABLE_COLUMN_DATEMODIFIED = "modified";
 
+    /**
+     * Trigger name
+     */
     String DB_TABLE_TRIGGER_UPDATE_DATE_AFTER_RECORD_INSERTION = "cmSubCategory_update_date_after_insertion";
     String DB_TABLE_TRIGGER_UPDATE_DATE_AFTER_RECORD_UPDATE = "cmSubCategory_update_date_after_update";
 
 
+    /**
+     * SQL script to create database table if not exists
+     */
     String _DB_CREATE_SUBCATEGORY_TABLE_IF_NOT_EXISTS =
             "CREATE TABLE IF NOT EXISTS " + DB_TABLE_SUBCATEGORY + " (\n" +
                     "    " + DB_TABLE_COLUMN_SUBCATEGORY_PK + " INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
@@ -22,6 +35,9 @@ public interface DBSubCategoryConst {
                     ");";
 
 
+    /**
+     * SQL script to create trigger if not exists
+     */
     String _DB_CREATE_SUBCATEGORY_TABLE_DATE_UPDATE_TRIGGER_IF_NOT_EXISTS =
             "CREATE TRIGGER IF NOT EXISTS " + DB_TABLE_TRIGGER_UPDATE_DATE_AFTER_RECORD_INSERTION + "\n" +
                     "AFTER INSERT ON " + DB_TABLE_SUBCATEGORY + "\n" +
