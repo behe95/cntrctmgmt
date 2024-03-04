@@ -31,6 +31,13 @@ public class CategoryService {
     }
 
 
+    /**
+     * Add category to the database
+     *
+     * @param category Category to add
+     * @return Saved category
+     * @throws DuplicateEntityException If the category with the same name already exists
+     */
     public Category addCategory(Category category) throws DuplicateEntityException {
         Category saveCategory = null;
         try {
@@ -50,15 +57,33 @@ public class CategoryService {
     }
 
 
+    /**
+     * Retrieve category by id
+     *
+     * @param id ID to retrieve category
+     * @return Retrieved category
+     */
     public Optional<Category> getCategoryById(int id) {
         return this.categoryRepository.findById(id);
     }
 
+    /**
+     * Get list of all categories
+     *
+     * @return List of categories
+     */
     public List<Category> getAllCategories() {
         return this.categoryRepository.findAll();
     }
 
 
+    /**
+     * Save updated category
+     *
+     * @param category Category to update
+     * @throws DuplicateEntityException If the updated category's title already exists in the database
+     * @throws EntityNotFoundException  If the category to update is not found in the database
+     */
     public void updateCategory(Category category) throws DuplicateEntityException, EntityNotFoundException {
         this.categoryRepository.findById(category.getId()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.ENTITY_NOT_FOUND.getMessage()));
 
@@ -77,6 +102,12 @@ public class CategoryService {
         }
     }
 
+    /**
+     * Delete category from the database
+     * Remove any association of the category with any other subcategories
+     *
+     * @param category Category to delete
+     */
     @Transactional
     public void deleteCategory(Category category) {
 
@@ -87,6 +118,11 @@ public class CategoryService {
     }
 
 
+    /**
+     * Delete all the categories from the database
+     * Remove any association of the categories with any
+     * other subcategories prior to deletion
+     */
     @Transactional
     public void deleteAllCategories() {
 
@@ -105,8 +141,12 @@ public class CategoryService {
      * TODO:    May be Not working properly!!!
      *          Need to test with real data and in memory database
      *          Issue: skip few records when some records are deleted thorugh
+     * <p>
+     * Delete multiple categories at once
+     * Remove any association of the categories with any
+     * other subcategories prior to deletion
      *
-     * @param categories
+     * @param categories List of categories to delete
      */
     @Transactional
     public void deleteCategories(List<Category> categories) {

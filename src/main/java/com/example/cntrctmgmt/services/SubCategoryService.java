@@ -24,6 +24,14 @@ public class SubCategoryService {
         this.subCategoryRepository = subCategoryRepository;
     }
 
+    /**
+     * Add sub-category to the database
+     *
+     * @param subCategory Sub-category to add
+     * @return Saved sub-category
+     * @throws DuplicateEntityException If the sub-category with the same name already exists
+     * @throws UnknownException         If any unknown exception found
+     */
     public SubCategory addSubCategory(SubCategory subCategory) throws DuplicateEntityException, UnknownException {
         SubCategory savedSubCategory = null;
         try {
@@ -44,15 +52,34 @@ public class SubCategoryService {
         return savedSubCategory;
     }
 
+    /**
+     * Retrieve the sub-category by id
+     *
+     * @param id ID to retrieve the sub-category
+     * @return Retrieved sub-category
+     */
     public Optional<SubCategory> getSubCategoryById(int id) {
         return this.subCategoryRepository.findById(id);
     }
 
+    /**
+     * Get list of all sub-categories
+     *
+     * @return List of sub-categories
+     */
     public List<SubCategory> getAllSubCategories() {
         return this.subCategoryRepository.findAll();
     }
 
 
+    /**
+     * Save updated sub-category
+     *
+     * @param subCategory Sub-category to update
+     * @throws DuplicateEntityException If the updated sub-category's title already exists in the database
+     * @throws EntityNotFoundException  If the sub-category to update is not found in the database
+     * @throws UnknownException         If any unknown exception found
+     */
     @Transactional
     public void updateSubCategory(SubCategory subCategory) throws DuplicateEntityException, EntityNotFoundException, UnknownException {
         SubCategory savedSubCategory = this.subCategoryRepository.findById(subCategory.getId()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.ENTITY_NOT_FOUND.getMessage()));
@@ -61,7 +88,7 @@ public class SubCategoryService {
             savedSubCategory.setTitle(subCategory.getTitle());
             this.subCategoryRepository.save(savedSubCategory);
 
-        }catch (JpaSystemException jpaSystemException) {
+        } catch (JpaSystemException jpaSystemException) {
             if (jpaSystemException.getRootCause() instanceof SQLiteException) {
                 int errorCode = ((SQLiteException) jpaSystemException.getRootCause()).getErrorCode();
                 if (errorCode == 19) //SQLITE_CONSTRAINT
@@ -75,11 +102,18 @@ public class SubCategoryService {
         }
     }
 
+    /**
+     * Delete sub-category from the database
+     *
+     * @param subCategory Sub-category to delete
+     */
     public void deleteSubCategory(SubCategory subCategory) {
         this.subCategoryRepository.delete(subCategory);
     }
 
-
+    /**
+     * Delete all the sub-categories from the database
+     */
     @Transactional
     public void deleteAllSubCategories() {
         this.subCategoryRepository.deleteAll();

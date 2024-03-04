@@ -22,37 +22,73 @@ public class SubContractService {
         this.subContractRepository = subContractRepository;
     }
 
+    /**
+     * Add sub-contract to the database
+     *
+     * @param subContract Sub-contract to add
+     * @return Saved sub-contract
+     */
     public SubContract addSubContract(SubContract subContract) {
         return this.subContractRepository.save(subContract);
     }
 
+    /**
+     * Retrieve all the contracts under one contract
+     *
+     * @param contract Contract to retrieve its children sub-contract
+     * @return Retreived sub-contracts
+     */
     public List<SubContract> getAllSubContractsByContract(Contract contract) {
         return this.subContractRepository.findAllByContract(contract);
     }
 
+    /**
+     * Retrieve sub-contract by id
+     *
+     * @param id ID to retrieve the sun-contract
+     * @return Retrieved sub-contract
+     */
     public Optional<SubContract> getSubContractById(int id) {
         return this.subContractRepository.findById(id);
     }
 
+    /**
+     * Save updated sub-contract
+     *
+     * @param subContract Sub-contract to update
+     */
     @Transactional
     public void updateSubContract(SubContract subContract) {
-         this.subContractRepository.findById(subContract.getId())
+        this.subContractRepository.findById(subContract.getId())
                 .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.ENTITY_NOT_FOUND.getMessage()));
 
         this.subContractRepository.save(subContract);
 
     }
 
+    /**
+     * Delete sub-contract from the database
+     *
+     * @param subContract Sub-contract to delete
+     */
     @Transactional
     public void deleteSubContract(SubContract subContract) {
         this.subContractRepository.delete(subContract);
     }
 
+    /**
+     * Delete all the sub-contracts from the database
+     */
     @Transactional
     public void deleteAllSubContract() {
         this.subContractRepository.deleteAll();
     }
 
+    /**
+     * Delete multiple sub-contracts at once
+     *
+     * @param subContracts List of sub-contracts to delete
+     */
     @Transactional
     public void deleteSubContracts(List<SubContract> subContracts) {
         this.subContractRepository.deleteAll(subContracts);
