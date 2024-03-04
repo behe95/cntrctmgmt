@@ -93,4 +93,8 @@ public class SubCategory {
     public void setCategoryList(List<Category> categoryList) {
         this.categoryList = categoryList;
     }
+
+    public void addToCategoryList(Category category) {
+        this.categoryList.add(category);
+    }
 }

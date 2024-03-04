@@ -112,7 +112,7 @@ public class Category {
     }
 
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.REFRESH)
     @JoinTable(
             name = DBTableJoinerCategorySubCategoryConst.DB_TABLE_JOINER_CATEGORY_SUBCATEGORY
             ,joinColumns = @JoinColumn(name = DBTableJoinerCategorySubCategoryConst.DB_TABLE_COLUMN_CATEGORY_FK)
@@ -124,6 +124,10 @@ public class Category {
 
     public void setSubCategoryList(List<SubCategory> subCategoryList) {
         this.subCategoryList = subCategoryList;
+    }
+
+    public void addToSubCategoryList(SubCategory subCategory) {
+        this.subCategoryList.add(subCategory);
     }
 
     @Override
