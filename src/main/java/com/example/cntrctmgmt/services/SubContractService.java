@@ -33,10 +33,10 @@ public class SubContractService {
     }
 
     /**
-     * Retrieve all the contracts under one contract
+     * Retrieve all the sub-contracts under one contract
      *
      * @param contract Contract to retrieve its children sub-contract
-     * @return Retreived sub-contracts
+     * @return Retrieved sub-contracts
      */
     public List<SubContract> getAllSubContractsByContract(Contract contract) {
         return this.subContractRepository.findAllByContract(contract);
