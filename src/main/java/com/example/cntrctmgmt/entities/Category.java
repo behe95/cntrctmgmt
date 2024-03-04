@@ -4,6 +4,8 @@ import com.example.cntrctmgmt.constant.db.DBCategoryConst;
 import com.example.cntrctmgmt.constant.db.DBTableJoinerCategorySubCategoryConst;
 import jakarta.persistence.*;
 import javafx.beans.property.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -23,7 +25,7 @@ public class Category {
     private ObjectProperty<LocalDateTime> modified = new SimpleObjectProperty<>();
 
     @Transient
-    private List<SubCategory> subCategoryList = new ArrayList<>();
+    private ObservableList<SubCategory> subCategoryList = FXCollections.observableList(new ArrayList<>());
 
 
     /**
@@ -123,7 +125,7 @@ public class Category {
     }
 
     public void setSubCategoryList(List<SubCategory> subCategoryList) {
-        this.subCategoryList = subCategoryList;
+        this.subCategoryList = FXCollections.observableList(subCategoryList);
     }
 
     public void addToSubCategoryList(SubCategory subCategory) {

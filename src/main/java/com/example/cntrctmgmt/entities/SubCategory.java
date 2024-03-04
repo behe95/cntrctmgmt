@@ -3,6 +3,8 @@ package com.example.cntrctmgmt.entities;
 import com.example.cntrctmgmt.constant.db.DBSubCategoryConst;
 import jakarta.persistence.*;
 import javafx.beans.property.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,7 +18,7 @@ public class SubCategory {
     private ObjectProperty<LocalDateTime> created = new SimpleObjectProperty<>();
     private ObjectProperty<LocalDateTime> modified = new SimpleObjectProperty<>();
 
-    private List<Category> categoryList = new ArrayList<>();
+    private ObservableList<Category> categoryList = FXCollections.observableList(new ArrayList<>());
 
     /**
      * Default constructor for JPA
@@ -91,7 +93,7 @@ public class SubCategory {
     }
 
     public void setCategoryList(List<Category> categoryList) {
-        this.categoryList = categoryList;
+        this.categoryList = FXCollections.observableList(categoryList);
     }
 
     public void addToCategoryList(Category category) {

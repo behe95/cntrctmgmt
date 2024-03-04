@@ -21,7 +21,7 @@ public class Contract {
     private ObjectProperty<LocalDateTime> modified = new SimpleObjectProperty<>();
 
     @Transient  // ignore , use getter instead
-    private List<SubContract> subContracts = new ArrayList<SubContract>();
+    private ObservableList<SubContract> subContracts = FXCollections.observableList(new ArrayList<>());
 
     public Contract() {}
 
@@ -92,7 +92,7 @@ public class Contract {
     }
 
     public void setSubContracts(List<SubContract> subContracts) {
-        this.subContracts = subContracts;
+        this.subContracts = FXCollections.observableList(subContracts);
     }
 
     public void addSubContract(SubContract subContract) {this.subContracts.add(subContract);}
