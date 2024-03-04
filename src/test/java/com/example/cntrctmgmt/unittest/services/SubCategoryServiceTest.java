@@ -7,14 +7,12 @@ import com.example.cntrctmgmt.exceptions.UnknownException;
 import com.example.cntrctmgmt.repositories.SubCategoryRepository;
 import com.example.cntrctmgmt.services.SubCategoryService;
 import jakarta.persistence.EntityNotFoundException;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
-import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 
@@ -110,7 +108,6 @@ class SubCategoryServiceTest {
                 .hasMessage(ExceptionMessage.UNKNOWN_EXCEPTION.getMessage());
 
     }
-
 
 
     @Test
@@ -328,7 +325,6 @@ class SubCategoryServiceTest {
 
         // given
         given(this.subCategoryRepositoryMock.findById(argSubCategory.getId())).willReturn(Optional.of(mockSubCategory));
-
 
 
         // re-create any exception but sqlite unique constraint exception

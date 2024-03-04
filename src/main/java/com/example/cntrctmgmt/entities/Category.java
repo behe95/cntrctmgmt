@@ -19,7 +19,6 @@ public class Category {
     private BooleanProperty softCost = new SimpleBooleanProperty();
 
 
-
     private ObjectProperty<LocalDateTime> created = new SimpleObjectProperty<>();
 
     private ObjectProperty<LocalDateTime> modified = new SimpleObjectProperty<>();
@@ -117,8 +116,8 @@ public class Category {
     @ManyToMany(cascade = CascadeType.REFRESH)
     @JoinTable(
             name = DBTableJoinerCategorySubCategoryConst.DB_TABLE_JOINER_CATEGORY_SUBCATEGORY
-            ,joinColumns = @JoinColumn(name = DBTableJoinerCategorySubCategoryConst.DB_TABLE_COLUMN_CATEGORY_FK)
-            ,inverseJoinColumns = @JoinColumn(name = DBTableJoinerCategorySubCategoryConst.DB_TABLE_COLUMN_SUBCATEGORY_FK)
+            , joinColumns = @JoinColumn(name = DBTableJoinerCategorySubCategoryConst.DB_TABLE_COLUMN_CATEGORY_FK)
+            , inverseJoinColumns = @JoinColumn(name = DBTableJoinerCategorySubCategoryConst.DB_TABLE_COLUMN_SUBCATEGORY_FK)
     )
     public List<SubCategory> getSubCategoryList() {
         return subCategoryList;

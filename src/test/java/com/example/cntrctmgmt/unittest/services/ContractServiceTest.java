@@ -1,34 +1,21 @@
 package com.example.cntrctmgmt.unittest.services;
 
-import com.example.cntrctmgmt.entities.Category;
 import com.example.cntrctmgmt.entities.Contract;
-import com.example.cntrctmgmt.repositories.CategoryRepository;
 import com.example.cntrctmgmt.repositories.ContractRepository;
 import com.example.cntrctmgmt.services.ContractService;
 import org.junit.jupiter.api.Test;
 
-
 import com.example.cntrctmgmt.constant.responsemessage.ExceptionMessage;
-import com.example.cntrctmgmt.entities.SubCategory;
-import com.example.cntrctmgmt.exceptions.DuplicateEntityException;
-import com.example.cntrctmgmt.exceptions.UnknownException;
-import com.example.cntrctmgmt.repositories.SubCategoryRepository;
 import jakarta.persistence.EntityNotFoundException;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
-import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.orm.jpa.JpaSystemException;
-import org.sqlite.SQLiteErrorCode;
-import org.sqlite.SQLiteException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -105,7 +92,7 @@ class ContractServiceTest {
         assertTrue(contract.isPresent());
         assertEquals(1, contract.get().getId());
         verify(this.contractRepositoryMock, times(1)).findById(idArgumentCaptor.capture());
-        assertEquals(1,idArgumentCaptor.getValue());
+        assertEquals(1, idArgumentCaptor.getValue());
 
     }
 

@@ -23,9 +23,12 @@ public class Contract {
     @Transient  // ignore , use getter instead
     private ObservableList<SubContract> subContracts = FXCollections.observableList(new ArrayList<>());
 
-    public Contract() {}
+    public Contract() {
+    }
 
-    public Contract(String title) {this.setTitle(title);}
+    public Contract(String title) {
+        this.setTitle(title);
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -95,5 +98,7 @@ public class Contract {
         this.subContracts = FXCollections.observableList(subContracts);
     }
 
-    public void addSubContract(SubContract subContract) {this.subContracts.add(subContract);}
+    public void addSubContract(SubContract subContract) {
+        this.subContracts.add(subContract);
+    }
 }

@@ -11,24 +11,18 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.BDDMockito.given;
 
 import com.example.cntrctmgmt.services.CategoryService;
-import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.Query;
-import jakarta.persistence.TypedQuery;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.sqlite.SQLiteErrorCode;
 import org.sqlite.SQLiteException;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,7 +30,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class CategoryServiceTest {
-//    @Mock
+    //    @Mock
 //    private EntityManager entityManager;
     @Mock
     private CategoryRepository categoryRepositoryMock;
@@ -254,7 +248,6 @@ class CategoryServiceTest {
         assertEquals(categoryToUpdate.getId(), capturedCategory.getId());
         assertEquals(categoryToUpdate.getTitle(), capturedCategory.getTitle());
         assertEquals(categoryToUpdate.getSoftCost(), capturedCategory.getSoftCost());
-
 
 
     }

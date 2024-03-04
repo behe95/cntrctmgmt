@@ -12,6 +12,5 @@ import java.util.List;
 
 @Repository
 public interface SubContractRepository extends JpaRepository<SubContract, Integer> {
-
     List<SubContract> findAllByContract(Contract contract);
 }

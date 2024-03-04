@@ -1,6 +1,5 @@
 package com.example.cntrctmgmt;
 
-import com.example.cntrctmgmt.CntrctmgmtApplication;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.stage.Stage;

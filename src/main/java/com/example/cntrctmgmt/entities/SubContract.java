@@ -1,8 +1,6 @@
 package com.example.cntrctmgmt.entities;
 
-import com.example.cntrctmgmt.constant.db.DBContractConst;
 import com.example.cntrctmgmt.constant.db.DBSubContractConst;
-import com.example.cntrctmgmt.constant.db.DBTransactionTypeConst;
 import jakarta.persistence.*;
 import javafx.beans.property.*;
 

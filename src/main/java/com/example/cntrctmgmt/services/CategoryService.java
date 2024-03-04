@@ -7,8 +7,6 @@ import com.example.cntrctmgmt.exceptions.DuplicateEntityException;
 import com.example.cntrctmgmt.repositories.CategoryRepository;
 import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Service;
@@ -37,7 +35,7 @@ public class CategoryService {
         Category saveCategory = null;
         try {
             saveCategory = this.categoryRepository.save(category);
-        }catch (JpaSystemException jpaSystemException) {
+        } catch (JpaSystemException jpaSystemException) {
             if (jpaSystemException.getRootCause() instanceof SQLiteException) {
                 int errorCode = ((SQLiteException) jpaSystemException.getRootCause()).getErrorCode();
                 if (errorCode == 19) //SQLITE_CONSTRAINT
@@ -61,13 +59,13 @@ public class CategoryService {
     }
 
 
-    public void updateCategory(Category category) throws DuplicateEntityException, EntityNotFoundException  {
+    public void updateCategory(Category category) throws DuplicateEntityException, EntityNotFoundException {
         this.categoryRepository.findById(category.getId()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.ENTITY_NOT_FOUND.getMessage()));
 
         try {
             this.categoryRepository.save(category);
 
-        }catch (JpaSystemException jpaSystemException) {
+        } catch (JpaSystemException jpaSystemException) {
             if (jpaSystemException.getRootCause() instanceof SQLiteException) {
                 int errorCode = ((SQLiteException) jpaSystemException.getRootCause()).getErrorCode();
                 if (errorCode == 19) //SQLITE_CONSTRAINT
@@ -107,6 +105,7 @@ public class CategoryService {
      * TODO:    May be Not working properly!!!
      *          Need to test with real data and in memory database
      *          Issue: skip few records when some records are deleted thorugh
+     *
      * @param categories
      */
     @Transactional

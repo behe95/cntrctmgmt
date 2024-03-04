@@ -3,7 +3,6 @@ package com.example.cntrctmgmt.config;
 import com.example.cntrctmgmt.constant.db.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 //@Configuration
@@ -46,7 +45,6 @@ public class ApplicationConfig implements CommandLineRunner {
 
         // insert default value to the transaction type table
         this.jdbcTemplate.execute(DBTransactionTypeConst._DB_INSERT_INTO_TRANSACTIONTYPE_TABLE_DEFAULT_VALUES);
-
 
 
         // contract table

@@ -1,31 +1,18 @@
 package com.example.cntrctmgmt.integerationtest.services;
 
-import com.example.cntrctmgmt.TestConfig;
 import com.example.cntrctmgmt.entities.*;
 import com.example.cntrctmgmt.exceptions.DuplicateEntityException;
 import com.example.cntrctmgmt.exceptions.UnknownException;
 import com.example.cntrctmgmt.services.CategoryService;
-import com.example.cntrctmgmt.services.ContractService;
 import com.example.cntrctmgmt.services.SubCategoryService;
-import com.example.cntrctmgmt.services.SubContractService;
 import com.github.javafaker.Faker;
 import jakarta.transaction.Transactional;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.annotation.Commit;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.Rollback;
-
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,7 +48,6 @@ class CategoryServiceTest {
         // save category
         Category returnedCategory1 = this.categoryService.addCategory(category1);
         Category returnedCategory2 = this.categoryService.addCategory(category2);
-
 
 
         // subcategory
@@ -101,7 +87,7 @@ class CategoryServiceTest {
         subCategories.add(subCategory2);
 
         category.setSubCategoryList(subCategories); // immutable list causes JPA to throw exception
-                                                    // hence modifiable list is passed
+        // hence modifiable list is passed
         subCategory1.setCategoryList(List.of(category));
         subCategory2.setCategoryList(List.of(category));
         this.categoryService.updateCategory(category);
@@ -160,11 +146,10 @@ class CategoryServiceTest {
         subCategories1.add(subCategory2);
 
         category1.setSubCategoryList(subCategories1); // immutable list causes JPA to throw exception
-                                                        // hence modifiable list is passed
+        // hence modifiable list is passed
         subCategory1.setCategoryList(new ArrayList<>(List.of(category1)));  // mutable
         subCategory2.setCategoryList(new ArrayList<>(List.of(category1)));  // mutable
         this.categoryService.updateCategory(category1);
-
 
 
         List<SubCategory> subCategories2 = new ArrayList<>();
@@ -176,15 +161,12 @@ class CategoryServiceTest {
         this.categoryService.updateCategory(category2);
 
 
-
         /**
          * when
          * delete
          * {category1} has {subCategory1, subCategory2}
          */
         this.categoryService.deleteCategory(category1);
-
-
 
 
         /**
@@ -215,7 +197,6 @@ class CategoryServiceTest {
         assertTrue(updatedCategory2.isPresent());
         assertTrue(updatedSubCategory1.isPresent());
         assertTrue(updatedSubCategory2.isPresent());
-
 
 
         // check they have joined entites
@@ -259,12 +240,10 @@ class CategoryServiceTest {
         this.categoryService.updateCategory(category1);
 
 
-
         category2.addToSubCategoryList(subCategory1); // immutable list causes JPA to throw exception
         // hence modifiable list is passed
         subCategory1.addToCategoryList(category2);  // mutable
         this.categoryService.updateCategory(category2);
-
 
 
         /**
@@ -274,8 +253,6 @@ class CategoryServiceTest {
          * {category2} has {subCategory1}
          */
         this.categoryService.deleteAllCategories();
-
-
 
 
         /**
@@ -305,7 +282,6 @@ class CategoryServiceTest {
         assertTrue(updatedCategory2.isEmpty());
         assertTrue(updatedSubCategory1.isPresent());
         assertTrue(updatedSubCategory2.isPresent());
-
 
 
         // check they have joined entites
@@ -348,7 +324,6 @@ class CategoryServiceTest {
         this.categoryService.updateCategory(category1);
 
 
-
         List<SubCategory> subCategories2 = new ArrayList<>();
         subCategories2.add(subCategory1);
 
@@ -358,15 +333,12 @@ class CategoryServiceTest {
         this.categoryService.updateCategory(category2);
 
 
-
         /**
          * when
          * delete
          * {category2} has {subCategory1}
          */
         this.categoryService.deleteCategories(new ArrayList<>(List.of(category2)));
-
-
 
 
         /**
@@ -396,7 +368,6 @@ class CategoryServiceTest {
         assertTrue(updatedCategory2.isEmpty());
         assertTrue(updatedSubCategory1.isPresent());
         assertTrue(updatedSubCategory2.isPresent());
-
 
 
         // check they have joined entites

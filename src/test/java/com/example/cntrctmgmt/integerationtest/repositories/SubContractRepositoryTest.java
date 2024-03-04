@@ -1,7 +1,6 @@
 package com.example.cntrctmgmt.integerationtest.repositories;
 
 import com.example.cntrctmgmt.TestConfig;
-import com.example.cntrctmgmt.constant.db.DBTransactionTypeConst;
 import com.example.cntrctmgmt.entities.Contract;
 import com.example.cntrctmgmt.entities.SubContract;
 import com.example.cntrctmgmt.entities.TransactionType;
@@ -17,10 +16,8 @@ import org.springframework.test.annotation.Rollback;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-
 
 
 @SpringBootTest
@@ -51,7 +48,6 @@ class SubContractRepositoryTest {
         transactionType1.setId(1);
         transactionType1.setTitle("Credit");
         transactionType1.setMultiplier(-1);
-
 
 
         SubContract subContract1 = new SubContract();

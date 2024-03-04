@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.annotation.Commit;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.Rollback;
 
@@ -113,7 +112,6 @@ class ContractServiceTest {
         LocalDateTime subContractStartDate = LocalDateTime.now();
 
 
-
         SubContract subContract = new SubContract();
         subContract.setTitle("Security improvement");
         subContract.setOrderNumber(1);
@@ -145,7 +143,7 @@ class ContractServiceTest {
         assertEquals(1, updatedContract.get().getSubContracts().size());
         assertEquals(1, savedSubContractList.size());
         assertNotNull(updatedContract.get().getSubContracts().get(0).getTransactionType());
-        assertEquals(1,updatedContract.get().getSubContracts().get(0).getTransactionType().getId());
+        assertEquals(1, updatedContract.get().getSubContracts().get(0).getTransactionType().getId());
         assertEquals(this.category.getId(), updatedContract.get().getSubContracts().get(0).getCategory().getId());
         assertEquals(this.subCategory.getId(), updatedContract.get().getSubContracts().get(0).getSubCategory().getId());
 
@@ -299,7 +297,6 @@ class ContractServiceTest {
         assertEquals(savedContract2.getTitle(), contracts.get(0).getTitle());
         assertEquals(savedContract2.getCreated(), contracts.get(0).getCreated());
         assertEquals(savedContract2.getModified(), contracts.get(0).getModified());
-
 
 
         // also check the child subContracts are deleted too

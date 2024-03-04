@@ -23,7 +23,8 @@ public class SubCategory {
     /**
      * Default constructor for JPA
      */
-    public SubCategory() {}
+    public SubCategory() {
+    }
 
     public SubCategory(String title) {
         this.setTitle(title);

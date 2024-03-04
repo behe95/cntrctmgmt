@@ -11,13 +11,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.example.cntrctmgmt.constant.responsemessage.ExceptionMessage;
 import jakarta.persistence.EntityNotFoundException;
 import org.mockito.ArgumentCaptor;
+
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -50,8 +54,8 @@ class SubContractServiceTest {
         Contract contract = new Contract();
         contract.setId(1);
         contract.setTitle("Software upgrade");
-        contract.setCreated(LocalDateTime.of(2024,1,1,0,0));
-        contract.setModified(LocalDateTime.of(2024,2,1,0,0));
+        contract.setCreated(LocalDateTime.of(2024, 1, 1, 0, 0));
+        contract.setModified(LocalDateTime.of(2024, 2, 1, 0, 0));
 
         SubContract subContract = new SubContract();
         subContract.setTitle("Security improvement");
@@ -75,8 +79,8 @@ class SubContractServiceTest {
         Contract mockContract = new Contract();
         mockContract.setId(1);
         mockContract.setTitle("Software upgrade");
-        mockContract.setCreated(LocalDateTime.of(2024,1,1,0,0));
-        mockContract.setModified(LocalDateTime.of(2024,2,1,0,0));
+        mockContract.setCreated(LocalDateTime.of(2024, 1, 1, 0, 0));
+        mockContract.setModified(LocalDateTime.of(2024, 2, 1, 0, 0));
 
         SubContract mockSubContract = new SubContract();
         mockSubContract.setId(1);
@@ -118,9 +122,8 @@ class SubContractServiceTest {
         assertEquals(subContract.getStartDate(), savedSubContract.getStartDate());
         assertEquals(subContract.getEndDate(), savedSubContract.getEndDate());
         assertEquals(subContract, subContractArgumentCaptor.getValue());
-        assertEquals(subContract.getCategory().getId(),savedSubContract.getCategory().getId());
+        assertEquals(subContract.getCategory().getId(), savedSubContract.getCategory().getId());
         assertEquals(subContract.getSubCategory().getId(), savedSubContract.getSubCategory().getId());
-
 
 
     }
@@ -145,8 +148,8 @@ class SubContractServiceTest {
         Contract contract = new Contract();
         contract.setId(1);
         contract.setTitle("Software upgrade");
-        contract.setCreated(LocalDateTime.of(2024,1,1,0,0));
-        contract.setModified(LocalDateTime.of(2024,2,1,0,0));
+        contract.setCreated(LocalDateTime.of(2024, 1, 1, 0, 0));
+        contract.setModified(LocalDateTime.of(2024, 2, 1, 0, 0));
 
         SubContract subContract = new SubContract();
         subContract.setId(1);
@@ -206,8 +209,8 @@ class SubContractServiceTest {
         Contract contract = new Contract();
         contract.setId(1);
         contract.setTitle("Software upgrade");
-        contract.setCreated(LocalDateTime.of(2024,1,1,0,0));
-        contract.setModified(LocalDateTime.of(2024,2,1,0,0));
+        contract.setCreated(LocalDateTime.of(2024, 1, 1, 0, 0));
+        contract.setModified(LocalDateTime.of(2024, 2, 1, 0, 0));
 
         SubContract subContract = new SubContract();
         subContract.setId(1);
@@ -232,8 +235,8 @@ class SubContractServiceTest {
         Contract mockContract = new Contract();
         mockContract.setId(1);
         mockContract.setTitle("Software upgrade");
-        mockContract.setCreated(LocalDateTime.of(2024,1,1,0,0));
-        mockContract.setModified(LocalDateTime.of(2024,2,1,0,0));
+        mockContract.setCreated(LocalDateTime.of(2024, 1, 1, 0, 0));
+        mockContract.setModified(LocalDateTime.of(2024, 2, 1, 0, 0));
 
         SubContract mockSubContract = new SubContract();
         mockSubContract.setId(1);
@@ -302,8 +305,8 @@ class SubContractServiceTest {
         Contract contract = new Contract();
         contract.setId(1);
         contract.setTitle("Software upgrade");
-        contract.setCreated(LocalDateTime.of(2024,1,1,0,0));
-        contract.setModified(LocalDateTime.of(2024,2,1,0,0));
+        contract.setCreated(LocalDateTime.of(2024, 1, 1, 0, 0));
+        contract.setModified(LocalDateTime.of(2024, 2, 1, 0, 0));
 
         SubContract subContract = new SubContract();
         subContract.setId(1);
@@ -368,8 +371,8 @@ class SubContractServiceTest {
         Contract contract = new Contract();
         contract.setId(1);
         contract.setTitle("Software upgrade");
-        contract.setCreated(LocalDateTime.of(2024,1,1,0,0));
-        contract.setModified(LocalDateTime.of(2024,2,1,0,0));
+        contract.setCreated(LocalDateTime.of(2024, 1, 1, 0, 0));
+        contract.setModified(LocalDateTime.of(2024, 2, 1, 0, 0));
 
         SubContract subContract = new SubContract();
         subContract.setId(1);
@@ -440,8 +443,8 @@ class SubContractServiceTest {
         Contract contract = new Contract();
         contract.setId(1);
         contract.setTitle("Software upgrade");
-        contract.setCreated(LocalDateTime.of(2024,1,1,0,0));
-        contract.setModified(LocalDateTime.of(2024,2,1,0,0));
+        contract.setCreated(LocalDateTime.of(2024, 1, 1, 0, 0));
+        contract.setModified(LocalDateTime.of(2024, 2, 1, 0, 0));
 
         SubContract subContract1 = new SubContract();
         subContract1.setId(1);
