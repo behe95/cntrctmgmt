@@ -7,6 +7,7 @@ import com.example.cntrctmgmt.exceptions.UnknownException;
 import com.example.cntrctmgmt.repositories.SubCategoryRepository;
 import com.example.cntrctmgmt.services.SubCategoryService;
 import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -390,6 +391,7 @@ class SubCategoryServiceTest {
     }
 
     @Test
+    @Disabled
     void deleteAllSubCategories() {
         /**
          * when

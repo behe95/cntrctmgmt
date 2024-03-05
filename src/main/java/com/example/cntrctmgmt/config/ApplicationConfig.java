@@ -3,6 +3,7 @@ package com.example.cntrctmgmt.config;
 import com.example.cntrctmgmt.constant.db.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 //@Configuration

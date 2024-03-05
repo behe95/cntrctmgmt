@@ -1,11 +1,12 @@
 package com.example.cntrctmgmt.services;
 
 import com.example.cntrctmgmt.constant.responsemessage.ExceptionMessage;
+import com.example.cntrctmgmt.entities.Category;
 import com.example.cntrctmgmt.entities.SubCategory;
 import com.example.cntrctmgmt.exceptions.DuplicateEntityException;
 import com.example.cntrctmgmt.exceptions.UnknownException;
 import com.example.cntrctmgmt.repositories.SubCategoryRepository;
-import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.jpa.JpaSystemException;
@@ -17,6 +18,9 @@ import java.util.Optional;
 
 @Service
 public class SubCategoryService {
+
+    @PersistenceContext
+    private EntityManager entityManager;
     private final SubCategoryRepository subCategoryRepository;
 
     @Autowired
@@ -104,10 +108,14 @@ public class SubCategoryService {
 
     /**
      * Delete sub-category from the database
+     * Remove any association of the category with any other subcategories
      *
      * @param subCategory Sub-category to delete
      */
     public void deleteSubCategory(SubCategory subCategory) {
+        for (Category category : subCategory.getCategoryList()) {
+            category.getSubCategoryList().remove(subCategory);
+        }
         this.subCategoryRepository.delete(subCategory);
     }
 
@@ -116,6 +124,13 @@ public class SubCategoryService {
      */
     @Transactional
     public void deleteAllSubCategories() {
+        List<SubCategory> subCategories = entityManager.createQuery("SELECT sc FROM SubCategory sc", SubCategory.class).getResultList();
+
+        for (SubCategory subCategory : subCategories) {
+            for (Category category : subCategory.getCategoryList()) {
+                category.getSubCategoryList().remove(subCategory);
+            }
+        }
         this.subCategoryRepository.deleteAll();
     }
 }

@@ -169,6 +169,7 @@ class CategoryServiceTest {
         this.categoryService.deleteCategory(category1);
 
 
+
         /**
          * then
          * retrieve the category
