@@ -13,8 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
-<AnchorPane fx:id="mainViewAnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane fx:id="mainViewAnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.cntrctmgmt.controllers.MainViewController">
    <children>
       <VBox layoutX="57.0" layoutY="109.0" maxWidth="-Infinity" prefHeight="600.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -47,12 +46,12 @@
                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                 </rowConstraints>
                                  <children>
-                                    <Label text="Category management">
+                                    <Label fx:id="labelSettingsCategoryManagement" onMouseClicked="#labelSettingsCategoryManagementOnMouseClicked" text="Category management">
                                        <cursor>
                                           <Cursor fx:constant="HAND" />
                                        </cursor>
                                     </Label>
-                                    <Label text="Sub-category management" GridPane.rowIndex="1">
+                                    <Label fx:id="labelSettingsSubCategoryManagement" onMouseClicked="#labelSettingsSubCategoryManagementOnMouseClicked" text="Sub-category management" GridPane.rowIndex="1">
                                        <cursor>
                                           <Cursor fx:constant="HAND" />
                                        </cursor>
