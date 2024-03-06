@@ -12,13 +12,17 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.event.EventTarget;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
+import javafx.util.StringConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
@@ -30,7 +34,11 @@ import java.util.Objects;
 @Controller
 public class SettingsCategoryViewController {
 
-    private final ApplicationContext applicationContext;
+    private final CategoryService categoryService;
+    private final SubCategoryService subCategoryService;
+
+    private ObservableList<Category> categories;
+    private ObservableList<SubCategory> subCategories;
 
     @FXML
     private ListView<Category> listViewCategory;
@@ -45,48 +53,65 @@ public class SettingsCategoryViewController {
     private EntityManager entityManager;
 
     @Autowired
-    public SettingsCategoryViewController(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
+    public SettingsCategoryViewController(CategoryService categoryService, SubCategoryService subCategoryService) {
+        this.categoryService = categoryService;
+        this.subCategoryService = subCategoryService;
+        categories = FXCollections.observableArrayList(new ArrayList<>());
+        subCategories = FXCollections.observableArrayList(new ArrayList<>());
     }
 
 
     @FXML
     private void initialize() {
         // Get all the categories
-        CategoryService categoryService = this.applicationContext.getBean(CategoryService.class);
-        List<Category> categoryList = categoryService.getAllCategories();
-        ObservableList<Category> categories = FXCollections.observableArrayList(new ArrayList<>());
-        categories.setAll(categoryList);
-        listViewCategory.setItems(categories);
-
+        categories.setAll(categoryService.getAllCategories());
         // Get all the subcategories
-        SubCategoryService subCategoryService = this.applicationContext.getBean(SubCategoryService.class);
-        List<SubCategory> subCategoryList = subCategoryService.getAllSubCategories();
-        ObservableList<SubCategory> subCategories = FXCollections.observableArrayList(new ArrayList<>());
-        subCategories.setAll(subCategoryList);
+        subCategories.setAll(subCategoryService.getAllSubCategories());
+
+        // populate list views
+        initListViewCategory();
+        initListViewAvailableSubCategory();
+        initListViewAssignedSubCategory();
+    }
 
 
 
-
-
+    private void initListViewCategory() {
+        listViewCategory.setItems(categories);
+        listViewCategory.setEditable(true);
 
 
         // Show Category title in listviewCategory
         listViewCategory.setCellFactory(new Callback<ListView<Category>, ListCell<Category>>() {
             @Override
             public ListCell<Category> call(ListView<Category> categoryListView) {
-                return new ListCell<Category>() {
+                return new TextFieldListCell<Category>() {
                     @Override
-                    protected void updateItem(Category category, boolean empty) {
+                    public void commitEdit(Category category) {
+                        super.commitEdit(category);
+                        setText(category.getTitle());
+                    }
+
+
+                    @Override
+                    public void updateItem(Category category, boolean empty) {
                         super.updateItem(category, empty);
-                        if (Objects.nonNull(category)) {
-                            setText(category.getTitle());
-                        }
+                        setConverter(new StringConverter<Category>() {
+                            @Override
+                            public String toString(Category category) {
+                                return category.getTitle();
+                            }
+                            @Override
+                            public Category fromString(String s) {
+                                getItem().setTitle(s);
+                                return getItem();
+                            }
+                        });
+
                         // on Category selection
                         this.setOnMouseClicked(mouseEvent -> {
                             if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
                                 if (Objects.nonNull(category) && !empty) {
-//                                listViewAssignedSubCategory.setItems(FXCollections.observableArrayList(category.getSubCategoryList()));
                                     listViewAssignedSubCategory.setItems(category.getSubCategoryList());
                                     listViewAvailableSubCategory
                                             .setItems(FXCollections.observableArrayList(
@@ -100,38 +125,48 @@ public class SettingsCategoryViewController {
                             if (mouseEvent.getButton().equals(MouseButton.SECONDARY)) {
                                 ContextMenu contextMenu = new ContextMenu();
                                 MenuItem saveMenutItem = new MenuItem("Save");
+                                MenuItem addMenutItem = new MenuItem("Add New");
+                                MenuItem editMenuItem = new MenuItem("Edit");
+                                MenuItem deleteMenuItem = new MenuItem("Delete");
                                 MenuItem cancelMenuItem = new MenuItem("Cancel");
 
-                                saveMenutItem.setOnAction(new EventHandler<ActionEvent>() {
-                                    @Override
-                                    public void handle(ActionEvent actionEvent) {
-                                        try {
-                                            categoryService.updateCategory(listViewProperty().get().getSelectionModel().getSelectedItem());
-                                            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                                            alert.setContentText("Category updated!");
-                                            alert.showAndWait();
-                                        } catch (DuplicateEntityException e) {
-                                            Alert alert = new Alert(Alert.AlertType.ERROR);
-                                            alert.setContentText(e.getMessage());
-                                            alert.showAndWait();
-                                        }
+                                saveMenutItem.setOnAction(actionEvent -> {
+                                    try {
+                                        categoryService.updateCategory(listViewProperty().get().getSelectionModel().getSelectedItem());
+                                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                                        alert.setContentText("Category updated!");
+                                        alert.showAndWait();
+                                    } catch (DuplicateEntityException e) {
+                                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                                        alert.setContentText(e.getMessage());
+                                        alert.showAndWait();
                                     }
                                 });
 
-                                contextMenu.getItems().addAll(saveMenutItem, cancelMenuItem);
+                                /**
+                                 * TODO 
+                                 */
+//                                addMenutItem.setOnAction(actionEvent -> {
+//                                    Category newCategory = new Category();
+//                                    listViewCategory.itemsProperty().get().add(newCategory);
+//                                    listViewCategory.getSelectionModel().select(newCategory);
+//                                    listViewCategory.getFocusModel().focus(listViewCategory.itemsProperty().get().size()-1);
+//                                    listViewCategory.requestFocus();
+//                                });
 
+                                editMenuItem.setOnAction(actionEvent -> startEdit());
 
+                                contextMenu.getItems().addAll(saveMenutItem, addMenutItem, editMenuItem, deleteMenuItem, cancelMenuItem);
                                 this.setContextMenu(contextMenu);
                             }
                         });
-
-
-
                     }
                 };
             }
         });
+    }
 
+    private void initListViewAvailableSubCategory() {
         // Show SubCategory title in listViewAvailableSubCategory
 
         listViewAvailableSubCategory.setCellFactory(new Callback<ListView<SubCategory>, ListCell<SubCategory>>() {
@@ -159,7 +194,9 @@ public class SettingsCategoryViewController {
                 };
             }
         });
+    }
 
+    private void initListViewAssignedSubCategory() {
         // Show SubCategory title in listviewAssignedSubCategory
         listViewAssignedSubCategory.setCellFactory(new Callback<ListView<SubCategory>, ListCell<SubCategory>>() {
             @Override
@@ -186,7 +223,7 @@ public class SettingsCategoryViewController {
                 };
             }
         });
-
-
     }
+
+
 }

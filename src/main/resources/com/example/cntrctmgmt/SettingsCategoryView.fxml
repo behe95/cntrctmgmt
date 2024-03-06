@@ -17,9 +17,9 @@
         <columnConstraints>
             <ColumnConstraints />
             <ColumnConstraints />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="30.0" prefWidth="176.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="217.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="35.0" prefWidth="207.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="34.0" prefWidth="176.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="193.0" minWidth="10.0" percentWidth="33.0" prefWidth="193.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="33.0" prefWidth="207.0" />
         </columnConstraints>
         <rowConstraints>
             <RowConstraints maxHeight="22.0" minHeight="10.0" prefHeight="22.0" vgrow="SOMETIMES" />
@@ -55,7 +55,7 @@
             </HBox>
             <Separator orientation="VERTICAL" prefHeight="200.0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
             <Separator orientation="VERTICAL" prefHeight="200.0" GridPane.columnIndex="4" GridPane.rowIndex="1" />
-            <ListView fx:id="listViewCategory" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+            <ListView fx:id="listViewCategory" editable="true" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
             <ListView fx:id="listViewAvailableSubCategory" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
             <ListView fx:id="listViewAssignedSubCategory" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="4" GridPane.rowIndex="1" />
          </children>
