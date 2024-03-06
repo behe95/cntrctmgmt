@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -89,7 +91,8 @@ public class SubCategory {
     }
 
     @ManyToMany(mappedBy = "subCategoryList")
-    public List<Category> getCategoryList() {
+    @Fetch(FetchMode.JOIN)
+    public ObservableList<Category> getCategoryList() {
         return categoryList;
     }
 

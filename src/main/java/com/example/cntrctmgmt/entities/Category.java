@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -119,7 +121,8 @@ public class Category {
             , joinColumns = @JoinColumn(name = DBTableJoinerCategorySubCategoryConst.DB_TABLE_COLUMN_CATEGORY_FK)
             , inverseJoinColumns = @JoinColumn(name = DBTableJoinerCategorySubCategoryConst.DB_TABLE_COLUMN_SUBCATEGORY_FK)
     )
-    public List<SubCategory> getSubCategoryList() {
+    @Fetch(FetchMode.JOIN)
+    public ObservableList<SubCategory> getSubCategoryList() {
         return subCategoryList;
     }
 
