@@ -151,6 +151,27 @@ public class SettingsCategoryViewController {
                                     }
                                 });
 
+                                deleteMenuItem.setOnAction(actionEvent -> {
+                                    try {
+                                        Category category1 = listViewProperty().get().getSelectionModel().getSelectedItem();
+                                        String message = "Category deleted!";
+
+                                        categoryService.deleteCategory(category);
+
+                                        listViewCategory.itemsProperty().get().remove(category1);
+                                        listViewCategory.getSelectionModel().clearSelection();
+
+                                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                                        alert.setContentText(message);
+                                        alert.showAndWait();
+
+                                    } catch (Exception ex) {
+                                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                                        alert.setContentText("Something went wrong! Unable to delete at this time.");
+                                        alert.showAndWait();
+                                    }
+                                });
+
                                 /**
                                  * TODO
                                  */
