@@ -108,6 +108,8 @@ public class SettingsCategoryViewController {
                             }
                         });
 
+
+
                         // on Category selection
                         this.setOnMouseClicked(mouseEvent -> {
                             if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
@@ -144,7 +146,7 @@ public class SettingsCategoryViewController {
                                 });
 
                                 /**
-                                 * TODO 
+                                 * TODO
                                  */
 //                                addMenutItem.setOnAction(actionEvent -> {
 //                                    Category newCategory = new Category();
@@ -178,6 +180,8 @@ public class SettingsCategoryViewController {
                         super.updateItem(subCategory, empty);
                         if (Objects.nonNull(subCategory) && !empty) {
                             setText(subCategory.getTitle());
+                        } else {
+                            setText(null);
                         }
 
                         this.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -207,6 +211,8 @@ public class SettingsCategoryViewController {
                         super.updateItem(subCategory, empty);
                         if (Objects.nonNull(subCategory) && !empty) {
                             setText(subCategory.getTitle());
+                        }else {
+                            setText(null);
                         }
 
                         this.setOnMouseClicked(new EventHandler<MouseEvent>() {
