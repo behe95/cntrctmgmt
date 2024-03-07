@@ -10,10 +10,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.event.EventTarget;
-import javafx.event.EventType;
+import javafx.event.*;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -110,6 +107,7 @@ public class SettingsCategoryViewController {
 
 
 
+
                         // on Category selection
                         this.setOnMouseClicked(mouseEvent -> {
                             if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
@@ -134,9 +132,17 @@ public class SettingsCategoryViewController {
 
                                 saveMenutItem.setOnAction(actionEvent -> {
                                     try {
-                                        categoryService.updateCategory(listViewProperty().get().getSelectionModel().getSelectedItem());
+                                        Category category1 = listViewProperty().get().getSelectionModel().getSelectedItem();
+                                        String message = "Category updated!";
+                                        if (category1.getId() <= 0) {
+                                            categoryService.addCategory(category1);
+                                            message = "Category saved!";
+                                        } else {
+                                            categoryService.updateCategory(category1);
+                                        }
+
                                         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                                        alert.setContentText("Category updated!");
+                                        alert.setContentText(message);
                                         alert.showAndWait();
                                     } catch (DuplicateEntityException e) {
                                         Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -148,13 +154,12 @@ public class SettingsCategoryViewController {
                                 /**
                                  * TODO
                                  */
-//                                addMenutItem.setOnAction(actionEvent -> {
-//                                    Category newCategory = new Category();
-//                                    listViewCategory.itemsProperty().get().add(newCategory);
-//                                    listViewCategory.getSelectionModel().select(newCategory);
-//                                    listViewCategory.getFocusModel().focus(listViewCategory.itemsProperty().get().size()-1);
-//                                    listViewCategory.requestFocus();
-//                                });
+                                addMenutItem.setOnAction(actionEvent -> {
+                                    Category newCategory = new Category();
+                                    listViewCategory.itemsProperty().get().add(newCategory);
+                                    listViewCategory.getSelectionModel().select(newCategory);
+                                    listViewCategory.edit(listViewCategory.itemsProperty().get().size()-1);
+                                });
 
                                 editMenuItem.setOnAction(actionEvent -> startEdit());
 
