@@ -105,6 +105,7 @@ public class SettingsCategoryViewController {
                             }
                         });
 
+                        
 
 
 
@@ -148,6 +149,7 @@ public class SettingsCategoryViewController {
                                         Alert alert = new Alert(Alert.AlertType.ERROR);
                                         alert.setContentText(e.getMessage());
                                         alert.showAndWait();
+                                        this.startEdit();
                                     }
                                 });
 
