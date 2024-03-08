@@ -1,6 +1,6 @@
 package com.example.cntrctmgmt.constant.responsemessage;
 
-public enum EndUserMessage {
+public enum EndUserResponseMessage {
     CATEGORY_SAVED("Category saved successfully!"),
     CATEGORY_UPDATED("Category updated successfully!"),
     CATEGORY_DELETED("Category deleted successfully!"),
@@ -18,7 +18,7 @@ public enum EndUserMessage {
     SUBCONTRACT_DELETED("Sub-contract deleted successfully!");
 
     private final String message;
-    EndUserMessage(String message) {
+    EndUserResponseMessage(String message) {
         this.message = message;
     }
 
