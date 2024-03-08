@@ -34,5 +34,6 @@ public class CntrctmgmtUIInitializer implements ApplicationListener<UILoaderEven
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
     }
 }

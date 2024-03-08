@@ -111,9 +111,6 @@ public class SettingsCategoryViewController {
                     @Override
                     public void updateItem(Category category, boolean empty) {
                         super.updateItem(category, empty);
-
-
-
                         setConverter(new StringConverter<Category>() {
                             @Override
                             public String toString(Category category) {
@@ -153,14 +150,8 @@ public class SettingsCategoryViewController {
                     // show context menu for interacting with the selected list-cell
                     if (mouseEvent.getButton().equals(MouseButton.SECONDARY)) {
                         textFieldListCell.setContextMenu(getCustomContextMenu(textFieldListCell));
-
                     }
                 });
-
-
-
-
-
                 return textFieldListCell;
             }
         });
@@ -298,13 +289,19 @@ public class SettingsCategoryViewController {
         // edit selected list-cell
         editMenuItem.setOnAction(actionEvent -> textFieldListCell.startEdit());
 
-
+        // add menu items to the context menu
         contextMenu.getItems().addAll(saveMenutItem, addMenutItem, editMenuItem, deleteMenuItem, cancelMenuItem);
 
         return contextMenu;
 
     }
 
+    /**
+     * An event handler which is part of a menu item. Triggered on action and save or update a category.
+     * @param actionEvent   Any event triggered on the main item that contains the event handler
+     * @param category      Category to save or update
+     * @return              A flag if the save or update is successful or not.
+     */
     private boolean saveOrUpdateCategory(ActionEvent actionEvent, Category category) {
         {
             boolean isSaved = true;
@@ -330,8 +327,8 @@ public class SettingsCategoryViewController {
 
     /**
      * Delete a category from the list-cell
-     * @param actionEvent
-     * @param category
+     * @param actionEvent   Any event triggered on the main item that contains the event handler
+     * @param category      Category to delete
      */
     private void deleteCategory(ActionEvent actionEvent, Category category) {
         try {
