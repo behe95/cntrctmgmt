@@ -7,8 +7,6 @@ import com.example.cntrctmgmt.entities.SubCategory;
 import com.example.cntrctmgmt.exceptions.DuplicateEntityException;
 import com.example.cntrctmgmt.services.CategoryService;
 import com.example.cntrctmgmt.services.SubCategoryService;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.*;
@@ -32,8 +30,8 @@ public class SettingsCategoryViewController {
     private final CategoryService categoryService;
     private final SubCategoryService subCategoryService;
 
-    private ObservableList<Category> categoryObservableList;
-    private ObservableList<SubCategory> subCategoryObservableList;
+    private final ObservableList<Category> categoryObservableList;
+    private final ObservableList<SubCategory> subCategoryObservableList;
 
     @FXML
     private ListView<Category> listViewCategory;
@@ -89,17 +87,33 @@ public class SettingsCategoryViewController {
         listViewCategory.setCellFactory(new Callback<ListView<Category>, ListCell<Category>>() {
             @Override
             public ListCell<Category> call(ListView<Category> categoryListView) {
-                return new TextFieldListCell<Category>() {
+                TextFieldListCell<Category> textFieldListCell = new TextFieldListCell<Category>() {
                     @Override
                     public void commitEdit(Category category) {
                         super.commitEdit(category);
                         setText(category.getTitle());
                     }
 
+                    @Override
+                    public void cancelEdit() {
+                        super.cancelEdit();
+                        // remove the category if it's not updated with any values
+                        Category selectedCategory = listViewCategory.getSelectionModel().getSelectedItem();
+                        if (Objects.nonNull(selectedCategory)
+                                && Objects.isNull(selectedCategory.getTitle())
+                                && selectedCategory.getId() <= 0
+                                && selectedCategory.getSubCategoryList().size() == 0) {
+                            listViewCategory.itemsProperty().get().remove(selectedCategory);
+                        }
+                    }
+
                     // convert object to make it compatible for the TextFieldListCell
                     @Override
                     public void updateItem(Category category, boolean empty) {
                         super.updateItem(category, empty);
+
+
+
                         setConverter(new StringConverter<Category>() {
                             @Override
                             public String toString(Category category) {
@@ -130,16 +144,34 @@ public class SettingsCategoryViewController {
                                     );
                                 }
                             }
-
-                            // show context menu for interacting with the selected list-cell
-                            if (mouseEvent.getButton().equals(MouseButton.SECONDARY)) {
-                                this.setContextMenu(getCustomContextMenu(this));
-                            }
                         });
                     }
+
                 };
+
+                textFieldListCell.addEventHandler(MouseEvent.MOUSE_CLICKED, mouseEvent -> {
+                    // show context menu for interacting with the selected list-cell
+                    if (mouseEvent.getButton().equals(MouseButton.SECONDARY)) {
+                        textFieldListCell.setContextMenu(getCustomContextMenu(textFieldListCell));
+
+                    }
+                });
+
+
+
+
+
+                return textFieldListCell;
             }
         });
+
+
+        listViewCategory.setOnMouseClicked(mouseEvent -> {
+            if (mouseEvent.getButton().equals(MouseButton.PRIMARY) && mouseEvent.getClickCount() == 2) {
+                addNewItemCategory();
+            }
+        });
+
     }
 
     /**
@@ -245,58 +277,25 @@ public class SettingsCategoryViewController {
         // throws exception if duplicate category
         // is being saved
         saveMenutItem.setOnAction(actionEvent -> {
-            try {
-                Category category1 = textFieldListCell.listViewProperty()
-                        .get().getSelectionModel().getSelectedItem();
-                if (category1.getId() <= 0) {
-                    categoryService.addCategory(category1);
-                } else {
-                    categoryService.updateCategory(category1);
-                }
-
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setContentText(EndUserResponseMessage.CATEGORY_SAVED.getMessage());
-                alert.showAndWait();
-            } catch (DuplicateEntityException e) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setContentText(EndUserResponseMessage.CATEGORY_SAVED_ERROR + " " + e.getMessage());
-                alert.showAndWait();
+            Category category = textFieldListCell.listViewProperty()
+                    .get().getSelectionModel().getSelectedItem();
+            boolean isSavedOrUpdated = saveOrUpdateCategory(actionEvent, category);
+            if(!isSavedOrUpdated) {
                 textFieldListCell.startEdit();
             }
         });
 
         // delete category
         deleteMenuItem.setOnAction(actionEvent -> {
-            try {
-                Category category1 = textFieldListCell.listViewProperty().get().getSelectionModel().getSelectedItem();
-
-                Category category = textFieldListCell.getItem();
-
-                categoryService.deleteCategory(category);
-
-                listViewCategory.itemsProperty().get().remove(category1);
-                listViewCategory.getSelectionModel().clearSelection();
-
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setContentText(EndUserResponseMessage.CATEGORY_DELETED.getMessage());
-                alert.showAndWait();
-
-            } catch (Exception ex) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setContentText(EndUserResponseMessage.CATEGORY_DELETED_ERROR.getMessage());
-                alert.showAndWait();
-            }
+            Category category = textFieldListCell.listViewProperty().get().getSelectionModel().getSelectedItem();
+            deleteCategory(actionEvent, category);
         });
 
         // add a new category item at the end of the ListView
         // automatically focus and start editing once added
-        addMenutItem.setOnAction(actionEvent -> {
-            Category newCategory = new Category();
-            listViewCategory.itemsProperty().get().add(newCategory);
-            listViewCategory.getSelectionModel().select(newCategory);
-            listViewCategory.edit(listViewCategory.itemsProperty().get().size() - 1);
-        });
+        addMenutItem.setOnAction(actionEvent -> addNewItemCategory());
 
+        // edit selected list-cell
         editMenuItem.setOnAction(actionEvent -> textFieldListCell.startEdit());
 
 
@@ -304,6 +303,63 @@ public class SettingsCategoryViewController {
 
         return contextMenu;
 
+    }
+
+    private boolean saveOrUpdateCategory(ActionEvent actionEvent, Category category) {
+        {
+            boolean isSaved = true;
+            try {
+                if (category.getId() <= 0) {
+                    categoryService.addCategory(category);
+                } else {
+                    categoryService.updateCategory(category);
+                }
+
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setContentText(EndUserResponseMessage.CATEGORY_SAVED.getMessage());
+                alert.showAndWait();
+            } catch (DuplicateEntityException e) {
+                isSaved = false;
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setContentText(EndUserResponseMessage.CATEGORY_SAVED_ERROR + " " + e.getMessage());
+                alert.showAndWait();
+            }
+            return isSaved;
+        }
+    }
+
+    /**
+     * Delete a category from the list-cell
+     * @param actionEvent
+     * @param category
+     */
+    private void deleteCategory(ActionEvent actionEvent, Category category) {
+        try {
+            categoryService.deleteCategory(category);
+            listViewCategory.itemsProperty().get().remove(category);
+            listViewCategory.getSelectionModel().clearSelection();
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setContentText(EndUserResponseMessage.CATEGORY_DELETED.getMessage());
+            alert.showAndWait();
+
+        } catch (Exception ex) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setContentText(EndUserResponseMessage.CATEGORY_DELETED_ERROR.getMessage());
+            alert.showAndWait();
+        }
+    }
+
+    /**
+     * Add a new category to the category list.
+     */
+    private void addNewItemCategory() {
+        Category newCategory = new Category();
+        listViewCategory.itemsProperty().get().add(newCategory);
+        listViewCategory.getSelectionModel().select(newCategory);
+        int newAddedCategoryIdx = listViewCategory.itemsProperty().get().size() - 1;
+        listViewCategory.selectionModelProperty().get().select(newAddedCategoryIdx);
+        listViewCategory.edit(newAddedCategoryIdx);
     }
 
 

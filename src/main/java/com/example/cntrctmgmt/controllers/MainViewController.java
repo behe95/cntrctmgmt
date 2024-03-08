@@ -5,6 +5,7 @@ import com.example.cntrctmgmt.constant.views.SCREEN_NAMES;
 import com.example.cntrctmgmt.util.JFXSceneLoader;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
@@ -47,12 +48,17 @@ public class MainViewController {
 
     @FXML
     void labelSettingsCategoryManagementOnMouseClicked(MouseEvent event) throws IOException {
-        jfxSceneLoader.changeInnerScreen(SCREEN_NAMES.SETTINGS_CATEGORY_SCREEN, gridpaneDynamicScreenLoader);
+        if (event.getButton().equals(MouseButton.PRIMARY)) {
+            jfxSceneLoader.changeInnerScreen(SCREEN_NAMES.SETTINGS_CATEGORY_SCREEN, gridpaneDynamicScreenLoader);
+        }
     }
 
     @FXML
     void labelSettingsSubCategoryManagementOnMouseClicked(MouseEvent event) throws IOException {
-        jfxSceneLoader.changeInnerScreen(SCREEN_NAMES.SETTINGS_SUBCATEGORY_SCREEN, gridpaneDynamicScreenLoader);
+
+        if (event.getButton().equals(MouseButton.PRIMARY)) {
+            jfxSceneLoader.changeInnerScreen(SCREEN_NAMES.SETTINGS_SUBCATEGORY_SCREEN, gridpaneDynamicScreenLoader);
+        }
 
     }
 
