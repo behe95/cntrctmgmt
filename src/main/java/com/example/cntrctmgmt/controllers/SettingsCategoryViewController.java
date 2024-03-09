@@ -7,6 +7,9 @@ import com.example.cntrctmgmt.entities.SubCategory;
 import com.example.cntrctmgmt.exceptions.DuplicateEntityException;
 import com.example.cntrctmgmt.services.CategoryService;
 import com.example.cntrctmgmt.services.SubCategoryService;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.*;
@@ -21,34 +24,64 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Objects;
 
+/**
+ * This controller is responsible for setting up the category.
+ * It is directly tied with the SettingsCategoryView.fxml that renders the settings
+ * for the category section.
+ * End user can select any of the categories, update and delete based on the selection.
+ * End user can add a new category. Also, user can see the assigned list of sub-categories
+ * for any selected category. Sub-categories can be un-assigned at any time if necessary.
+ */
 @Controller
 public class SettingsCategoryViewController {
 
 
+    // service class to interact with service repository
     private final CategoryService categoryService;
+
+    // service class to interact with sub-category repository
     private final SubCategoryService subCategoryService;
 
+    // contains all the categories
     private final ObservableList<Category> categoryObservableList;
+    // contains all the subcategories
+    // this is a reference list which is not tied to any rendered nodes
     private final ObservableList<SubCategory> subCategoryObservableList;
 
+    // contains available sub-categories for each category
+    private final HashMap<Category, ObservableList<SubCategory>> availableSubCategories;
+
+    // currently selected category by the end user
+    private final ObjectProperty<Category> currentSelectedCategory = new SimpleObjectProperty<>();
+
+    // List view to display all the categories
     @FXML
     private ListView<Category> listViewCategory;
 
+    // List view to display all the available sub-categories
+    // that can be assigned to any selected category
     @FXML
     private ListView<SubCategory> listViewAvailableSubCategory;
 
+    // List view to display all the assigned sub-categories to
+    // the currently selected categories
     @FXML
     private ListView<SubCategory> listViewAssignedSubCategory;
 
 
     @Autowired
     public SettingsCategoryViewController(CategoryService categoryService, SubCategoryService subCategoryService) {
+        // service to interact with repository
         this.categoryService = categoryService;
         this.subCategoryService = subCategoryService;
-        categoryObservableList = FXCollections.observableArrayList(new ArrayList<>());
-        subCategoryObservableList = FXCollections.observableArrayList(new ArrayList<>());
+
+        // data containers
+        this.availableSubCategories = new HashMap<>();
+        this.categoryObservableList = FXCollections.observableArrayList(new ArrayList<>());
+        this.subCategoryObservableList = FXCollections.observableArrayList(new ArrayList<>());
     }
 
 
@@ -59,10 +92,45 @@ public class SettingsCategoryViewController {
         // Get all the subcategories
         subCategoryObservableList.setAll(subCategoryService.getAllSubCategories());
 
+        // populate ListView for all the categories
+        listViewCategory.setItems(categoryObservableList);
+
+        // category change
+        currentSelectedCategory.addListener(categoryChangeListener());
+
         // populate list views
-        initListViewCategory();
-        initListViewAvailableSubCategory();
-        initListViewAssignedSubCategory();
+        setupCellFactoryListViewCategory();
+        setupCellFactoryListViewAvailableSubCategory();
+        setupCellFactoryListViewAssignedSubCategory();
+    }
+
+
+    /**
+     * A change listener that get triggered when end user change any category
+     *
+     * @return a change listener
+     */
+    private ChangeListener<Category> categoryChangeListener() {
+        return (observableValue, oldCategory, newCategory) -> {
+            if (oldCategory != newCategory && Objects.nonNull(newCategory)) {
+                // gets all the available sub-categories that can be assigned
+                if (!availableSubCategories.containsKey(newCategory)) {
+                    availableSubCategories.put(
+                            newCategory, FXCollections.observableArrayList(
+                                    subCategoryObservableList
+                                            .filtered(
+                                                    availableSubCategory -> newCategory.getSubCategoryList().stream()
+                                                            .noneMatch(assignedSubCategory -> assignedSubCategory.getId() == availableSubCategory.getId())
+                                            )
+                            )
+                    );
+                }
+                // populate the ListViews with available and assigned sub-categories
+                Category category = currentSelectedCategory.get();
+                listViewAvailableSubCategory.setItems(availableSubCategories.get(category));
+                listViewAssignedSubCategory.setItems(category.getSubCategoryList());
+            }
+        };
     }
 
 
@@ -78,8 +146,7 @@ public class SettingsCategoryViewController {
      * User can right-click on any of the ListCell that will pop-up a context menu for
      * further interaction.
      */
-    private void initListViewCategory() {
-        listViewCategory.setItems(categoryObservableList);
+    private void setupCellFactoryListViewCategory() {
         listViewCategory.setEditable(true);
 
 
@@ -129,16 +196,8 @@ public class SettingsCategoryViewController {
                         this.setOnMouseClicked(mouseEvent -> {
                             if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
                                 if (Objects.nonNull(category) && !empty) {
-                                    listViewAssignedSubCategory.setItems(category.getSubCategoryList());
-                                    listViewAvailableSubCategory
-                                    .setItems(FXCollections.observableArrayList(
-                                            subCategoryObservableList
-                                                    .filtered(
-                                                    subCategory -> category.getSubCategoryList().stream()
-                                                            .noneMatch(subCategory1 -> subCategory1.getId() == subCategory.getId())
-                                                    )
-                                            )
-                                    );
+                                    // set currentSelectedCategory
+                                    currentSelectedCategory.set(getItem());
                                 }
                             }
                         });
@@ -172,7 +231,7 @@ public class SettingsCategoryViewController {
      * End user can double-click on any of the sub-categories which will move
      * the sub-category to the assigned sub-category.
      */
-    private void initListViewAvailableSubCategory() {
+    private void setupCellFactoryListViewAvailableSubCategory() {
         // Show SubCategory title in listViewAvailableSubCategory
         listViewAvailableSubCategory.setCellFactory(new Callback<ListView<SubCategory>, ListCell<SubCategory>>() {
             @Override
@@ -192,13 +251,14 @@ public class SettingsCategoryViewController {
                             @Override
                             public void handle(MouseEvent mouseEvent) {
                                 if (mouseEvent.getClickCount() == 2 && Objects.nonNull(subCategory)) {
+                                    Category category = currentSelectedCategory.get();
                                     // remove the sub-category from the available sub-category list
-                                    listViewAvailableSubCategory.getItems().remove(subCategory);
+                                    availableSubCategories.get(category).remove(subCategory);
                                     // assign the sub-category to the selected category
-                                    listViewCategory.getSelectionModel().getSelectedItem().getSubCategoryList().add(subCategory);
+                                    category.getSubCategoryList().add(subCategory);
                                     // assign the selected category to the sub-category that has been assigned
                                     // to make association in the persistence context
-                                    subCategory.getCategoryList().add(listViewCategory.getSelectionModel().getSelectedItem());
+                                    subCategory.getCategoryList().add(category);
                                 }
                             }
                         });
@@ -215,7 +275,7 @@ public class SettingsCategoryViewController {
      * End user can double-click on any of the sub-categories which will move
      * the sub-category to the ListView that contains un-assigned or available sub-categories.
      */
-    private void initListViewAssignedSubCategory() {
+    private void setupCellFactoryListViewAssignedSubCategory() {
         // Show SubCategory title in listviewAssignedSubCategory
         listViewAssignedSubCategory.setCellFactory(new Callback<ListView<SubCategory>, ListCell<SubCategory>>() {
             @Override
@@ -235,13 +295,14 @@ public class SettingsCategoryViewController {
                             @Override
                             public void handle(MouseEvent mouseEvent) {
                                 if (mouseEvent.getClickCount() == 2 && Objects.nonNull(subCategory)) {
+                                    Category category = currentSelectedCategory.get();
                                     // add the sub-category to the list of available sub-categories
-                                    listViewAvailableSubCategory.getItems().add(subCategory);
+                                    availableSubCategories.get(category).add(subCategory);
                                     // remove the sub-category from the assigned sub-category list
-                                    listViewCategory.getSelectionModel().getSelectedItem().getSubCategoryList().remove(subCategory);
+                                    category.getSubCategoryList().remove(subCategory);
                                     // remove the selected category from the sub-category that has been un-assigned
                                     // to remove the association in the persistence context
-                                    subCategory.getCategoryList().remove(listViewCategory.getSelectionModel().getSelectedItem());
+                                    subCategory.getCategoryList().remove(category);
                                 }
                             }
                         });
@@ -253,8 +314,9 @@ public class SettingsCategoryViewController {
 
     /**
      * Creates a Context menu for user interaction with a selected ListCell
+     *
      * @param textFieldListCell ListCell that will be interacted
-     * @return  Context Menu
+     * @return Context Menu
      */
     private ContextMenu getCustomContextMenu(TextFieldListCell<Category> textFieldListCell) {
         ContextMenu contextMenu = new ContextMenu();
@@ -271,7 +333,7 @@ public class SettingsCategoryViewController {
             Category category = textFieldListCell.listViewProperty()
                     .get().getSelectionModel().getSelectedItem();
             boolean isSavedOrUpdated = saveOrUpdateCategory(actionEvent, category);
-            if(!isSavedOrUpdated) {
+            if (!isSavedOrUpdated) {
                 textFieldListCell.startEdit();
             }
         });
@@ -298,9 +360,10 @@ public class SettingsCategoryViewController {
 
     /**
      * An event handler which is part of a menu item. Triggered on action and save or update a category.
-     * @param actionEvent   Any event triggered on the main item that contains the event handler
-     * @param category      Category to save or update
-     * @return              A flag if the save or update is successful or not.
+     *
+     * @param actionEvent Any event triggered on the main item that contains the event handler
+     * @param category    Category to save or update
+     * @return A flag if the save or update is successful or not.
      */
     private boolean saveOrUpdateCategory(ActionEvent actionEvent, Category category) {
         {
@@ -327,8 +390,9 @@ public class SettingsCategoryViewController {
 
     /**
      * Delete a category from the list-cell
-     * @param actionEvent   Any event triggered on the main item that contains the event handler
-     * @param category      Category to delete
+     *
+     * @param actionEvent Any event triggered on the main item that contains the event handler
+     * @param category    Category to delete
      */
     private void deleteCategory(ActionEvent actionEvent, Category category) {
         try {
@@ -354,12 +418,11 @@ public class SettingsCategoryViewController {
         Category newCategory = new Category();
         listViewCategory.itemsProperty().get().add(newCategory);
         listViewCategory.getSelectionModel().select(newCategory);
+
         int newAddedCategoryIdx = listViewCategory.itemsProperty().get().size() - 1;
         listViewCategory.selectionModelProperty().get().select(newAddedCategoryIdx);
         listViewCategory.edit(newAddedCategoryIdx);
     }
-
-
 
 
 }
