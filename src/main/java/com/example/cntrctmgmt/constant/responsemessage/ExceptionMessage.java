@@ -4,7 +4,9 @@ public enum ExceptionMessage {
 
     UNKNOWN_EXCEPTION("Something went wrong!"),
     DUPLICATE_ENTITY_EXCEPTION("Record already exists!"),
-    ENTITY_NOT_FOUND("Not found!");
+    ENTITY_NOT_FOUND("Not found!"),
+
+    EMPTY_INPUT_ERROR("Input field cannot be empty!");
 
     private final String message;
 
