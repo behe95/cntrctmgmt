@@ -109,6 +109,9 @@ public class SettingsCategoryViewController {
 
     @FXML
     private void initialize() {
+        // category change
+        currentSelectedCategory.addListener(categoryChangeListener());
+
         // Get all the categories
         categoryObservableList.setAll(categoryService.getAllCategories());
         // Get all the subcategories
@@ -116,9 +119,11 @@ public class SettingsCategoryViewController {
 
         // populate ListView for all the categories
         listViewCategory.setItems(categoryObservableList);
+        // select the first item for the first time by default
+        listViewCategory.getSelectionModel().selectFirst();
+        currentSelectedCategory.set(listViewCategory.getSelectionModel().getSelectedItem());
 
-        // category change
-        currentSelectedCategory.addListener(categoryChangeListener());
+
 
         // populate list views
         setupCellFactoryListViewCategory();
