@@ -2,14 +2,14 @@ package com.example.cntrctmgmt.constant.responsemessage;
 
 public enum EndUserResponseMessage {
     CATEGORY_SAVED("Category saved successfully!"),
-    CATEGORY_SAVED_ERROR("Something went wrong! Unable to sav category!"),
+    CATEGORY_SAVED_ERROR("Something went wrong! Unable to save category!"),
     CATEGORY_UPDATED("Category updated successfully!"),
     CATEGORY_UPDATED_ERROR("Something went wrong! Unable to update category!"),
     CATEGORY_DELETED("Category deleted successfully!"),
     CATEGORY_DELETED_ERROR("Something went wrong! Unable to delete category!"),
 
     SUBCATEGORY_SAVED("Sub-category saved successfully!"),
-    SUBCATEGORY_SAVED_ERROR("Something went wrong! Something went wrong! Unable to save sub-category!"),
+    SUBCATEGORY_SAVED_ERROR("Something went wrong! Unable to save sub-category!"),
     SUBCATEGORY_UPDATED("Sub-category updated successfully!"),
     SUBCATEGORY_UPDATED_ERROR("Something went wrong! Unable to update sub-category!"),
     SUBCATEGORY_DELETED("Sub-category deleted successfully!"),

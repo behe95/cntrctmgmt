@@ -50,6 +50,7 @@ public class MainViewController {
     void labelSettingsCategoryManagementOnMouseClicked(MouseEvent event) throws IOException {
         if (event.getButton().equals(MouseButton.PRIMARY)) {
             jfxSceneLoader.changeInnerScreen(SCREEN_NAMES.SETTINGS_CATEGORY_SCREEN, gridpaneDynamicScreenLoader);
+            labelScreenTitle.setText(SCREEN_NAMES.SETTINGS_CATEGORY_SCREEN.getTitle());
         }
     }
 
@@ -58,6 +59,7 @@ public class MainViewController {
 
         if (event.getButton().equals(MouseButton.PRIMARY)) {
             jfxSceneLoader.changeInnerScreen(SCREEN_NAMES.SETTINGS_SUBCATEGORY_SCREEN, gridpaneDynamicScreenLoader);
+            labelScreenTitle.setText(SCREEN_NAMES.SETTINGS_SUBCATEGORY_SCREEN.getTitle());
         }
 
     }

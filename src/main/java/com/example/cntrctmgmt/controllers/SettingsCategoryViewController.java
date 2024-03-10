@@ -7,23 +7,21 @@ import com.example.cntrctmgmt.entities.Category;
 import com.example.cntrctmgmt.entities.SubCategory;
 import com.example.cntrctmgmt.exceptions.DuplicateEntityException;
 import com.example.cntrctmgmt.exceptions.InvalidInputException;
+import com.example.cntrctmgmt.exceptions.UnknownException;
 import com.example.cntrctmgmt.services.CategoryService;
 import com.example.cntrctmgmt.services.SubCategoryService;
-import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.*;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldListCell;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.control.skin.VirtualFlow;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
@@ -91,6 +89,10 @@ public class SettingsCategoryViewController {
     @FXML
     private Button btnSaveCategory;
 
+    // check box to select if the category is a soft cost or not
+    @FXML
+    private CheckBox checkBoxSoftCost;
+
 
     @Autowired
     public SettingsCategoryViewController(CategoryService categoryService, SubCategoryService subCategoryService) {
@@ -154,6 +156,7 @@ public class SettingsCategoryViewController {
                 Category category = currentSelectedCategory.get();
                 listViewAvailableSubCategory.setItems(availableSubCategories.get(category));
                 listViewAssignedSubCategory.setItems(category.getSubCategoryList());
+                checkBoxSoftCost.setSelected(category.getSoftCost());
             }
 
             // Disable the icon button if no category found for selection
@@ -236,6 +239,8 @@ public class SettingsCategoryViewController {
 
 
                 };
+
+
 
 
                 textFieldListCell.addEventHandler(MouseEvent.MOUSE_CLICKED, mouseEvent -> {
@@ -501,14 +506,48 @@ public class SettingsCategoryViewController {
 
         listViewCategory.edit(newAddedCategoryIdx);
     }
+
+    /**
+     * Add a new sub-category to the available sub-category list.
+     */
+    private void addNewItemSubCategory() {
+        SubCategory subCategory = new SubCategory("Final SubCategory");
+
+        try {
+            SubCategory savedSubCategory = subCategoryService.addSubCategory(subCategory);
+            subCategoryObservableList.add(savedSubCategory);
+            if (Objects.nonNull(currentSelectedCategory.get())) {
+                availableSubCategories.get(currentSelectedCategory.get()).add(savedSubCategory);
+            }
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setContentText(EndUserResponseMessage.SUBCATEGORY_SAVED.getMessage());
+            alert.showAndWait();
+        } catch (DuplicateEntityException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setContentText(EndUserResponseMessage.SUBCATEGORY_SAVED_ERROR.getMessage() + " " + e.getMessage());
+            alert.showAndWait();
+        } catch (UnknownException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setContentText(ExceptionMessage.UNKNOWN_EXCEPTION.getMessage() + " " + e.getMessage());
+            alert.showAndWait();
+        }
+    }
+
     /**
      * Event handler for add button
      * @param event Event that triggers this handler
      */
     @FXML
     void onActionBtnAddNewCategory(ActionEvent event) {
-        addNewItemCategory();
+        if (listViewCategory.isFocused()) {
+            addNewItemCategory();
+        } else if (listViewAvailableSubCategory.isFocused()) {
+            addNewItemSubCategory();
+        }
     }
+
+
     /**
      * Event handler for delete button
      * @param event Event that triggers this handler
@@ -527,5 +566,12 @@ public class SettingsCategoryViewController {
         saveOrUpdateCategory(event, currentSelectedCategory.get());
     }
 
-
+    /**
+     * Event handler for soft cost selection check box
+     * @param event Event that triggers this handler
+     */
+    @FXML
+    void checkBoxSoftCostHandler(ActionEvent event) {
+        listViewCategory.getSelectionModel().getSelectedItems().forEach(category -> category.setSoftCost(checkBoxSoftCost.isSelected()));
+    }
 }
