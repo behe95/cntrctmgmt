@@ -56,6 +56,31 @@ public class CategoryService {
         return saveCategory;
     }
 
+    /**
+     * Add categories to the database
+     *
+     * @param categories Categories to add
+     * @return Saved categories
+     * @throws DuplicateEntityException If any categories with the same name already exists
+     */
+    @Transactional
+    public List<Category> addAllCategories(List<Category> categories) throws DuplicateEntityException {
+        List<Category> savedCategories = null;
+        try {
+            savedCategories = this.categoryRepository.saveAll(categories);
+        } catch (JpaSystemException jpaSystemException) {
+            if (jpaSystemException.getRootCause() instanceof SQLiteException) {
+                int errorCode = ((SQLiteException) jpaSystemException.getRootCause()).getErrorCode();
+                if (errorCode == 19) //SQLITE_CONSTRAINT
+                {
+                    throw new DuplicateEntityException(ExceptionMessage.DUPLICATE_ENTITY_EXCEPTION.getMessage());
+                }
+            }
+        }
+
+        return savedCategories;
+    }
+
 
     /**
      * Retrieve category by id
