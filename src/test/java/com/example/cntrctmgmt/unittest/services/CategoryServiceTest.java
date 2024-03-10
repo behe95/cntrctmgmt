@@ -313,4 +313,59 @@ class CategoryServiceTest {
 
         assertEquals(mockCategories.size(), categoryList.size());
     }
+
+    @Test
+    void addAllCategories() throws DuplicateEntityException {
+        // given
+        Category givenCategory1 = new Category("Banking", false);
+        Category givenCategory2 = new Category("Insurance", false);
+        List<Category> categories = new ArrayList<>(List.of(givenCategory1, givenCategory2));
+
+        // when
+        // then
+        // check no exception thrown
+        assertThatCode(() -> this.categoryServiceUnderTest.addAllCategories(categories))
+                .doesNotThrowAnyException();
+        // check the method was called only once
+        verify(this.categoryRepositoryMock, times(1)).saveAll(categories);
+
+
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<List<Category>> argumentCaptor = ArgumentCaptor.forClass(List.class);
+
+        // check returned data is valid
+        when(this.categoryRepositoryMock.saveAll(argumentCaptor.capture())).thenReturn(categories);
+        List<Category> savedCategories = this.categoryServiceUnderTest.addAllCategories(categories);
+
+        assertEquals(2, savedCategories.size());
+        assertEquals(categories, argumentCaptor.getValue());
+    }
+
+    @Test
+    void addAllCategoriesWithDuplicateEntityException() {
+        // given
+        Category givenCategory1 = new Category("Banking", false);
+        Category givenCategory2 = new Category("Insurance", false);
+        List<Category> categories = new ArrayList<>(List.of(givenCategory1, givenCategory2));
+
+        // re-create the sqlite unique constraint exception
+        SQLiteException sqLiteException = new SQLiteException("", SQLiteErrorCode.SQLITE_CONSTRAINT);
+        JpaSystemException jpaSystemException = new JpaSystemException(new RuntimeException("", sqLiteException));
+
+        // setup the mock environment
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<List<Category>> argumentCaptor = ArgumentCaptor.forClass(List.class);
+        when(this.categoryRepositoryMock.saveAll(argumentCaptor.capture())).thenThrow(jpaSystemException);
+
+
+        // run the test
+        assertThatThrownBy(() -> this.categoryServiceUnderTest.addAllCategories(categories))
+                .isInstanceOf(DuplicateEntityException.class)
+                .hasMessage(ExceptionMessage.DUPLICATE_ENTITY_EXCEPTION.getMessage());
+
+        // then
+        assertEquals(categories, argumentCaptor.getValue());
+
+
+    }
 }
