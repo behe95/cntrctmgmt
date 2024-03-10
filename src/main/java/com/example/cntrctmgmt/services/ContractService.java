@@ -23,7 +23,7 @@ public class ContractService {
     }
 
     /**
-     * Add contract to the databse
+     * Add contract to the database
      *
      * @param contract Contract to add
      * @return Saved contract.
@@ -53,10 +53,12 @@ public class ContractService {
 
     /**
      * Save updated contract.
+     * @deprecated Unnecessary query to check if a record exists in the database. Instead, use {@link #addContract(Contract)}
      *
      * @param contract Contract to update
      * @throws EntityNotFoundException If the category to update is not found in the database
      */
+    @Deprecated(since = "3/10/2024",forRemoval = true)
     public void updateContract(Contract contract) throws EntityNotFoundException {
         this.contractRepository.findById(contract.getId())
                 .orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.ENTITY_NOT_FOUND.getMessage()));

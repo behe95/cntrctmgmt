@@ -104,11 +104,13 @@ public class CategoryService {
 
     /**
      * Save updated category
+     * @deprecated Unnecessary query to check if a record exists in the database. Instead, use {@link #addCategory(Category)}
      *
      * @param category Category to update
      * @throws DuplicateEntityException If the updated category's title already exists in the database
      * @throws EntityNotFoundException  If the category to update is not found in the database
      */
+    @Deprecated(since = "3/10/2024",forRemoval = true)
     public void updateCategory(Category category) throws DuplicateEntityException, EntityNotFoundException {
         this.categoryRepository.findById(category.getId()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.ENTITY_NOT_FOUND.getMessage()));
 

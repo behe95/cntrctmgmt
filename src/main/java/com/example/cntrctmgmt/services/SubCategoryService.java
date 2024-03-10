@@ -78,12 +78,14 @@ public class SubCategoryService {
 
     /**
      * Save updated sub-category
+     * @deprecated Unnecessary query to check if a record exists in the database. Instead, use {@link #addSubCategory(SubCategory)}
      *
      * @param subCategory Sub-category to update
      * @throws DuplicateEntityException If the updated sub-category's title already exists in the database
      * @throws EntityNotFoundException  If the sub-category to update is not found in the database
      * @throws UnknownException         If any unknown exception found
      */
+    @Deprecated(since = "3/10/2024",forRemoval = true)
     @Transactional
     public void updateSubCategory(SubCategory subCategory) throws DuplicateEntityException, EntityNotFoundException, UnknownException {
         SubCategory savedSubCategory = this.subCategoryRepository.findById(subCategory.getId()).orElseThrow(() -> new EntityNotFoundException(ExceptionMessage.ENTITY_NOT_FOUND.getMessage()));

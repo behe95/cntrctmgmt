@@ -140,6 +140,7 @@ public class SettingsCategoryViewController {
     /**
      * A change listener that get triggered when end user change any category
      *
+     *
      * @return a change listener
      */
     private ChangeListener<Category> categoryChangeListener() {

@@ -54,9 +54,11 @@ public class SubContractService {
 
     /**
      * Save updated sub-contract
+     * @deprecated Unnecessary query to check if a record exists in the database. Instead, use {@link #addSubContract(SubContract)}
      *
      * @param subContract Sub-contract to update
      */
+    @Deprecated(since = "3/10/2024",forRemoval = true)
     @Transactional
     public void updateSubContract(SubContract subContract) {
         this.subContractRepository.findById(subContract.getId())
