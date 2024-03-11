@@ -33,11 +33,13 @@ public class CategoryService {
 
     /**
      * Add category to the database
+     * @deprecated Use {@link #addAllCategories(List)}
      *
      * @param category Category to add
      * @return Saved category
      * @throws DuplicateEntityException If the category with the same name already exists
      */
+    @Deprecated(since = "3/11/2024",forRemoval = true)
     public Category addCategory(Category category) throws DuplicateEntityException {
         Category saveCategory = null;
         try {
