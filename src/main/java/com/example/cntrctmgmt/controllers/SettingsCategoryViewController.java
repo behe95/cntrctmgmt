@@ -446,6 +446,13 @@ public class SettingsCategoryViewController {
         MenuItem deleteMenuItem = new MenuItem("Delete");
         MenuItem cancelMenuItem = new MenuItem("Cancel");
 
+        // disable the following for any other cells that don't contain data
+        if (textFieldListCell.isEmpty() || Objects.isNull(textFieldListCell.getItem())) {
+            saveMenutItem.setDisable(true);
+            editMenuItem.setDisable(true);
+            deleteMenuItem.setDisable(true);
+        }
+
         // save or update category
         // throws exception if duplicate category
         // is being saved
