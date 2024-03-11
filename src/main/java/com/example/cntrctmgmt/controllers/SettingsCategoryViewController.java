@@ -454,6 +454,8 @@ public class SettingsCategoryViewController {
 
     /**
      * An event handler which is part of a menu item. Triggered on action and save or update a category.
+     * This method may add or update multiple categories if multiple categories are selected for
+     * saving or updating at once
      *
      * @param actionEvent Any event triggered on the main item that contains the event handler
      * @param category    Category to save or update
@@ -470,8 +472,8 @@ public class SettingsCategoryViewController {
                 }
 
 
-                categoryService.addCategory(category);
-
+//                categoryService.addCategory(category);
+                categoryService.addAllCategories(listViewCategory.getSelectionModel().getSelectedItems());
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setContentText(EndUserResponseMessage.CATEGORY_SAVED.getMessage());
                 alert.showAndWait();
@@ -597,11 +599,12 @@ public class SettingsCategoryViewController {
      */
     @FXML
     void onActionBtnAddNewCategory(ActionEvent event) {
-        if (listViewCategory.isFocused()) {
-            addNewItemCategory();
-        } else if (listViewAvailableSubCategory.isFocused()) {
-            addNewItemSubCategory();
-        }
+        addNewItemCategory();
+//        if (listViewCategory.isFocused()) {
+//            addNewItemCategory();
+//        } else if (listViewAvailableSubCategory.isFocused()) {
+//            addNewItemSubCategory();
+//        }
     }
 
 
