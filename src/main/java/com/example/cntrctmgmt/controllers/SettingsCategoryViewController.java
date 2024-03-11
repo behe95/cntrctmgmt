@@ -12,6 +12,8 @@ import com.example.cntrctmgmt.services.CategoryService;
 import com.example.cntrctmgmt.services.SubCategoryService;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -22,6 +24,8 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.control.skin.VirtualFlow;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
@@ -203,6 +207,56 @@ public class SettingsCategoryViewController {
             public ListCell<Category> call(ListView<Category> categoryListView) {
 
                 TextFieldListCell<Category> textFieldListCell = new TextFieldListCell<Category>() {
+
+                    // Contains text value inside the listcell when in editing state
+                    private StringProperty tempTextProperty = new SimpleStringProperty("");
+
+                    // check if the list-cell editing state is turned off by pressing
+                    // ESCAPE Key or not
+                    boolean isCancelledEditingByEscapeKey = false;
+
+                    // Temp event handler that handles the key press of list-cell's textfield when editing
+                    EventHandler<KeyEvent> escapeKeyEventHandler = keyEvent -> {
+                        if (keyEvent.getCode().equals(KeyCode.ESCAPE)) {
+                            isCancelledEditingByEscapeKey = true;
+                        }
+                    };
+
+                    @Override
+                    public void startEdit() {
+                        super.startEdit();
+                        // contains the temp text-field inside the list-cell
+                        TextField textField = null;
+                        if (Objects.nonNull(getGraphic())) {
+                            textField = (TextField) getGraphic();
+                            // binding to capture the edited values
+                            tempTextProperty.bind(textField.textProperty());
+                            textField.addEventHandler(KeyEvent.KEY_PRESSED, escapeKeyEventHandler);
+                        }
+                    }
+
+                    @Override
+                    public void cancelEdit() {
+                        if (isCancelledEditingByEscapeKey) {
+                            isCancelledEditingByEscapeKey = false;
+                        } else {
+                            // commit changes before cancelling
+                            String editedValues = tempTextProperty.get();
+                            setText(editedValues);
+                            Category category = getItem();
+                            category.setTitle(editedValues);
+                            updateItem(category, false);
+                            commitEdit(category);
+
+                            // cleanup
+                            if (getGraphic() instanceof TextField textField) {
+                                textField.removeEventHandler(KeyEvent.KEY_PRESSED, escapeKeyEventHandler);
+                            }
+                            listViewCategory.getSelectionModel().clearSelection();
+
+                        }
+                        super.cancelEdit();
+                    }
 
                     @Override
                     public void commitEdit(Category category) {
@@ -415,11 +469,8 @@ public class SettingsCategoryViewController {
                     throw new InvalidInputException(ExceptionMessage.EMPTY_INPUT_ERROR.getMessage());
                 }
 
-                if (category.getId() <= 0) {
-                    categoryService.addCategory(category);
-                } else {
-                    categoryService.updateCategory(category);
-                }
+
+                categoryService.addCategory(category);
 
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setContentText(EndUserResponseMessage.CATEGORY_SAVED.getMessage());
