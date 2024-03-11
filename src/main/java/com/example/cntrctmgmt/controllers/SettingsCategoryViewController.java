@@ -215,10 +215,17 @@ public class SettingsCategoryViewController {
                     // ESCAPE Key or not
                     boolean isCancelledEditingByEscapeKey = false;
 
+                    // check if the list-cell editing state is turned off by
+                    // pressing Enter key when committed
+                    boolean isCommitedEditingByEnterKey = false;
+
                     // Temp event handler that handles the key press of list-cell's textfield when editing
                     EventHandler<KeyEvent> escapeKeyEventHandler = keyEvent -> {
                         if (keyEvent.getCode().equals(KeyCode.ESCAPE)) {
                             isCancelledEditingByEscapeKey = true;
+                        }
+                        if (keyEvent.getCode().equals(KeyCode.ENTER)) {
+                            isCommitedEditingByEnterKey = true;
                         }
                     };
 
@@ -237,9 +244,8 @@ public class SettingsCategoryViewController {
 
                     @Override
                     public void cancelEdit() {
-                        if (isCancelledEditingByEscapeKey) {
-                            isCancelledEditingByEscapeKey = false;
-                        } else {
+
+                        if (!isCancelledEditingByEscapeKey && !isCommitedEditingByEnterKey){
                             // commit changes before cancelling
                             String editedValues = tempTextProperty.get();
                             setText(editedValues);
@@ -253,8 +259,26 @@ public class SettingsCategoryViewController {
                                 textField.removeEventHandler(KeyEvent.KEY_PRESSED, escapeKeyEventHandler);
                             }
                             listViewCategory.getSelectionModel().clearSelection();
-
                         }
+
+
+                        if (isCancelledEditingByEscapeKey) {
+                            isCancelledEditingByEscapeKey = false;
+                        }
+
+                        if (isCommitedEditingByEnterKey) {
+                            isCommitedEditingByEnterKey = false;
+                        }
+
+                        /**
+                         * TODO:    if user left a cell blank remove it
+                         */
+//                        if (!isEmpty()
+//                                && Objects.isNull(getItem().getTitle())
+//                                && getItem().getSubCategoryList().size() == 0) {
+//                            availableSubCategories.remove(getItem());
+//                            categoryObservableList.remove(getItem());
+//                        }
                         super.cancelEdit();
                     }
 

@@ -63,7 +63,7 @@ public class CategoryService {
      * @return Saved categories
      * @throws DuplicateEntityException If any categories with the same name already exists
      */
-    @Transactional
+    @Transactional(rollbackOn = DuplicateEntityException.class)
     public List<Category> addAllCategories(List<Category> categories) throws DuplicateEntityException {
         List<Category> savedCategories = null;
         try {
