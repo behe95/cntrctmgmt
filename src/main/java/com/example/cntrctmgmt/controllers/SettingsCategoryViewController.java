@@ -113,6 +113,12 @@ public class SettingsCategoryViewController {
 
     @FXML
     private void initialize() {
+
+        // initially disable to icon to interact
+        // no category selected
+        btnDeleteCategory.setDisable(true);
+        btnSaveCategory.setDisable(true);
+
         // category change
         currentSelectedCategory.addListener(categoryChangeListener());
 
@@ -134,10 +140,6 @@ public class SettingsCategoryViewController {
         setupCellFactoryListViewAvailableSubCategory();
         setupCellFactoryListViewAssignedSubCategory();
 
-        // initially disable to icon to interact
-        // no category selected
-        btnDeleteCategory.setDisable(true);
-        btnSaveCategory.setDisable(true);
     }
 
 
