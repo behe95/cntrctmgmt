@@ -171,6 +171,14 @@ public class SettingsCategoryViewController {
                 checkBoxSoftCost.setSelected(category.getSoftCost());
             }
 
+            // if there is no selection show empty list views
+            // default view
+            if (Objects.isNull(currentSelectedCategory.get())) {
+                listViewAvailableSubCategory.setItems(null);
+                listViewAssignedSubCategory.setItems(null);
+                checkBoxSoftCost.setSelected(false);
+            }
+
             // Disable the icon button if no category found for selection
             if (Objects.isNull(currentSelectedCategory.get())) {
                 btnDeleteCategory.setDisable(true);
@@ -221,6 +229,19 @@ public class SettingsCategoryViewController {
                     // pressing Enter key when committed
                     boolean isCommitedEditingByEnterKey = false;
 
+                    // focused lost
+                    boolean isFocusLost = false;
+
+                    // change listener when focus lost
+                    ChangeListener<? super Boolean> focusLostListener = new ChangeListener<Boolean>() {
+                        @Override
+                        public void changed(ObservableValue<? extends Boolean> observableValue, Boolean wasFocused, Boolean isFocused) {
+                            if (!isFocused) {
+                                cancelEdit();
+                            }
+                        }
+                    };
+
                     // Temp event handler that handles the key press of list-cell's textfield when editing
                     EventHandler<KeyEvent> escapeKeyEventHandler = keyEvent -> {
                         if (keyEvent.getCode().equals(KeyCode.ESCAPE)) {
@@ -235,17 +256,27 @@ public class SettingsCategoryViewController {
                     public void startEdit() {
                         super.startEdit();
                         // contains the temp text-field inside the list-cell
-                        TextField textField = null;
                         if (Objects.nonNull(getGraphic())) {
-                            textField = (TextField) getGraphic();
+                            TextField textField = (TextField) getGraphic();
                             // binding to capture the edited values
                             tempTextProperty.bind(textField.textProperty());
                             textField.addEventHandler(KeyEvent.KEY_PRESSED, escapeKeyEventHandler);
+                            textField.focusedProperty().addListener(focusLostListener);
                         }
+
+
+
                     }
 
                     @Override
                     public void cancelEdit() {
+
+                        // cleanup
+                        if (Objects.nonNull(getGraphic()) && getGraphic() instanceof TextField textField) {
+                            textField.focusedProperty().removeListener(focusLostListener);
+                            textField.removeEventHandler(KeyEvent.KEY_PRESSED, escapeKeyEventHandler);
+                        }
+
 
                         if (!isCancelledEditingByEscapeKey && !isCommitedEditingByEnterKey){
                             // commit changes before cancelling
@@ -255,13 +286,10 @@ public class SettingsCategoryViewController {
                             category.setTitle(editedValues);
                             updateItem(category, false);
                             commitEdit(category);
-
-                            // cleanup
-                            if (getGraphic() instanceof TextField textField) {
-                                textField.removeEventHandler(KeyEvent.KEY_PRESSED, escapeKeyEventHandler);
-                            }
                             listViewCategory.getSelectionModel().clearSelection();
+                            currentSelectedCategory.set(null);
                         }
+
 
 
                         if (isCancelledEditingByEscapeKey) {
@@ -282,6 +310,7 @@ public class SettingsCategoryViewController {
 //                            categoryObservableList.remove(getItem());
 //                        }
                         super.cancelEdit();
+
                     }
 
                     @Override
