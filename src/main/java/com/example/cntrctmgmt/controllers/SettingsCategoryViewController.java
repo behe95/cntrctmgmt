@@ -141,6 +141,47 @@ public class SettingsCategoryViewController {
         setupCellFactoryListViewAssignedSubCategory();
 
     }
+    /**
+     * Event handler for add button
+     * @param event Event that triggers this handler
+     */
+    @FXML
+    void onActionBtnAddNewCategory(ActionEvent event) {
+        addNewItemCategory();
+//        if (listViewCategory.isFocused()) {
+//            addNewItemCategory();
+//        } else if (listViewAvailableSubCategory.isFocused()) {
+//            addNewItemSubCategory();
+//        }
+    }
+
+
+    /**
+     * Event handler for delete button
+     * @param event Event that triggers this handler
+     */
+    @FXML
+    void onActionBtnDeleteCategory(ActionEvent event) {
+        deleteCategory(event);
+    }
+
+    /**
+     * Event handler for save or update button
+     * @param event Event that triggers this handler
+     */
+    @FXML
+    void onActionBtnSaveCategory(ActionEvent event) {
+        saveOrUpdateCategory(event, currentSelectedCategory.get());
+    }
+
+    /**
+     * Event handler for soft cost selection check box
+     * @param event Event that triggers this handler
+     */
+    @FXML
+    void checkBoxSoftCostHandler(ActionEvent event) {
+        listViewCategory.getSelectionModel().getSelectedItems().forEach(category -> category.setSoftCost(checkBoxSoftCost.isSelected()));
+    }
 
 
     /**
@@ -400,14 +441,7 @@ public class SettingsCategoryViewController {
                             @Override
                             public void handle(MouseEvent mouseEvent) {
                                 if (mouseEvent.getClickCount() == 2 && Objects.nonNull(subCategory)) {
-                                    Category category = currentSelectedCategory.get();
-                                    // remove the sub-category from the available sub-category list
-                                    availableSubCategories.get(category).remove(subCategory);
-                                    // assign the sub-category to the selected category
-                                    category.getSubCategoryList().add(subCategory);
-                                    // assign the selected category to the sub-category that has been assigned
-                                    // to make association in the persistence context
-                                    subCategory.getCategoryList().add(category);
+                                    assignSubCategory(subCategory);
                                 }
                             }
                         });
@@ -444,14 +478,7 @@ public class SettingsCategoryViewController {
                             @Override
                             public void handle(MouseEvent mouseEvent) {
                                 if (mouseEvent.getClickCount() == 2 && Objects.nonNull(subCategory)) {
-                                    Category category = currentSelectedCategory.get();
-                                    // add the sub-category to the list of available sub-categories
-                                    availableSubCategories.get(category).add(subCategory);
-                                    // remove the sub-category from the assigned sub-category list
-                                    category.getSubCategoryList().remove(subCategory);
-                                    // remove the selected category from the sub-category that has been un-assigned
-                                    // to remove the association in the persistence context
-                                    subCategory.getCategoryList().remove(category);
+                                    unassignSubCategory(subCategory);
                                 }
                             }
                         });
@@ -655,45 +682,38 @@ public class SettingsCategoryViewController {
         }
     }
 
-    /**
-     * Event handler for add button
-     * @param event Event that triggers this handler
-     */
-    @FXML
-    void onActionBtnAddNewCategory(ActionEvent event) {
-        addNewItemCategory();
-//        if (listViewCategory.isFocused()) {
-//            addNewItemCategory();
-//        } else if (listViewAvailableSubCategory.isFocused()) {
-//            addNewItemSubCategory();
-//        }
-    }
 
 
     /**
-     * Event handler for delete button
-     * @param event Event that triggers this handler
+     * This method assign a sub-category to a category
+     * @param subCategory   Sub-category to assign
      */
-    @FXML
-    void onActionBtnDeleteCategory(ActionEvent event) {
-        deleteCategory(event);
+    private void assignSubCategory(SubCategory subCategory) {
+        Category category = currentSelectedCategory.get();
+        // remove the sub-category from the available sub-category list
+        availableSubCategories.get(category).remove(subCategory);
+        // assign the sub-category to the selected category
+        category.getSubCategoryList().add(subCategory);
+        // assign the selected category to the sub-category that has been assigned
+        // to make association in the persistence context
+        subCategory.getCategoryList().add(category);
+
     }
 
     /**
-     * Event handler for save or update button
-     * @param event Event that triggers this handler
+     * This method un-assign a sub-category from a category
+     * @param subCategory   Sub-category to un-assign
      */
-    @FXML
-    void onActionBtnSaveCategory(ActionEvent event) {
-        saveOrUpdateCategory(event, currentSelectedCategory.get());
+    private void unassignSubCategory(SubCategory subCategory) {
+        Category category = currentSelectedCategory.get();
+        // add the sub-category to the list of available sub-categories
+        availableSubCategories.get(category).add(subCategory);
+        // remove the sub-category from the assigned sub-category list
+        category.getSubCategoryList().remove(subCategory);
+        // remove the selected category from the sub-category that has been un-assigned
+        // to remove the association in the persistence context
+        subCategory.getCategoryList().remove(category);
     }
 
-    /**
-     * Event handler for soft cost selection check box
-     * @param event Event that triggers this handler
-     */
-    @FXML
-    void checkBoxSoftCostHandler(ActionEvent event) {
-        listViewCategory.getSelectionModel().getSelectedItems().forEach(category -> category.setSoftCost(checkBoxSoftCost.isSelected()));
-    }
+
 }
