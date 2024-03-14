@@ -134,15 +134,16 @@ public class SettingsCategoryViewController {
         currentSelectedCategory.set(listViewCategory.getSelectionModel().getSelectedItem());
 
 
-
         // populate list views
         setupCellFactoryListViewCategory();
         setupCellFactoryListViewAvailableSubCategory();
         setupCellFactoryListViewAssignedSubCategory();
 
     }
+
     /**
      * Event handler for add button
+     *
      * @param event Event that triggers this handler
      */
     @FXML
@@ -158,6 +159,7 @@ public class SettingsCategoryViewController {
 
     /**
      * Event handler for delete button
+     *
      * @param event Event that triggers this handler
      */
     @FXML
@@ -167,6 +169,7 @@ public class SettingsCategoryViewController {
 
     /**
      * Event handler for save or update button
+     *
      * @param event Event that triggers this handler
      */
     @FXML
@@ -176,6 +179,7 @@ public class SettingsCategoryViewController {
 
     /**
      * Event handler for soft cost selection check box
+     *
      * @param event Event that triggers this handler
      */
     @FXML
@@ -186,7 +190,6 @@ public class SettingsCategoryViewController {
 
     /**
      * A change listener that get triggered when end user change any category
-     *
      *
      * @return a change listener
      */
@@ -306,7 +309,6 @@ public class SettingsCategoryViewController {
                         }
 
 
-
                     }
 
                     @Override
@@ -319,7 +321,7 @@ public class SettingsCategoryViewController {
                         }
 
 
-                        if (!isCancelledEditingByEscapeKey && !isCommitedEditingByEnterKey){
+                        if (!isCancelledEditingByEscapeKey && !isCommitedEditingByEnterKey) {
                             // commit changes before cancelling
                             String editedValues = tempTextProperty.get();
                             setText(editedValues);
@@ -330,7 +332,6 @@ public class SettingsCategoryViewController {
                             listViewCategory.getSelectionModel().clearSelection();
                             currentSelectedCategory.set(null);
                         }
-
 
 
                         if (isCancelledEditingByEscapeKey) {
@@ -395,8 +396,6 @@ public class SettingsCategoryViewController {
 
 
                 };
-
-
 
 
                 textFieldListCell.addEventHandler(MouseEvent.MOUSE_CLICKED, mouseEvent -> {
@@ -683,10 +682,10 @@ public class SettingsCategoryViewController {
     }
 
 
-
     /**
      * This method assign a sub-category to a category
-     * @param subCategory   Sub-category to assign
+     *
+     * @param subCategory Sub-category to assign
      */
     private void assignSubCategory(SubCategory subCategory) {
         Category category = currentSelectedCategory.get();
@@ -702,7 +701,8 @@ public class SettingsCategoryViewController {
 
     /**
      * This method un-assign a sub-category from a category
-     * @param subCategory   Sub-category to un-assign
+     *
+     * @param subCategory Sub-category to un-assign
      */
     private void unassignSubCategory(SubCategory subCategory) {
         Category category = currentSelectedCategory.get();

@@ -51,7 +51,7 @@
                         </HBox>
                         <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="3">
                            <children>
-                              <Label text="Available Sub-category">
+                              <Label text="Available category">
                                  <font>
                                     <Font name="System Bold" size="12.0" />
                                  </font>
@@ -60,7 +60,7 @@
                         </HBox>
                         <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="4">
                            <children>
-                              <Label text="Assigned Sub-category">
+                              <Label text="Assigned category">
                                  <font>
                                     <Font name="System Bold" size="12.0" />
                                  </font>
@@ -69,16 +69,16 @@
                         </HBox>
                         <Separator orientation="VERTICAL" prefHeight="200.0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
                         <Separator orientation="VERTICAL" prefHeight="200.0" GridPane.columnIndex="4" GridPane.rowIndex="1" />
-                        <ListView fx:id="listViewCategory" editable="true" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                        <ListView fx:id="listViewAvailableSubCategory" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
-                        <ListView fx:id="listViewAssignedSubCategory" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="4" GridPane.rowIndex="1" />
+                        <ListView fx:id="listViewSubCategory" editable="true" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                        <ListView fx:id="listViewAvailableCategory" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                        <ListView fx:id="listViewAssignedCategory" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="4" GridPane.rowIndex="1" />
                      </children>
                   </GridPane>
                </children>
             </AnchorPane>
             <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10.0" GridPane.hgrow="ALWAYS">
                <children>
-                  <Button fx:id="btnAddNewCategory" contentDisplay="CENTER" ellipsisString="" focusTraversable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onActionBtnAddNewCategory" prefHeight="20.0" prefWidth="20.0" style="-fx-background-radius: 100; -fx-background-color: transaparent;">
+                  <Button fx:id="btnAddNewSubCategory" contentDisplay="CENTER" ellipsisString="" focusTraversable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onActionBtnAddNewCategory" prefHeight="20.0" prefWidth="20.0" style="-fx-background-radius: 100; -fx-background-color: transaparent;">
                      <graphic>
                         <SVGPath content="M 10.24 20.48 A 10.24 10.24 90 1 0 10.24 0 a 10.24 10.24 90 1 0 0 20.48 z M 9.28 13.76 V 11.2 H 6.72 c -0.532 0 -0.96 -0.428 -0.96 -0.96 s 0.428 -0.96 0.96 -0.96 h 2.56 V 6.72 c 0 -0.532 0.428 -0.96 0.96 -0.96 s 0.96 0.428 0.96 0.96 v 2.56 h 2.56 c 0.532 0 0.96 0.428 0.96 0.96 s -0.428 0.96 -0.96 0.96 H 11.2 v 2.56 c 0 0.532 -0.428 0.96 -0.96 0.96 s -0.96 -0.428 -0.96 -0.96 z" />
                      </graphic>
@@ -86,7 +86,7 @@
                         <Cursor fx:constant="HAND" />
                      </cursor>
                   </Button>
-                  <Button fx:id="btnSaveCategory" contentDisplay="CENTER" ellipsisString="" focusTraversable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onActionBtnSaveCategory" prefHeight="20.0" prefWidth="20.0" style="-fx-background-radius: 100; -fx-background-color: transaparent;">
+                  <Button fx:id="btnSaveSubCategory" contentDisplay="CENTER" ellipsisString="" focusTraversable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onActionBtnSaveCategory" prefHeight="20.0" prefWidth="20.0" style="-fx-background-radius: 100; -fx-background-color: transaparent;">
                      <graphic>
                         <SVGPath content="M 2.56 1.28 C 1.148 1.28 0 2.428 0 3.84 V 16.64 c 0 1.412 1.148 2.56 2.56 2.56 H 15.36 c 1.412 0 2.56 -1.148 2.56 -2.56 V 6.932 c 0 -0.68 -0.268 -1.332 -0.748 -1.812 L 14.08 2.028 C 13.6 1.548 12.948 1.28 12.268 1.28 H 2.56 z m 0 3.84 c 0 -0.708 0.572 -1.28 1.28 -1.28 H 11.52 c 0.708 0 1.28 0.572 1.28 1.28 v 2.56 c 0 0.708 -0.572 1.28 -1.28 1.28 H 3.84 c -0.708 0 -1.28 -0.572 -1.28 -1.28 V 5.12 z M 8.96 11.52 a 2.56 2.56 90 1 1 0 5.12 a 2.56 2.56 90 1 1 0 -5.12 z" />
                      </graphic>
@@ -94,7 +94,7 @@
                         <Cursor fx:constant="HAND" />
                      </cursor>
                   </Button>
-                  <Button fx:id="btnDeleteCategory" contentDisplay="CENTER" ellipsisString="" focusTraversable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onActionBtnDeleteCategory" prefHeight="20.0" prefWidth="20.0" style="-fx-background-radius: 100; -fx-background-color: transaparent;">
+                  <Button fx:id="btnDeleteSubCategory" contentDisplay="CENTER" ellipsisString="" focusTraversable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onActionBtnDeleteCategory" prefHeight="20.0" prefWidth="20.0" style="-fx-background-radius: 100; -fx-background-color: transaparent;">
                      <graphic>
                         <SVGPath content="M 5.408 0.708 L 5.12 1.28 H 1.28 C 0.572 1.28 0 1.852 0 2.56 S 0.572 3.84 1.28 3.84 H 16.64 c 0.708 0 1.28 -0.572 1.28 -1.28 s -0.572 -1.28 -1.28 -1.28 H 12.8 l -0.288 -0.572 C 12.296 0.272 11.852 0 11.368 0 H 6.552 c -0.484 0 -0.928 0.272 -1.144 0.708 z M 16.64 5.12 H 1.28 L 2.128 18.68 c 0.064 1.012 0.904 1.8 1.916 1.8 H 13.876 c 1.012 0 1.852 -0.788 1.916 -1.8 L 16.64 5.12 z" />
                      </graphic>
