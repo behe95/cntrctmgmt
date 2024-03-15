@@ -1,6 +1,7 @@
 package com.example.cntrctmgmt.unittest.services;
 
 import com.example.cntrctmgmt.constant.responsemessage.ExceptionMessage;
+import com.example.cntrctmgmt.entities.Category;
 import com.example.cntrctmgmt.entities.SubCategory;
 import com.example.cntrctmgmt.exceptions.DuplicateEntityException;
 import com.example.cntrctmgmt.exceptions.UnknownException;
@@ -14,6 +15,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 
@@ -399,5 +401,61 @@ class SubCategoryServiceTest {
          */
         this.subCategoryServiceUnderTest.deleteAllSubCategories();
         then(this.subCategoryRepositoryMock).should(times(1)).deleteAll();
+    }
+
+
+    @Test
+    void addAllSubCategories() throws DuplicateEntityException {
+        // given
+        SubCategory givenSubCategory1 = new SubCategory("Banking");
+        SubCategory givenSubCategory2 = new SubCategory("Insurance");
+        List<SubCategory> subCategories = new ArrayList<>(List.of(givenSubCategory1, givenSubCategory2));
+
+        // when
+        // then
+        // check no exception thrown
+        assertThatCode(() -> this.subCategoryServiceUnderTest.addAllSubCategories(subCategories))
+                .doesNotThrowAnyException();
+        // check the method was called only once
+        verify(this.subCategoryRepositoryMock, times(1)).saveAll(subCategories);
+
+
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<List<SubCategory>> argumentCaptor = ArgumentCaptor.forClass(List.class);
+
+        // check returned data is valid
+        when(this.subCategoryRepositoryMock.saveAll(argumentCaptor.capture())).thenReturn(subCategories);
+        List<SubCategory> savedSubCategories = this.subCategoryServiceUnderTest.addAllSubCategories(subCategories);
+
+        assertEquals(2, savedSubCategories.size());
+        assertEquals(subCategories, argumentCaptor.getValue());
+    }
+
+    @Test
+    void addAllSubCategoriesWithDuplicateEntityException() {
+        // given
+        SubCategory givenSubCategory1 = new SubCategory("Banking");
+        SubCategory givenSubCategory2 = new SubCategory("Insurance");
+        List<SubCategory> subCategories = new ArrayList<>(List.of(givenSubCategory1, givenSubCategory2));
+
+        // re-create the sqlite unique constraint exception
+        SQLiteException sqLiteException = new SQLiteException("", SQLiteErrorCode.SQLITE_CONSTRAINT);
+        JpaSystemException jpaSystemException = new JpaSystemException(new RuntimeException("", sqLiteException));
+
+        // setup the mock environment
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<List<SubCategory>> argumentCaptor = ArgumentCaptor.forClass(List.class);
+        when(this.subCategoryRepositoryMock.saveAll(argumentCaptor.capture())).thenThrow(jpaSystemException);
+
+
+        // run the test
+        assertThatThrownBy(() -> this.subCategoryServiceUnderTest.addAllSubCategories(subCategories))
+                .isInstanceOf(DuplicateEntityException.class)
+                .hasMessage(ExceptionMessage.DUPLICATE_ENTITY_EXCEPTION.getMessage());
+
+        // then
+        assertEquals(subCategories, argumentCaptor.getValue());
+
+
     }
 }
