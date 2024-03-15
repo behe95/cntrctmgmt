@@ -57,6 +57,31 @@ public class SubCategoryService {
     }
 
     /**
+     * Add sub-categories to the database
+     *
+     * @param subCategories Sub-Categories to add
+     * @return Saved sub-categories
+     * @throws DuplicateEntityException If any sub-categories with the same name already exists
+     */
+    @Transactional(rollbackOn = DuplicateEntityException.class)
+    public List<SubCategory> addAllSubCategories(List<SubCategory> subCategories) throws DuplicateEntityException {
+        List<SubCategory> savedCategories = null;
+        try {
+            savedCategories = this.subCategoryRepository.saveAll(subCategories);
+        } catch (JpaSystemException jpaSystemException) {
+            if (jpaSystemException.getRootCause() instanceof SQLiteException) {
+                int errorCode = ((SQLiteException) jpaSystemException.getRootCause()).getErrorCode();
+                if (errorCode == 19) //SQLITE_CONSTRAINT
+                {
+                    throw new DuplicateEntityException(ExceptionMessage.DUPLICATE_ENTITY_EXCEPTION.getMessage());
+                }
+            }
+        }
+
+        return savedCategories;
+    }
+
+    /**
      * Retrieve the sub-category by id
      *
      * @param id ID to retrieve the sub-category
@@ -134,5 +159,23 @@ public class SubCategoryService {
             }
         }
         this.subCategoryRepository.deleteAll();
+    }
+
+    /**
+     * Delete multiple categories at once
+     * Remove any association of the categories with any
+     * other subcategories prior to deletion
+     *
+     * @param subCategories List of categories to delete
+     */
+    @Transactional
+    public void deleteSubCategories(List<SubCategory> subCategories) {
+        for (SubCategory subCategory : subCategories) {
+            for (Category category : subCategory.getCategoryList()) {
+                category.getSubCategoryList().remove(subCategory);
+            }
+        }
+
+        this.subCategoryRepository.deleteAll(subCategories);
     }
 }
