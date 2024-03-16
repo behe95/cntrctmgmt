@@ -27,6 +27,7 @@ class SubCategoryServiceTest {
     @Autowired
     private SubCategoryService subCategoryService;
 
+
     enum KEYS {
         CATEGORY1, CATEGORY2, SUBCATEGORY1, SUBCATEGORY2
     }
@@ -178,7 +179,7 @@ class SubCategoryServiceTest {
         Category category2 = categoryEnumMap.get(KEYS.CATEGORY2);
 
         SubCategory subCategory1FoundInCategory1 = category1.getSubCategoryList().stream().filter(sc -> sc.getId() == subCategory.getId()).findAny().orElse(null);
-        SubCategory subCategory1FoundInCategory2 = category1.getSubCategoryList().stream().filter(sc -> sc.getId() == subCategory.getId()).findAny().orElse(null);
+        SubCategory subCategory1FoundInCategory2 = category2.getSubCategoryList().stream().filter(sc -> sc.getId() == subCategory.getId()).findAny().orElse(null);
 
         assertNull(subCategory1FoundInCategory1);
         assertNull(subCategory1FoundInCategory2);
@@ -231,6 +232,64 @@ class SubCategoryServiceTest {
          */
         SubCategory subCategory1 = subCategoryEnumMap.get(KEYS.SUBCATEGORY1);
         SubCategory subCategory2 = subCategoryEnumMap.get(KEYS.SUBCATEGORY2);
+
+        Optional<SubCategory> sc1 = this.subCategoryService.getSubCategoryById(subCategory1.getId());
+        Optional<SubCategory> sc2 = this.subCategoryService.getSubCategoryById(subCategory2.getId());
+
+        assertFalse(sc1.isPresent());
+        assertFalse(sc2.isPresent());
+
+        /**
+         * there is no association in database
+         */
+        Category c1 = this.categoryService.getCategoryById(category1.getId()).orElse(null);
+        Category c2 = this.categoryService.getCategoryById(category2.getId()).orElse(null);
+
+        assert c1 != null;
+        assertEquals(0, c1.getSubCategoryList().size());
+        assert c2 != null;
+        assertEquals(0, c2.getSubCategoryList().size());
+    }
+
+    @Test
+    void deleteSubCategories() {
+        /**
+         * Given
+         *
+         * {category1} has {subCategory1, subCategory2}
+         * {category2} has {subCategory1}
+         * --------------------------------------------
+         * {subCategory1} has {category1,category2}
+         * {subCategory2} has {category1}
+         */
+        SubCategory subCategory1 = subCategoryEnumMap.get(KEYS.SUBCATEGORY1);
+        SubCategory subCategory2 = subCategoryEnumMap.get(KEYS.SUBCATEGORY2);
+        List<SubCategory> subCategories = new ArrayList<>(List.of(subCategory1, subCategory2));
+
+        /**
+         * when
+         */
+        this.subCategoryService.deleteSubCategories(subCategories);
+
+        /**
+         * then
+         * Check if the association with category1 and category2
+         * has been removed too - in the persistence context
+         */
+        Category category1 = categoryEnumMap.get(KEYS.CATEGORY1);
+        Category category2 = categoryEnumMap.get(KEYS.CATEGORY2);
+        SubCategory subCategory1FoundInCategory1 = category1.getSubCategoryList().stream().filter(sc -> sc.getId() == subCategory1.getId()).findAny().orElse(null);
+        SubCategory subCategory2oundInCategory1 = category1.getSubCategoryList().stream().filter(sc -> sc.getId() == subCategory2.getId()).findAny().orElse(null);
+        SubCategory subCategory1FoundInCategory2 = category2.getSubCategoryList().stream().filter(sc -> sc.getId() == subCategory1.getId()).findAny().orElse(null);
+
+        assertNull(subCategory1FoundInCategory1);
+        assertNull(subCategory2oundInCategory1);
+        assertNull(subCategory1FoundInCategory2);
+
+
+        /**
+         * Check there is no sub sub-categories in database
+         */
 
         Optional<SubCategory> sc1 = this.subCategoryService.getSubCategoryById(subCategory1.getId());
         Optional<SubCategory> sc2 = this.subCategoryService.getSubCategoryById(subCategory2.getId());
