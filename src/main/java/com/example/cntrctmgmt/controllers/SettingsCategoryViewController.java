@@ -46,14 +46,10 @@ import java.util.Objects;
  * for any selected category. Sub-categories can be un-assigned at any time if necessary.
  */
 @Controller
-public class SettingsCategoryViewController {
+public class SettingsCategoryViewController extends SettingsCategorySubCategoryTemplate{
 
 
-    // service class to interact with service repository
-    private final CategoryService categoryService;
 
-    // service class to interact with sub-category repository
-    private final SubCategoryService subCategoryService;
 
     // contains all the categories
     private final ObservableList<Category> categoryObservableList;
@@ -101,8 +97,7 @@ public class SettingsCategoryViewController {
     @Autowired
     public SettingsCategoryViewController(CategoryService categoryService, SubCategoryService subCategoryService) {
         // service to interact with repository
-        this.categoryService = categoryService;
-        this.subCategoryService = subCategoryService;
+        super(categoryService,subCategoryService);
 
         // data containers
         this.availableSubCategories = new HashMap<>();
