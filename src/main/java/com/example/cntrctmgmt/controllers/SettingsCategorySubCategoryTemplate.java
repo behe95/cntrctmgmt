@@ -1,24 +1,30 @@
 package com.example.cntrctmgmt.controllers;
 
+import com.example.cntrctmgmt.constant.responsemessage.EndUserResponseMessage;
+import com.example.cntrctmgmt.constant.responsemessage.ExceptionMessage;
 import com.example.cntrctmgmt.entities.Category;
 import com.example.cntrctmgmt.entities.SubCategory;
+import com.example.cntrctmgmt.exceptions.DuplicateEntityException;
+import com.example.cntrctmgmt.exceptions.InvalidInputException;
 import com.example.cntrctmgmt.services.CategoryService;
 import com.example.cntrctmgmt.services.SubCategoryService;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.TextFieldListCell;
 import org.springframework.stereotype.Controller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 @Controller
-public abstract class SettingsCategorySubCategoryTemplate<P,C> {
+public abstract class SettingsCategorySubCategoryTemplate<P, C> {
 
     // service class to interact with service repository
     protected final CategoryService categoryService;
@@ -56,6 +62,7 @@ public abstract class SettingsCategorySubCategoryTemplate<P,C> {
     }
 
     protected final void initializeListView(ListView<P> listViewParent, ListView<C> listViewAvailableChildren, ListView<C> listViewAssignedChildren) {
+        this.listViewParent = listViewParent;
         // populate ListView for all the categories
         listViewParent.setItems(parentObservableList);
         // select the first item for the first time by default
@@ -121,4 +128,163 @@ public abstract class SettingsCategorySubCategoryTemplate<P,C> {
             category.getSubCategoryList().remove(subCategory);
         }
     }
+
+    protected void addParent(P parent) {
+        listViewParent.itemsProperty().get().add(parent);
+        // clear any previous selection
+        listViewParent.getSelectionModel().clearSelection();
+        // select new item
+        listViewParent.getSelectionModel().select(parent);
+        currentSelected.set(parent);
+
+
+        int newAddedSubCategoryIdx = listViewParent.itemsProperty().get().size() - 1;
+        listViewParent.layout();
+        listViewParent.scrollTo(newAddedSubCategoryIdx);
+        listViewParent.getFocusModel().focus(newAddedSubCategoryIdx);
+
+
+        listViewParent.edit(newAddedSubCategoryIdx);
+    }
+
+    protected boolean saveOrUpdateParent() {
+
+        boolean isSaved = true;
+        try {
+
+            onSaveOrUpdateParentValidate();
+
+            onSaveOrUpdateParent();
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setContentText(onParentSaveOrUpdateSuccessShow());
+            alert.showAndWait();
+        } catch (DuplicateEntityException e) {
+            isSaved = false;
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setContentText(onParentSaveOrUpdateFailureShow() + " " + e.getMessage());
+            alert.showAndWait();
+        } catch (InvalidInputException e) {
+            isSaved = false;
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setContentText(e.getMessage());
+            alert.showAndWait();
+        }
+        return isSaved;
+    }
+
+    protected abstract void onSaveOrUpdateParent() throws DuplicateEntityException;
+
+    protected abstract void onSaveOrUpdateParentValidate() throws InvalidInputException;
+
+    protected abstract String onParentSaveOrUpdateSuccessShow();
+
+    protected abstract String onParentSaveOrUpdateFailureShow();
+
+
+    protected void deleteParent(ActionEvent actionEvent) {
+        try {
+            onDeleteParent();
+            // get the index of the deleted category
+            int selectedIdx = listViewParent.getSelectionModel().getSelectedIndices().stream().min(Integer::compareTo).orElse(-1);
+
+
+            // clean up the available categories
+            for (P key : listViewParent.getSelectionModel().getSelectedItems()) {
+                // remove the assigned sub-categories
+                availableToBeAssigned.get(key).clear();
+                // remove the category
+                availableToBeAssigned.remove(key);
+            }
+
+            // remove it from the category ListView
+            listViewParent.itemsProperty().get().removeAll(listViewParent.getSelectionModel().getSelectedItems());
+            // clear selection
+            listViewParent.getSelectionModel().clearSelection();
+
+            // if there are still categories left, change the selection
+            // and focus to either next or previous category relative to the
+            // index that were removed
+            if (listViewParent.itemsProperty().get().size() > 0) {
+                if (selectedIdx >= listViewParent.itemsProperty().get().size()) {
+                    selectedIdx = selectedIdx - 1;
+                }
+                listViewParent.getSelectionModel().select(selectedIdx);
+                listViewParent.getFocusModel().focus(selectedIdx);
+                // set the current selected category
+                currentSelected.set(listViewParent.getSelectionModel().getSelectedItem());
+            } else {
+                // set current category
+                currentSelected.set(null);
+            }
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setContentText(onParentDeleteSuccessShow());
+            alert.showAndWait();
+
+        } catch (Exception ex) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setContentText(onParentDeleteFailureShow());
+            alert.showAndWait();
+        }
+    }
+
+    public abstract void onDeleteParent();
+
+    protected abstract String onParentDeleteSuccessShow();
+
+    protected abstract String onParentDeleteFailureShow();
+
+
+    /**
+     * Creates a Context menu for user interaction with a selected ListCell
+     *
+     * @param textFieldListCell ListCell that will be interacted
+     * @return Context Menu
+     */
+    protected ContextMenu getCustomContextMenu(TextFieldListCell<P> textFieldListCell) {
+        ContextMenu contextMenu = new ContextMenu();
+        MenuItem saveMenutItem = new MenuItem("Save");
+        MenuItem addMenutItem = new MenuItem("Add New");
+        MenuItem editMenuItem = new MenuItem("Edit");
+        MenuItem deleteMenuItem = new MenuItem("Delete");
+        MenuItem cancelMenuItem = new MenuItem("Cancel");
+
+        // disable the following for any other cells that don't contain data
+        if (textFieldListCell.isEmpty() || Objects.isNull(textFieldListCell.getItem())) {
+            saveMenutItem.setDisable(true);
+            editMenuItem.setDisable(true);
+            deleteMenuItem.setDisable(true);
+        }
+
+        // save or update category
+        // throws exception if duplicate category
+        // is being saved
+        saveMenutItem.setOnAction(actionEvent -> {
+            boolean isSavedOrUpdated = saveOrUpdateParent();
+            if (!isSavedOrUpdated) {
+                textFieldListCell.startEdit();
+            }
+        });
+
+        // delete category
+        deleteMenuItem.setOnAction(actionEvent -> {
+            textFieldListCell.listViewProperty().get().getSelectionModel().getSelectedItem();
+            deleteParent(actionEvent);
+        });
+
+        // add a new category item at the end of the ListView
+        // automatically focus and start editing once added
+        addMenutItem.setOnAction(actionEvent -> addParent(onAddNewParentCreateNewParent()));
+
+        // edit selected list-cell
+        editMenuItem.setOnAction(actionEvent -> textFieldListCell.startEdit());
+
+        // add menu items to the context menu
+        contextMenu.getItems().addAll(saveMenutItem, addMenutItem, editMenuItem, deleteMenuItem, cancelMenuItem);
+
+        return contextMenu;
+
+    }
+
+    protected abstract P onAddNewParentCreateNewParent();
+
 }

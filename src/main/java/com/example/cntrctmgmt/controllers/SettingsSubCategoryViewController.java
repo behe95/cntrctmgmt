@@ -44,7 +44,7 @@ import java.util.Objects;
  * for any selected sub-category. Sub-categories can be un-assigned at any time if necessary.
  */
 @Controller
-public class SettingsSubCategoryViewController extends SettingsCategorySubCategoryTemplate<SubCategory, Category>{
+public class SettingsSubCategoryViewController extends SettingsCategorySubCategoryTemplate<SubCategory, Category> {
 
 
     // button icon to add a new sub-category
@@ -76,8 +76,9 @@ public class SettingsSubCategoryViewController extends SettingsCategorySubCatego
 
     public SettingsSubCategoryViewController(CategoryService categoryService, SubCategoryService subCategoryService) {
         // service to interact with repository
-        super(categoryService,subCategoryService);
+        super(categoryService, subCategoryService);
     }
+
 
     @FXML
     protected void initialize() {
@@ -155,7 +156,7 @@ public class SettingsSubCategoryViewController extends SettingsCategorySubCatego
             @Override
             public ListCell<SubCategory> call(ListView<SubCategory> subCategoryListView) {
 
-                TextFieldListCell<SubCategory> textFieldListCell = new TextFieldListCell<>(){
+                TextFieldListCell<SubCategory> textFieldListCell = new TextFieldListCell<>() {
                     // contains text value inside the list cell when in editing state
                     private StringProperty tempTextProperty = new SimpleStringProperty("");
 
@@ -255,7 +256,6 @@ public class SettingsSubCategoryViewController extends SettingsCategorySubCatego
                         });
 
 
-
                         // show available categories and assigned categories
                         this.setOnMouseClicked(mouseEvent -> {
                             if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
@@ -269,7 +269,7 @@ public class SettingsSubCategoryViewController extends SettingsCategorySubCatego
 
                     @Override
                     public void commitEdit(SubCategory subCategory) {
-                        if(!isEmpty()) {
+                        if (!isEmpty()) {
                             super.commitEdit(subCategory);
                             setText(subCategory.getTitle());
                         }
@@ -365,96 +365,18 @@ public class SettingsSubCategoryViewController extends SettingsCategorySubCatego
 
 
     /**
-     * Creates a Context menu for user interaction with a selected ListCell
-     *
-     * @param textFieldListCell ListCell that will be interacted
-     * @return Context Menu
-     */
-    private ContextMenu getCustomContextMenu(TextFieldListCell<SubCategory> textFieldListCell) {
-        ContextMenu contextMenu = new ContextMenu();
-        MenuItem saveMenutItem = new MenuItem("Save");
-        MenuItem addMenutItem = new MenuItem("Add New");
-        MenuItem editMenuItem = new MenuItem("Edit");
-        MenuItem deleteMenuItem = new MenuItem("Delete");
-        MenuItem cancelMenuItem = new MenuItem("Cancel");
-
-        // disable the following for any other cells that don't contain data
-        if (textFieldListCell.isEmpty() || Objects.isNull(textFieldListCell.getItem())) {
-            saveMenutItem.setDisable(true);
-            editMenuItem.setDisable(true);
-            deleteMenuItem.setDisable(true);
-        }
-
-        // save or update sub-category
-        // throws exception if duplicate category
-        // is being saved
-        saveMenutItem.setOnAction(actionEvent -> {
-            SubCategory subCategory = textFieldListCell.listViewProperty()
-                    .get().getSelectionModel().getSelectedItem();
-            boolean isSavedOrUpdated = saveOrUpdateSubCategory(actionEvent, subCategory);
-            if (!isSavedOrUpdated) {
-                textFieldListCell.startEdit();
-            }
-        });
-
-        // delete sub-category
-        deleteMenuItem.setOnAction(actionEvent -> {
-            SubCategory subCategory = textFieldListCell.listViewProperty().get().getSelectionModel().getSelectedItem();
-            deleteSubCategory(actionEvent);
-        });
-
-        // add a new sub-category item at the end of the ListView
-        // automatically focus and start editing once added
-        addMenutItem.setOnAction(actionEvent -> addNewItemSubCategory());
-
-        // edit selected list-cell
-        editMenuItem.setOnAction(actionEvent -> textFieldListCell.startEdit());
-
-        // add menu items to the context menu
-        contextMenu.getItems().addAll(saveMenutItem, addMenutItem, editMenuItem, deleteMenuItem, cancelMenuItem);
-
-        return contextMenu;
-
-    }
-
-    /**
      * An event handler which is part of a menu item. Triggered on action and save or update a sub-category.
      * This method may add or update multiple sub-categories if multiple sub-categories are selected for
      * saving or updating at once
      *
      * @param actionEvent Any event triggered on the main item that contains the event handler
-     * @param subCategory    Category to save or update
+     * @param subCategory Category to save or update
      * @return A flag if the save or update is successful or not.
      */
     private boolean saveOrUpdateSubCategory(ActionEvent actionEvent, SubCategory subCategory) {
-        {
-            boolean isSaved = true;
-            try {
-
-                if (Objects.isNull(subCategory.getTitle())
-                        || subCategory.getTitle().equals("")) {
-                    throw new InvalidInputException(ExceptionMessage.EMPTY_INPUT_ERROR.getMessage());
-                }
-
-
-                subCategoryService.addAllSubCategories(listViewSubCategory.getSelectionModel().getSelectedItems());
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setContentText(EndUserResponseMessage.SUBCATEGORY_SAVED.getMessage());
-                alert.showAndWait();
-            } catch (DuplicateEntityException e) {
-                isSaved = false;
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setContentText(EndUserResponseMessage.SUBCATEGORY_SAVED_ERROR.getMessage() + " " + e.getMessage());
-                alert.showAndWait();
-            } catch (InvalidInputException e) {
-                isSaved = false;
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setContentText(e.getMessage());
-                alert.showAndWait();
-            }
-            return isSaved;
-        }
+        return saveOrUpdateParent();
     }
+
 
     /**
      * Delete a sub-category or multiple sub-categories from the list-cell
@@ -462,56 +384,12 @@ public class SettingsSubCategoryViewController extends SettingsCategorySubCatego
      * @param actionEvent Any event triggered on the main item that contains the event handler
      */
     private void deleteSubCategory(ActionEvent actionEvent) {
-        try {
-            // delete categories
-            subCategoryService.deleteSubCategories(listViewSubCategory.getSelectionModel().getSelectedItems());
-            // get the index of the deleted category
-            int selectedIdx = listViewSubCategory.getSelectionModel().getSelectedIndices().stream().min(Integer::compareTo).orElse(-1);
-
-
-            // clean up the available categories
-            for (SubCategory key : listViewSubCategory.getSelectionModel().getSelectedItems()) {
-                // remove the assigned categories
-                availableToBeAssigned.get(key).clear();
-                // remove the sub-category
-                availableToBeAssigned.remove(key);
-            }
-
-            // remove it from the category ListView
-            listViewSubCategory.itemsProperty().get().removeAll(listViewSubCategory.getSelectionModel().getSelectedItems());
-            // clear selection
-            listViewSubCategory.getSelectionModel().clearSelection();
-
-            // if there are still sub-categories left, change the selection
-            // and focus to either next or previous sub-category relative to the
-            // index that were removed
-            if (listViewSubCategory.itemsProperty().get().size() > 0) {
-                if (selectedIdx >= listViewSubCategory.itemsProperty().get().size()) {
-                    selectedIdx = selectedIdx - 1;
-                }
-                listViewSubCategory.getSelectionModel().select(selectedIdx);
-                listViewSubCategory.getFocusModel().focus(selectedIdx);
-                // set the current selected category
-                currentSelected.set(listViewSubCategory.getSelectionModel().getSelectedItem());
-            } else {
-                // set current category
-                currentSelected.set(null);
-            }
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setContentText(EndUserResponseMessage.SUBCATEGORY_DELETED.getMessage());
-            alert.showAndWait();
-
-        } catch (Exception ex) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setContentText(EndUserResponseMessage.SUBCATEGORY_DELETED_ERROR.getMessage());
-            alert.showAndWait();
-        }
+        deleteParent(actionEvent);
     }
 
     private ChangeListener<? super SubCategory> subCategoryChangeListener() {
         return (ChangeListener<SubCategory>) (observableValue, oldSubCategory, newSubCategory) -> {
-            if (oldSubCategory != newSubCategory && Objects.nonNull(newSubCategory))
-            {
+            if (oldSubCategory != newSubCategory && Objects.nonNull(newSubCategory)) {
                 // get all the available categories that can be assigned to
                 // a selected sub-category
                 if (!availableToBeAssigned.containsKey(newSubCategory)) {
@@ -556,24 +434,56 @@ public class SettingsSubCategoryViewController extends SettingsCategorySubCatego
      */
     private void addNewItemSubCategory() {
         SubCategory newSubCategory = new SubCategory();
-        listViewSubCategory.itemsProperty().get().add(newSubCategory);
-        // clear any previous selection
-        listViewSubCategory.getSelectionModel().clearSelection();
-        // select new item
-        listViewSubCategory.getSelectionModel().select(newSubCategory);
-        currentSelected.set(newSubCategory);
-
-
-        int newAddedSubCategoryIdx = listViewSubCategory.itemsProperty().get().size() - 1;
-        listViewSubCategory.layout();
-        listViewSubCategory.scrollTo(newAddedSubCategoryIdx);
-        listViewSubCategory.getFocusModel().focus(newAddedSubCategoryIdx);
-
-
-        listViewSubCategory.edit(newAddedSubCategoryIdx);
+        addParent(newSubCategory);
     }
 
 
+    @Override
+    public void onDeleteParent() {
+        // delete categories
+        subCategoryService.deleteSubCategories(listViewParent.getSelectionModel().getSelectedItems());
+    }
+
+    @Override
+    protected String onParentDeleteSuccessShow() {
+        return EndUserResponseMessage.SUBCATEGORY_DELETED.getMessage();
+    }
+
+    @Override
+    protected String onParentDeleteFailureShow() {
+        return EndUserResponseMessage.SUBCATEGORY_DELETED_ERROR.getMessage();
+    }
 
 
+    @Override
+    protected void onSaveOrUpdateParent() throws DuplicateEntityException {
+        subCategoryService.addAllSubCategories(listViewParent.getSelectionModel().getSelectedItems());
+    }
+
+    @Override
+    protected void onSaveOrUpdateParentValidate() throws InvalidInputException {
+        for (SubCategory subCategory :
+                listViewParent.getSelectionModel().getSelectedItems()) {
+            if (Objects.isNull(subCategory.getTitle())
+                    || subCategory.getTitle().equals("")) {
+                throw new InvalidInputException(ExceptionMessage.EMPTY_INPUT_ERROR.getMessage());
+            }
+        }
+    }
+
+    @Override
+    protected String onParentSaveOrUpdateSuccessShow() {
+        return EndUserResponseMessage.SUBCATEGORY_SAVED.getMessage();
+    }
+
+    @Override
+    protected String onParentSaveOrUpdateFailureShow() {
+        return EndUserResponseMessage.SUBCATEGORY_SAVED_ERROR.getMessage();
+    }
+
+
+    @Override
+    protected SubCategory onAddNewParentCreateNewParent() {
+        return new SubCategory();
+    }
 }

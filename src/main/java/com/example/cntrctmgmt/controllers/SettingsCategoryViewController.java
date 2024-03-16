@@ -47,7 +47,7 @@ import java.util.Objects;
  * for any selected category. Sub-categories can be un-assigned at any time if necessary.
  */
 @Controller
-public class SettingsCategoryViewController extends SettingsCategorySubCategoryTemplate<Category, SubCategory>{
+public class SettingsCategoryViewController extends SettingsCategorySubCategoryTemplate<Category, SubCategory> {
 
     // List view to display all the categories
     @FXML
@@ -83,7 +83,7 @@ public class SettingsCategoryViewController extends SettingsCategorySubCategoryT
     @Autowired
     public SettingsCategoryViewController(CategoryService categoryService, SubCategoryService subCategoryService) {
         // service to interact with repository
-        super(categoryService,subCategoryService);
+        super(categoryService, subCategoryService);
 
     }
 
@@ -143,7 +143,7 @@ public class SettingsCategoryViewController extends SettingsCategorySubCategoryT
      */
     @FXML
     void onActionBtnSaveCategory(ActionEvent event) {
-        saveOrUpdateCategory(event, currentSelected.get());
+        saveOrUpdateCategory();
     }
 
     /**
@@ -456,97 +456,16 @@ public class SettingsCategoryViewController extends SettingsCategorySubCategoryT
         });
     }
 
-    /**
-     * Creates a Context menu for user interaction with a selected ListCell
-     *
-     * @param textFieldListCell ListCell that will be interacted
-     * @return Context Menu
-     */
-    private ContextMenu getCustomContextMenu(TextFieldListCell<Category> textFieldListCell) {
-        ContextMenu contextMenu = new ContextMenu();
-        MenuItem saveMenutItem = new MenuItem("Save");
-        MenuItem addMenutItem = new MenuItem("Add New");
-        MenuItem editMenuItem = new MenuItem("Edit");
-        MenuItem deleteMenuItem = new MenuItem("Delete");
-        MenuItem cancelMenuItem = new MenuItem("Cancel");
-
-        // disable the following for any other cells that don't contain data
-        if (textFieldListCell.isEmpty() || Objects.isNull(textFieldListCell.getItem())) {
-            saveMenutItem.setDisable(true);
-            editMenuItem.setDisable(true);
-            deleteMenuItem.setDisable(true);
-        }
-
-        // save or update category
-        // throws exception if duplicate category
-        // is being saved
-        saveMenutItem.setOnAction(actionEvent -> {
-            Category category = textFieldListCell.listViewProperty()
-                    .get().getSelectionModel().getSelectedItem();
-            boolean isSavedOrUpdated = saveOrUpdateCategory(actionEvent, category);
-            if (!isSavedOrUpdated) {
-                textFieldListCell.startEdit();
-            }
-        });
-
-        // delete category
-        deleteMenuItem.setOnAction(actionEvent -> {
-            Category category = textFieldListCell.listViewProperty().get().getSelectionModel().getSelectedItem();
-            deleteCategory(actionEvent);
-        });
-
-        // add a new category item at the end of the ListView
-        // automatically focus and start editing once added
-        addMenutItem.setOnAction(actionEvent -> addNewItemCategory());
-
-        // edit selected list-cell
-        editMenuItem.setOnAction(actionEvent -> textFieldListCell.startEdit());
-
-        // add menu items to the context menu
-        contextMenu.getItems().addAll(saveMenutItem, addMenutItem, editMenuItem, deleteMenuItem, cancelMenuItem);
-
-        return contextMenu;
-
-    }
 
     /**
      * An event handler which is part of a menu item. Triggered on action and save or update a category.
      * This method may add or update multiple categories if multiple categories are selected for
      * saving or updating at once
      *
-     * @param actionEvent Any event triggered on the main item that contains the event handler
-     * @param category    Category to save or update
      * @return A flag if the save or update is successful or not.
      */
-    private boolean saveOrUpdateCategory(ActionEvent actionEvent, Category category) {
-        {
-            boolean isSaved = true;
-            try {
-
-                if (Objects.isNull(category.getTitle())
-                        || category.getTitle().equals("")) {
-                    throw new InvalidInputException(ExceptionMessage.EMPTY_INPUT_ERROR.getMessage());
-                }
-
-
-//                categoryService.addCategory(category);
-                categoryService.addAllCategories(listViewCategory.getSelectionModel().getSelectedItems());
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setContentText(EndUserResponseMessage.CATEGORY_SAVED.getMessage());
-                alert.showAndWait();
-            } catch (DuplicateEntityException e) {
-                isSaved = false;
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setContentText(EndUserResponseMessage.CATEGORY_SAVED_ERROR.getMessage() + " " + e.getMessage());
-                alert.showAndWait();
-            } catch (InvalidInputException e) {
-                isSaved = false;
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setContentText(e.getMessage());
-                alert.showAndWait();
-            }
-            return isSaved;
-        }
+    private boolean saveOrUpdateCategory() {
+        return saveOrUpdateParent();
     }
 
     /**
@@ -555,50 +474,7 @@ public class SettingsCategoryViewController extends SettingsCategorySubCategoryT
      * @param actionEvent Any event triggered on the main item that contains the event handler
      */
     private void deleteCategory(ActionEvent actionEvent) {
-        try {
-            // delete categories
-            categoryService.deleteCategories(listViewCategory.getSelectionModel().getSelectedItems());
-            // get the index of the deleted category
-            int selectedIdx = listViewCategory.getSelectionModel().getSelectedIndices().stream().min(Integer::compareTo).orElse(-1);
-
-
-            // clean up the available categories
-            for (Category key : listViewCategory.getSelectionModel().getSelectedItems()) {
-                // remove the assigned sub-categories
-                availableToBeAssigned.get(key).clear();
-                // remove the category
-                availableToBeAssigned.remove(key);
-            }
-
-            // remove it from the category ListView
-            listViewCategory.itemsProperty().get().removeAll(listViewCategory.getSelectionModel().getSelectedItems());
-            // clear selection
-            listViewCategory.getSelectionModel().clearSelection();
-
-            // if there are still categories left, change the selection
-            // and focus to either next or previous category relative to the
-            // index that were removed
-            if (listViewCategory.itemsProperty().get().size() > 0) {
-                if (selectedIdx >= listViewCategory.itemsProperty().get().size()) {
-                    selectedIdx = selectedIdx - 1;
-                }
-                listViewCategory.getSelectionModel().select(selectedIdx);
-                listViewCategory.getFocusModel().focus(selectedIdx);
-                // set the current selected category
-                currentSelected.set(listViewCategory.getSelectionModel().getSelectedItem());
-            } else {
-                // set current category
-                currentSelected.set(null);
-            }
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setContentText(EndUserResponseMessage.CATEGORY_DELETED.getMessage());
-            alert.showAndWait();
-
-        } catch (Exception ex) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setContentText(EndUserResponseMessage.CATEGORY_DELETED_ERROR.getMessage());
-            alert.showAndWait();
-        }
+        deleteParent(actionEvent);
     }
 
     /**
@@ -606,53 +482,56 @@ public class SettingsCategoryViewController extends SettingsCategorySubCategoryT
      */
     private void addNewItemCategory() {
         Category newCategory = new Category();
-        listViewCategory.itemsProperty().get().add(newCategory);
-        // clear any previous selection
-        listViewCategory.getSelectionModel().clearSelection();
-        // select new item
-        listViewCategory.getSelectionModel().select(newCategory);
-        currentSelected.set(newCategory);
-
-
-        int newAddedCategoryIdx = listViewCategory.itemsProperty().get().size() - 1;
-        listViewCategory.layout();
-        listViewCategory.scrollTo(newAddedCategoryIdx);
-        listViewCategory.getFocusModel().focus(newAddedCategoryIdx);
-
-
-        listViewCategory.edit(newAddedCategoryIdx);
+        addParent(newCategory);
     }
 
-    /**
-     * Add a new sub-category to the available sub-category list.
-     */
-    private void addNewItemSubCategory() {
-        SubCategory subCategory = new SubCategory("Final SubCategory");
 
-        try {
-            SubCategory savedSubCategory = subCategoryService.addSubCategory(subCategory);
-            childObservableList.add(savedSubCategory);
-            if (Objects.nonNull(currentSelected.get())) {
-                availableToBeAssigned.get(currentSelected.get()).add(savedSubCategory);
+    @Override
+    public void onDeleteParent() {
+
+        // delete categories
+        categoryService.deleteCategories(listViewParent.getSelectionModel().getSelectedItems());
+    }
+
+    @Override
+    protected String onParentDeleteSuccessShow() {
+        return EndUserResponseMessage.CATEGORY_DELETED.getMessage();
+    }
+
+    @Override
+    protected String onParentDeleteFailureShow() {
+        return EndUserResponseMessage.CATEGORY_DELETED_ERROR.getMessage();
+    }
+
+
+    @Override
+    protected void onSaveOrUpdateParent() throws DuplicateEntityException {
+        categoryService.addAllCategories(listViewParent.getSelectionModel().getSelectedItems());
+    }
+
+    @Override
+    protected void onSaveOrUpdateParentValidate() throws InvalidInputException {
+        for (Category category :
+                listViewParent.getSelectionModel().getSelectedItems()) {
+            if (Objects.isNull(category.getTitle())
+                    || category.getTitle().equals("")) {
+                throw new InvalidInputException(ExceptionMessage.EMPTY_INPUT_ERROR.getMessage());
             }
-
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setContentText(EndUserResponseMessage.SUBCATEGORY_SAVED.getMessage());
-            alert.showAndWait();
-        } catch (DuplicateEntityException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setContentText(EndUserResponseMessage.SUBCATEGORY_SAVED_ERROR.getMessage() + " " + e.getMessage());
-            alert.showAndWait();
-        } catch (UnknownException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setContentText(ExceptionMessage.UNKNOWN_EXCEPTION.getMessage() + " " + e.getMessage());
-            alert.showAndWait();
         }
     }
 
+    @Override
+    protected String onParentSaveOrUpdateSuccessShow() {
+        return EndUserResponseMessage.CATEGORY_SAVED.getMessage();
+    }
 
+    @Override
+    protected String onParentSaveOrUpdateFailureShow() {
+        return EndUserResponseMessage.CATEGORY_SAVED_ERROR.getMessage();
+    }
 
-
-
-
+    @Override
+    protected Category onAddNewParentCreateNewParent() {
+        return new Category();
+    }
 }
