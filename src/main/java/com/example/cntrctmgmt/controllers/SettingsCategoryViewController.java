@@ -21,6 +21,7 @@ import javafx.collections.ObservableList;
 import javafx.event.*;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.control.skin.VirtualFlow;
@@ -88,27 +89,19 @@ public class SettingsCategoryViewController extends SettingsCategorySubCategoryT
 
 
     @FXML
-    private void initialize() {
+    protected void initialize() {
 
-        // initially disable to icon to interact
-        // no category selected
-        btnDeleteCategory.setDisable(true);
-        btnSaveCategory.setDisable(true);
 
         // category change
         currentSelected.addListener(categoryChangeListener());
 
         // Get all the categories
-        categoryObservableList.setAll(categoryService.getAllCategories());
+        parentObservableList.setAll(categoryService.getAllCategories());
         // Get all the subcategories
-        subCategoryObservableList.setAll(subCategoryService.getAllSubCategories());
+        childObservableList.setAll(subCategoryService.getAllSubCategories());
 
-        // populate ListView for all the categories
-        listViewCategory.setItems(categoryObservableList);
-        // select the first item for the first time by default
-        listViewCategory.getSelectionModel().selectFirst();
-        currentSelected.set(listViewCategory.getSelectionModel().getSelectedItem());
-
+        super.initializeButton(btnAddNewCategory, btnSaveCategory, btnDeleteCategory);
+        super.initializeListView(listViewCategory, listViewAvailableSubCategory, listViewAssignedSubCategory);
 
         // populate list views
         setupCellFactoryListViewCategory();
@@ -176,7 +169,7 @@ public class SettingsCategoryViewController extends SettingsCategorySubCategoryT
                 if (!availableToBeAssigned.containsKey(newCategory)) {
                     availableToBeAssigned.put(
                             newCategory, FXCollections.observableArrayList(
-                                    subCategoryObservableList
+                                    childObservableList
                                             .filtered(
                                                     availableSubCategory -> newCategory.getSubCategoryList().stream()
                                                             .noneMatch(assignedSubCategory -> assignedSubCategory.getId() == availableSubCategory.getId())
@@ -325,7 +318,7 @@ public class SettingsCategoryViewController extends SettingsCategorySubCategoryT
 //                                && Objects.isNull(getItem().getTitle())
 //                                && getItem().getSubCategoryList().size() == 0) {
 //                            availableToBeAssigned.remove(getItem());
-//                            categoryObservableList.remove(getItem());
+//                            parentObservableList.remove(getItem());
 //                        }
                         super.cancelEdit();
 
@@ -416,7 +409,7 @@ public class SettingsCategoryViewController extends SettingsCategorySubCategoryT
                             @Override
                             public void handle(MouseEvent mouseEvent) {
                                 if (mouseEvent.getClickCount() == 2 && Objects.nonNull(subCategory)) {
-                                    assignSubCategory(subCategory);
+                                    assign(subCategory);
                                 }
                             }
                         });
@@ -453,7 +446,7 @@ public class SettingsCategoryViewController extends SettingsCategorySubCategoryT
                             @Override
                             public void handle(MouseEvent mouseEvent) {
                                 if (mouseEvent.getClickCount() == 2 && Objects.nonNull(subCategory)) {
-                                    unassignSubCategory(subCategory);
+                                    unassign(subCategory);
                                 }
                             }
                         });
@@ -638,7 +631,7 @@ public class SettingsCategoryViewController extends SettingsCategorySubCategoryT
 
         try {
             SubCategory savedSubCategory = subCategoryService.addSubCategory(subCategory);
-            subCategoryObservableList.add(savedSubCategory);
+            childObservableList.add(savedSubCategory);
             if (Objects.nonNull(currentSelected.get())) {
                 availableToBeAssigned.get(currentSelected.get()).add(savedSubCategory);
             }
@@ -658,38 +651,8 @@ public class SettingsCategoryViewController extends SettingsCategorySubCategoryT
     }
 
 
-    /**
-     * This method assign a sub-category to a category
-     *
-     * @param subCategory Sub-category to assign
-     */
-    private void assignSubCategory(SubCategory subCategory) {
-        Category category = currentSelected.get();
-        // remove the sub-category from the available sub-category list
-        availableToBeAssigned.get(category).remove(subCategory);
-        // assign the sub-category to the selected category
-        category.getSubCategoryList().add(subCategory);
-        // assign the selected category to the sub-category that has been assigned
-        // to make association in the persistence context
-        subCategory.getCategoryList().add(category);
 
-    }
 
-    /**
-     * This method un-assign a sub-category from a category
-     *
-     * @param subCategory Sub-category to un-assign
-     */
-    private void unassignSubCategory(SubCategory subCategory) {
-        Category category = currentSelected.get();
-        // add the sub-category to the list of available sub-categories
-        availableToBeAssigned.get(category).add(subCategory);
-        // remove the sub-category from the assigned sub-category list
-        category.getSubCategoryList().remove(subCategory);
-        // remove the selected category from the sub-category that has been un-assigned
-        // to remove the association in the persistence context
-        subCategory.getCategoryList().remove(category);
-    }
 
 
 }

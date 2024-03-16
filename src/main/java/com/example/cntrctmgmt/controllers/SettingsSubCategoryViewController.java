@@ -80,26 +80,19 @@ public class SettingsSubCategoryViewController extends SettingsCategorySubCatego
     }
 
     @FXML
-    private void initialize() {
-        // initially disable the icons to interact
-        // no sub-category selected initially
-        btnSaveSubCategory.setDisable(true);
-        btnDeleteSubCategory.setDisable(true);
+    protected void initialize() {
 
         // sub-category change
         currentSelected.addListener(subCategoryChangeListener());
 
         // Get all the categories
-        categoryObservableList.setAll(categoryService.getAllCategories());
+        parentObservableList.setAll(subCategoryService.getAllSubCategories());
         // Get all the sub-categories
-        subCategoryObservableList.setAll(subCategoryService.getAllSubCategories());
+        childObservableList.setAll(categoryService.getAllCategories());
 
-        // populate ListView for all the sub-categories
-        listViewSubCategory.setItems(subCategoryObservableList);
-        // select the first item for the first time by default
-        listViewSubCategory.getSelectionModel().selectFirst();
-        currentSelected.set(listViewSubCategory.getSelectionModel().getSelectedItem());
 
+        super.initializeButton(btnAddNewSubCategory, btnSaveSubCategory, btnDeleteSubCategory);
+        super.initializeListView(listViewSubCategory, listViewAvailableCategory, listViewAssignedCategory);
 
 
         // setup the list views
@@ -323,7 +316,7 @@ public class SettingsSubCategoryViewController extends SettingsCategorySubCatego
                             @Override
                             public void handle(MouseEvent mouseEvent) {
                                 if (mouseEvent.getClickCount() == 2 && Objects.nonNull(category)) {
-                                    assignCategory(category);
+                                    assign(category);
                                 }
                             }
                         });
@@ -360,7 +353,7 @@ public class SettingsSubCategoryViewController extends SettingsCategorySubCatego
                             @Override
                             public void handle(MouseEvent mouseEvent) {
                                 if (mouseEvent.getClickCount() == 2 && Objects.nonNull(category)) {
-                                    unassignCategory(category);
+                                    unassign(category);
                                 }
                             }
                         });
@@ -524,14 +517,13 @@ public class SettingsSubCategoryViewController extends SettingsCategorySubCatego
                 if (!availableToBeAssigned.containsKey(newSubCategory)) {
                     availableToBeAssigned.put(
                             newSubCategory, FXCollections.observableArrayList(
-                                    categoryObservableList
+                                    childObservableList
                                             .filtered(
                                                     availableCategory -> newSubCategory.getCategoryList().stream()
                                                             .noneMatch(assignedCategory -> assignedCategory.getId() == availableCategory.getId())
                                             )
                             )
                     );
-                    System.out.println(newSubCategory);
                 }
 
                 // populate the ListViews with available and assigned categories
@@ -582,37 +574,6 @@ public class SettingsSubCategoryViewController extends SettingsCategorySubCatego
     }
 
 
-    /**
-     * This method assign a category to a sub-category
-     *
-     * @param category category to assign
-     */
-    private void assignCategory(Category category) {
-        SubCategory subCategory = currentSelected.get();
-        // remove the category from the available category list
-        availableToBeAssigned.get(subCategory).remove(category);
-        // assign the category to the selected sub-category
-        subCategory.getCategoryList().add(category);
-        // assign the selected sub-category to the category that has been assigned
-        // to make association in the persistence context
-        category.getSubCategoryList().add(subCategory);
 
-    }
-
-    /**
-     * This method un-assign a category from a sub-category
-     *
-     * @param category category to un-assign
-     */
-    private void unassignCategory(Category category) {
-        SubCategory subCategory = currentSelected.get();
-        // add the category to the list of available categories
-        availableToBeAssigned.get(subCategory).add(category);
-        // remove the category from the assigned category list
-        subCategory.getCategoryList().remove(category);
-        // remove the selected sub-category from the category that has been un-assigned
-        // to remove the association in the persistence context
-        category.getSubCategoryList().remove(subCategory);
-    }
 
 }
