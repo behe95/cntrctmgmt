@@ -44,26 +44,8 @@ import java.util.Objects;
  * for any selected sub-category. Sub-categories can be un-assigned at any time if necessary.
  */
 @Controller
-public class SettingsSubCategoryViewController {
+public class SettingsSubCategoryViewController extends SettingsCategorySubCategoryTemplate<SubCategory, Category>{
 
-    // service class to interact with service repository
-    private final CategoryService categoryService;
-
-    // service class to interact with sub-category repository
-    private final SubCategoryService subCategoryService;
-
-    // contains all the categories
-    // this is a reference list which is not tied to any rendered nodes
-    private final ObservableList<Category> categoryObservableList;
-
-    // contains all the sub-categories
-    private final ObservableList<SubCategory> subCategoryObservableList;
-
-    // contains available categories for each sub-category
-    private final HashMap<SubCategory, ObservableList<Category>> availableCategories;
-
-    // currently selected sub-category by the end user
-    private final ObjectProperty<SubCategory> currentSelectedSubCategory = new SimpleObjectProperty<>();
 
     // button icon to add a new sub-category
     @FXML
@@ -94,13 +76,7 @@ public class SettingsSubCategoryViewController {
 
     public SettingsSubCategoryViewController(CategoryService categoryService, SubCategoryService subCategoryService) {
         // service to interact with repository
-        this.categoryService = categoryService;
-        this.subCategoryService = subCategoryService;
-
-        // data containers
-        this.availableCategories = new HashMap<>();
-        this.categoryObservableList = FXCollections.observableArrayList(new ArrayList<>());
-        this.subCategoryObservableList = FXCollections.observableArrayList(new ArrayList<>());
+        super(categoryService,subCategoryService);
     }
 
     @FXML
@@ -111,7 +87,7 @@ public class SettingsSubCategoryViewController {
         btnDeleteSubCategory.setDisable(true);
 
         // sub-category change
-        currentSelectedSubCategory.addListener(subCategoryChangeListener());
+        currentSelected.addListener(subCategoryChangeListener());
 
         // Get all the categories
         categoryObservableList.setAll(categoryService.getAllCategories());
@@ -122,7 +98,7 @@ public class SettingsSubCategoryViewController {
         listViewSubCategory.setItems(subCategoryObservableList);
         // select the first item for the first time by default
         listViewSubCategory.getSelectionModel().selectFirst();
-        currentSelectedSubCategory.set(listViewSubCategory.getSelectionModel().getSelectedItem());
+        currentSelected.set(listViewSubCategory.getSelectionModel().getSelectedItem());
 
 
 
@@ -161,7 +137,7 @@ public class SettingsSubCategoryViewController {
      */
     @FXML
     void onActionBtnSaveSubCategory(ActionEvent event) {
-        saveOrUpdateSubCategory(event, currentSelectedSubCategory.get());
+        saveOrUpdateSubCategory(event, currentSelected.get());
     }
 
 
@@ -252,7 +228,7 @@ public class SettingsSubCategoryViewController {
                             updateItem(subCategory, false);
                             commitEdit(subCategory);
                             listViewSubCategory.getSelectionModel().clearSelection();
-                            currentSelectedSubCategory.set(null);
+                            currentSelected.set(null);
                         }
 
                         if (isCancelledEditingByEscapeKey) {
@@ -291,7 +267,7 @@ public class SettingsSubCategoryViewController {
                         this.setOnMouseClicked(mouseEvent -> {
                             if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
                                 if (Objects.nonNull(subCategory) && !empty) {
-                                    currentSelectedSubCategory.set(subCategory);
+                                    currentSelected.set(subCategory);
                                 }
                             }
                         });
@@ -503,9 +479,9 @@ public class SettingsSubCategoryViewController {
             // clean up the available categories
             for (SubCategory key : listViewSubCategory.getSelectionModel().getSelectedItems()) {
                 // remove the assigned categories
-                availableCategories.get(key).clear();
+                availableToBeAssigned.get(key).clear();
                 // remove the sub-category
-                availableCategories.remove(key);
+                availableToBeAssigned.remove(key);
             }
 
             // remove it from the category ListView
@@ -523,10 +499,10 @@ public class SettingsSubCategoryViewController {
                 listViewSubCategory.getSelectionModel().select(selectedIdx);
                 listViewSubCategory.getFocusModel().focus(selectedIdx);
                 // set the current selected category
-                currentSelectedSubCategory.set(listViewSubCategory.getSelectionModel().getSelectedItem());
+                currentSelected.set(listViewSubCategory.getSelectionModel().getSelectedItem());
             } else {
                 // set current category
-                currentSelectedSubCategory.set(null);
+                currentSelected.set(null);
             }
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setContentText(EndUserResponseMessage.SUBCATEGORY_DELETED.getMessage());
@@ -545,8 +521,8 @@ public class SettingsSubCategoryViewController {
             {
                 // get all the available categories that can be assigned to
                 // a selected sub-category
-                if (!availableCategories.containsKey(newSubCategory)) {
-                    availableCategories.put(
+                if (!availableToBeAssigned.containsKey(newSubCategory)) {
+                    availableToBeAssigned.put(
                             newSubCategory, FXCollections.observableArrayList(
                                     categoryObservableList
                                             .filtered(
@@ -559,20 +535,20 @@ public class SettingsSubCategoryViewController {
                 }
 
                 // populate the ListViews with available and assigned categories
-                SubCategory subCategory = currentSelectedSubCategory.get();
-                listViewAvailableCategory.setItems(availableCategories.get(subCategory));
+                SubCategory subCategory = currentSelected.get();
+                listViewAvailableCategory.setItems(availableToBeAssigned.get(subCategory));
                 listViewAssignedCategory.setItems(subCategory.getCategoryList());
             }
 
             // if there is no selection show empty list views
             // default view
-            if (Objects.isNull(currentSelectedSubCategory.get())) {
+            if (Objects.isNull(currentSelected.get())) {
                 listViewAvailableCategory.setItems(null);
                 listViewAssignedCategory.setItems(null);
             }
 
             // Disable the icon button if no sub-category found for selection
-            if (Objects.isNull(currentSelectedSubCategory.get())) {
+            if (Objects.isNull(currentSelected.get())) {
                 btnSaveSubCategory.setDisable(true);
                 btnDeleteSubCategory.setDisable(true);
             } else {
@@ -593,7 +569,7 @@ public class SettingsSubCategoryViewController {
         listViewSubCategory.getSelectionModel().clearSelection();
         // select new item
         listViewSubCategory.getSelectionModel().select(newSubCategory);
-        currentSelectedSubCategory.set(newSubCategory);
+        currentSelected.set(newSubCategory);
 
 
         int newAddedSubCategoryIdx = listViewSubCategory.itemsProperty().get().size() - 1;
@@ -612,9 +588,9 @@ public class SettingsSubCategoryViewController {
      * @param category category to assign
      */
     private void assignCategory(Category category) {
-        SubCategory subCategory = currentSelectedSubCategory.get();
+        SubCategory subCategory = currentSelected.get();
         // remove the category from the available category list
-        availableCategories.get(subCategory).remove(category);
+        availableToBeAssigned.get(subCategory).remove(category);
         // assign the category to the selected sub-category
         subCategory.getCategoryList().add(category);
         // assign the selected sub-category to the category that has been assigned
@@ -629,9 +605,9 @@ public class SettingsSubCategoryViewController {
      * @param category category to un-assign
      */
     private void unassignCategory(Category category) {
-        SubCategory subCategory = currentSelectedSubCategory.get();
+        SubCategory subCategory = currentSelected.get();
         // add the category to the list of available categories
-        availableCategories.get(subCategory).add(category);
+        availableToBeAssigned.get(subCategory).add(category);
         // remove the category from the assigned category list
         subCategory.getCategoryList().remove(category);
         // remove the selected sub-category from the category that has been un-assigned
