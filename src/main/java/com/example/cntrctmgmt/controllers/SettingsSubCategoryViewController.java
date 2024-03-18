@@ -9,22 +9,10 @@ import com.example.cntrctmgmt.exceptions.DuplicateEntityException;
 import com.example.cntrctmgmt.exceptions.InvalidInputException;
 import com.example.cntrctmgmt.services.CategoryService;
 import com.example.cntrctmgmt.services.SubCategoryService;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.scene.control.cell.TextFieldListCell;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.util.Callback;
-import javafx.util.StringConverter;
 import org.springframework.stereotype.Controller;
 
 import java.util.Objects;
@@ -41,31 +29,7 @@ import java.util.Objects;
 public class SettingsSubCategoryViewController extends SettingsCategorySubCategoryTemplate<SubCategory, Category> {
 
 
-    // button icon to add a new sub-category
-    @FXML
-    private Button btnAddNewSubCategory;
 
-    // button icon to delete one or multiple selected sub-categories
-    @FXML
-    private Button btnDeleteSubCategory;
-
-    // button icon to save or update single or multiple sub-categories
-    @FXML
-    private Button btnSaveSubCategory;
-
-    // List view to display all the assigned categories to
-    // the currently selected sub-category
-    @FXML
-    private ListView<Category> listViewAssignedCategory;
-
-    // List view to display all the available categories
-    // that can be assigned to any selected sub-categories
-    @FXML
-    private ListView<Category> listViewAvailableCategory;
-
-    // List view to display all the sub-categories
-    @FXML
-    private ListView<SubCategory> listViewSubCategory;
 
 
     public SettingsSubCategoryViewController(CategoryService categoryService, SubCategoryService subCategoryService) {
@@ -86,15 +50,9 @@ public class SettingsSubCategoryViewController extends SettingsCategorySubCatego
         childObservableList.setAll(categoryService.getAllCategories());
 
 
-        super.initializeButton(btnAddNewSubCategory, btnSaveSubCategory, btnDeleteSubCategory);
-        super.initializeListView(listViewSubCategory, listViewAvailableCategory, listViewAssignedCategory);
 
 
-        // setup the list views
-        // setup corresponding list cells
-        super.setupCellFactoryListViewParent();
-        super.setupCellFactoryListViewAvailableChildren();
-        super.setupCellFactoryListViewAssignedChildren();
+        super.initialize();
     }
 
     /**
@@ -172,24 +130,24 @@ public class SettingsSubCategoryViewController extends SettingsCategorySubCatego
 
                 // populate the ListViews with available and assigned categories
                 SubCategory subCategory = currentSelected.get();
-                listViewAvailableCategory.setItems(availableToBeAssigned.get(subCategory));
-                listViewAssignedCategory.setItems(subCategory.getCategoryList());
+                listViewAvailableChildren.setItems(availableToBeAssigned.get(subCategory));
+                listViewAssignedChildren.setItems(subCategory.getCategoryList());
             }
 
             // if there is no selection show empty list views
             // default view
             if (Objects.isNull(currentSelected.get())) {
-                listViewAvailableCategory.setItems(null);
-                listViewAssignedCategory.setItems(null);
+                listViewAvailableChildren.setItems(null);
+                listViewAssignedChildren.setItems(null);
             }
 
             // Disable the icon button if no sub-category found for selection
             if (Objects.isNull(currentSelected.get())) {
-                btnSaveSubCategory.setDisable(true);
-                btnDeleteSubCategory.setDisable(true);
+                btnSaveParent.setDisable(true);
+                btnDeleteParent.setDisable(true);
             } else {
-                btnSaveSubCategory.setDisable(false);
-                btnDeleteSubCategory.setDisable(false);
+                btnSaveParent.setDisable(false);
+                btnDeleteParent.setDisable(false);
             }
         };
     }

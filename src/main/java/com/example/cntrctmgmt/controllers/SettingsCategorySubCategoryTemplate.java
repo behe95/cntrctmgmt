@@ -16,6 +16,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.input.KeyCode;
@@ -52,13 +53,44 @@ public abstract class SettingsCategorySubCategoryTemplate<P, C> {
     protected final HashMap<P, ObservableList<C>> availableToBeAssigned;
 
     // List view to display all the categories
+    @FXML
     protected ListView<P> listViewParent;
-    protected ListView<C> listViewAvailableChildren;
-    protected ListView<C> listViewAssignedChildren;
 
+    // List view to display all the available sub-categories
+    // that can be assigned to any selected category
+    @FXML
+    protected ListView<C> listViewAvailableChildren;
+
+    // List view to display all the assigned sub-categories to
+    // the currently selected categories
+    @FXML
+    protected ListView<C> listViewAssignedChildren;
+    // button icon to add a new sub-category
+    @FXML
     protected Button btnAddParent;
-    protected Button btnSaveParent;
+
+    // button icon to delete one or multiple selected sub-categories
+    @FXML
     protected Button btnDeleteParent;
+
+    // button icon to save or update single or multiple sub-categories
+    @FXML
+    protected Button btnSaveParent;
+
+
+    @FXML
+    protected void initialize() {
+        // populate ListView for all the categories
+        listViewParent.setItems(parentObservableList);
+        // select the first item for the first time by default
+        listViewParent.getSelectionModel().selectFirst();
+        currentSelected.set(listViewParent.getSelectionModel().getSelectedItem());
+
+        // populate list views
+        setupCellFactoryListViewParent();
+        setupCellFactoryListViewAvailableChildren();
+        setupCellFactoryListViewAssignedChildren();
+    }
 
     public SettingsCategorySubCategoryTemplate(CategoryService categoryService, SubCategoryService subCategoryService) {
         this.categoryService = categoryService;
@@ -70,16 +102,7 @@ public abstract class SettingsCategorySubCategoryTemplate<P, C> {
         this.availableToBeAssigned = new HashMap<>();
     }
 
-    protected final void initializeListView(ListView<P> listViewParent, ListView<C> listViewAvailableChildren, ListView<C> listViewAssignedChildren) {
-        this.listViewParent = listViewParent;
-        this.listViewAvailableChildren = listViewAvailableChildren;
-        this.listViewAssignedChildren = listViewAssignedChildren;
-        // populate ListView for all the categories
-        listViewParent.setItems(parentObservableList);
-        // select the first item for the first time by default
-        listViewParent.getSelectionModel().selectFirst();
-        currentSelected.set(listViewParent.getSelectionModel().getSelectedItem());
-    }
+
 
     protected final void initializeButton(Button btnAddParent, Button btnSaveParent, Button btnDeleteParent) {
         this.btnAddParent = btnAddParent;
@@ -575,5 +598,7 @@ public abstract class SettingsCategorySubCategoryTemplate<P, C> {
             }
         });
     }
+
+
 
 }

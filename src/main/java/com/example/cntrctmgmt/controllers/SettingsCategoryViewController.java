@@ -9,21 +9,11 @@ import com.example.cntrctmgmt.exceptions.DuplicateEntityException;
 import com.example.cntrctmgmt.exceptions.InvalidInputException;
 import com.example.cntrctmgmt.services.CategoryService;
 import com.example.cntrctmgmt.services.SubCategoryService;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.*;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.TextFieldListCell;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.util.Callback;
-import javafx.util.StringConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -40,31 +30,7 @@ import java.util.Objects;
 @Controller
 public class SettingsCategoryViewController extends SettingsCategorySubCategoryTemplate<Category, SubCategory> {
 
-    // List view to display all the categories
-    @FXML
-    private ListView<Category> listViewCategory;
 
-    // List view to display all the available sub-categories
-    // that can be assigned to any selected category
-    @FXML
-    private ListView<SubCategory> listViewAvailableSubCategory;
-
-    // List view to display all the assigned sub-categories to
-    // the currently selected categories
-    @FXML
-    private ListView<SubCategory> listViewAssignedSubCategory;
-
-    // button icon to add a new category
-    @FXML
-    private Button btnAddNewCategory;
-
-    // button icon to delete a selected category
-    @FXML
-    private Button btnDeleteCategory;
-
-    // button icon to save or a update a selected category
-    @FXML
-    private Button btnSaveCategory;
 
     // check box to select if the category is a soft cost or not
     @FXML
@@ -81,8 +47,6 @@ public class SettingsCategoryViewController extends SettingsCategorySubCategoryT
 
     @FXML
     protected void initialize() {
-
-
         // category change
         currentSelected.addListener(categoryChangeListener());
 
@@ -91,13 +55,10 @@ public class SettingsCategoryViewController extends SettingsCategorySubCategoryT
         // Get all the subcategories
         childObservableList.setAll(subCategoryService.getAllSubCategories());
 
-        super.initializeButton(btnAddNewCategory, btnSaveCategory, btnDeleteCategory);
-        super.initializeListView(listViewCategory, listViewAvailableSubCategory, listViewAssignedSubCategory);
 
-        // populate list views
-        super.setupCellFactoryListViewParent();
-        super.setupCellFactoryListViewAvailableChildren();
-        setupCellFactoryListViewAssignedChildren();
+
+
+        super.initialize();
 
     }
 
@@ -109,11 +70,6 @@ public class SettingsCategoryViewController extends SettingsCategorySubCategoryT
     @FXML
     void onActionBtnAddNewCategory(ActionEvent event) {
         addNewItemCategory();
-//        if (listViewCategory.isFocused()) {
-//            addNewItemCategory();
-//        } else if (listViewAvailableSubCategory.isFocused()) {
-//            addNewItemSubCategory();
-//        }
     }
 
 
@@ -144,7 +100,7 @@ public class SettingsCategoryViewController extends SettingsCategorySubCategoryT
      */
     @FXML
     void checkBoxSoftCostHandler(ActionEvent event) {
-        listViewCategory.getSelectionModel().getSelectedItems().forEach(category -> category.setSoftCost(checkBoxSoftCost.isSelected()));
+        listViewParent.getSelectionModel().getSelectedItems().forEach(category -> category.setSoftCost(checkBoxSoftCost.isSelected()));
     }
 
 
