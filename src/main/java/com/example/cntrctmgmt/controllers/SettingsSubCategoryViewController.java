@@ -94,7 +94,7 @@ public class SettingsSubCategoryViewController extends SettingsCategorySubCatego
         // setup corresponding list cells
         super.setupCellFactoryListViewParent();
         super.setupCellFactoryListViewAvailableChildren();
-        setupCellFactoryListViewAssignedCategory();
+        super.setupCellFactoryListViewAssignedChildren();
     }
 
     /**
@@ -128,43 +128,6 @@ public class SettingsSubCategoryViewController extends SettingsCategorySubCatego
         saveOrUpdateSubCategory(event, currentSelected.get());
     }
 
-
-    /**
-     * All the assigned categories will be presented.
-     * Method populates the ListView with all the assigned categories
-     * except for the un-assigned categories.
-     * End user can double-click on any of the categories which will move
-     * the category to the ListView that contains un-assigned or available categories.
-     */
-    private void setupCellFactoryListViewAssignedCategory() {
-        // Show SubCategory title in listviewAssignedCategory
-        listViewAssignedCategory.setCellFactory(new Callback<ListView<Category>, ListCell<Category>>() {
-            @Override
-            public ListCell<Category> call(ListView<Category> categoryListView) {
-                return new ListCell<Category>() {
-                    @Override
-                    protected void updateItem(Category category, boolean empty) {
-                        super.updateItem(category, empty);
-                        if (Objects.nonNull(category) && !empty) {
-                            setText(category.getTitle());
-                        } else {
-                            setText(null);
-                        }
-
-                        // double click to un-assign the category
-                        this.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                            @Override
-                            public void handle(MouseEvent mouseEvent) {
-                                if (mouseEvent.getClickCount() == 2 && Objects.nonNull(category)) {
-                                    unassign(category);
-                                }
-                            }
-                        });
-                    }
-                };
-            }
-        });
-    }
 
 
     /**

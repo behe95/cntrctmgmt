@@ -97,7 +97,7 @@ public class SettingsCategoryViewController extends SettingsCategorySubCategoryT
         // populate list views
         super.setupCellFactoryListViewParent();
         super.setupCellFactoryListViewAvailableChildren();
-        setupCellFactoryListViewAssignedSubCategory();
+        setupCellFactoryListViewAssignedChildren();
 
     }
 
@@ -198,42 +198,6 @@ public class SettingsCategoryViewController extends SettingsCategorySubCategoryT
 
 
 
-    /**
-     * All the assigned sub-categories will be presented.
-     * Method populates the ListView with all the assigned sub-categories
-     * except for the un-assigned sub-categories.
-     * End user can double-click on any of the sub-categories which will move
-     * the sub-category to the ListView that contains un-assigned or available sub-categories.
-     */
-    private void setupCellFactoryListViewAssignedSubCategory() {
-        // Show SubCategory title in listviewAssignedSubCategory
-        listViewAssignedSubCategory.setCellFactory(new Callback<ListView<SubCategory>, ListCell<SubCategory>>() {
-            @Override
-            public ListCell<SubCategory> call(ListView<SubCategory> subCategoryListView) {
-                return new ListCell<SubCategory>() {
-                    @Override
-                    protected void updateItem(SubCategory subCategory, boolean empty) {
-                        super.updateItem(subCategory, empty);
-                        if (Objects.nonNull(subCategory) && !empty) {
-                            setText(subCategory.getTitle());
-                        } else {
-                            setText(null);
-                        }
-
-                        // double click to un-assign the sub-category
-                        this.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                            @Override
-                            public void handle(MouseEvent mouseEvent) {
-                                if (mouseEvent.getClickCount() == 2 && Objects.nonNull(subCategory)) {
-                                    unassign(subCategory);
-                                }
-                            }
-                        });
-                    }
-                };
-            }
-        });
-    }
 
 
     /**
