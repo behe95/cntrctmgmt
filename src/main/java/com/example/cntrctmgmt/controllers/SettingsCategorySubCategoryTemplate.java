@@ -36,51 +36,51 @@ public abstract class SettingsCategorySubCategoryTemplate<P, C> {
 
     // service class to interact with service repository
     protected final CategoryService categoryService;
-    // service class to interact with sub-category repository
+    // service class to interact with child repository
     protected final SubCategoryService subCategoryService;
 
-    // contains all the categories
+    // contains all the children
     // this is a reference list which is not tied to any rendered nodes
     protected final ObservableList<P> parentObservableList;
 
-    // contains all the sub-categories
+    // contains all the children
     protected final ObservableList<C> childObservableList;
 
-    // currently selected category by the end user
+    // currently selected parent by the end user
     protected final ObjectProperty<P> currentSelected = new SimpleObjectProperty<>();
 
     // contains available children for each parent
     protected final HashMap<P, ObservableList<C>> availableToBeAssigned;
 
-    // List view to display all the categories
+    // List view to display all the parents
     @FXML
     protected ListView<P> listViewParent;
 
-    // List view to display all the available sub-categories
-    // that can be assigned to any selected category
+    // List view to display all the available children
+    // that can be assigned to any selected parent
     @FXML
     protected ListView<C> listViewAvailableChildren;
 
-    // List view to display all the assigned sub-categories to
-    // the currently selected categories
+    // List view to display all the assigned children to
+    // the currently selected parents
     @FXML
     protected ListView<C> listViewAssignedChildren;
-    // button icon to add a new sub-category
+    // button icon to add a new child
     @FXML
     protected Button btnAddParent;
 
-    // button icon to delete one or multiple selected sub-categories
+    // button icon to delete one or multiple selected children
     @FXML
     protected Button btnDeleteParent;
 
-    // button icon to save or update single or multiple sub-categories
+    // button icon to save or update single or multiple children
     @FXML
     protected Button btnSaveParent;
 
 
     @FXML
     protected void initialize() {
-        // populate ListView for all the categories
+        // populate ListView for all the parents
         listViewParent.setItems(parentObservableList);
         // select the first item for the first time by default
         listViewParent.getSelectionModel().selectFirst();
@@ -104,17 +104,6 @@ public abstract class SettingsCategorySubCategoryTemplate<P, C> {
 
 
 
-    protected final void initializeButton(Button btnAddParent, Button btnSaveParent, Button btnDeleteParent) {
-        this.btnAddParent = btnAddParent;
-        this.btnSaveParent = btnSaveParent;
-        this.btnDeleteParent = btnDeleteParent;
-
-        // initially disable to icon to interact
-        // no category selected
-        this.btnSaveParent.setDisable(true);
-        this.btnDeleteParent.setDisable(true);
-    }
-
     /**
      * This method assign a child to a parent
      *
@@ -122,18 +111,18 @@ public abstract class SettingsCategorySubCategoryTemplate<P, C> {
      */
     protected void assign(C child) {
         P parent = currentSelected.get();
-        // remove the sub-category from the available sub-category list
+        // remove the child from the available children list
         availableToBeAssigned.get(parent).remove(child);
         if (parent instanceof Category category && child instanceof SubCategory subCategory) {
-            // assign the sub-category to the selected category
+            // assign the child to the selected parent
             category.getSubCategoryList().add(subCategory);
-            // assign the selected category to the sub-category that has been assigned
+            // assign the selected parent to the child that has been assigned
             // to make association in the persistence context
             subCategory.getCategoryList().add(category);
         } else if (parent instanceof SubCategory subCategory && child instanceof Category category) {
-            // assign the category to the selected sub-category
+            // assign the parent to the selected child
             subCategory.getCategoryList().add(category);
-            // assign the selected sub-category to the category that has been assigned
+            // assign the selected child to the parent that has been assigned
             // to make association in the persistence context
             category.getSubCategoryList().add(subCategory);
         }
@@ -146,7 +135,7 @@ public abstract class SettingsCategorySubCategoryTemplate<P, C> {
      */
     protected void unassign(C child) {
         P parent = currentSelected.get();
-        // add the sub-category to the list of available sub-categories
+        // add the child to the list of available children
         availableToBeAssigned.get(parent).add(child);
         if (parent instanceof Category category && child instanceof SubCategory subCategory) {
             // remove the child from the assigned parent list
@@ -157,7 +146,7 @@ public abstract class SettingsCategorySubCategoryTemplate<P, C> {
         } else if (parent instanceof SubCategory subCategory && child instanceof Category category) {
             // remove the category from the assigned category list
             subCategory.getCategoryList().remove(category);
-            // remove the selected sub-category from the category that has been un-assigned
+            // remove the selected child from the parent that has been un-assigned
             // to remove the association in the persistence context
             category.getSubCategoryList().remove(subCategory);
         }
@@ -218,11 +207,11 @@ public abstract class SettingsCategorySubCategoryTemplate<P, C> {
     protected void deleteParent(ActionEvent actionEvent) {
         try {
             onDeleteParent();
-            // get the index of the deleted category
+            // get the index of the deleted parent
             int selectedIdx = listViewParent.getSelectionModel().getSelectedIndices().stream().min(Integer::compareTo).orElse(-1);
 
 
-            // clean up the available categories
+            // clean up the available children
             for (P key : listViewParent.getSelectionModel().getSelectedItems()) {
                 // remove the assigned sub-categories
                 availableToBeAssigned.get(key).clear();
@@ -230,13 +219,13 @@ public abstract class SettingsCategorySubCategoryTemplate<P, C> {
                 availableToBeAssigned.remove(key);
             }
 
-            // remove it from the category ListView
+            // remove it from the parent ListView
             listViewParent.itemsProperty().get().removeAll(listViewParent.getSelectionModel().getSelectedItems());
             // clear selection
             listViewParent.getSelectionModel().clearSelection();
 
-            // if there are still categories left, change the selection
-            // and focus to either next or previous category relative to the
+            // if there are still parents left, change the selection
+            // and focus to either next or previous parent relative to the
             // index that were removed
             if (listViewParent.itemsProperty().get().size() > 0) {
                 if (selectedIdx >= listViewParent.itemsProperty().get().size()) {
@@ -290,7 +279,7 @@ public abstract class SettingsCategorySubCategoryTemplate<P, C> {
         }
 
         // save or update category
-        // throws exception if duplicate category
+        // throws exception if duplicate parent
         // is being saved
         saveMenutItem.setOnAction(actionEvent -> {
             boolean isSavedOrUpdated = saveOrUpdateParent();
@@ -299,13 +288,13 @@ public abstract class SettingsCategorySubCategoryTemplate<P, C> {
             }
         });
 
-        // delete category
+        // delete paren
         deleteMenuItem.setOnAction(actionEvent -> {
             textFieldListCell.listViewProperty().get().getSelectionModel().getSelectedItem();
             deleteParent(actionEvent);
         });
 
-        // add a new category item at the end of the ListView
+        // add a new parent item at the end of the ListView
         // automatically focus and start editing once added
         addMenutItem.setOnAction(actionEvent -> addParent(onAddNewParentCreateNewParent()));
 
@@ -322,14 +311,14 @@ public abstract class SettingsCategorySubCategoryTemplate<P, C> {
     protected abstract P onAddNewParentCreateNewParent();
 
     /**
-     * All the available categories will be presented.
-     * Method populates the ListView with all the available categories
+     * All the available parents will be presented.
+     * Method populates the ListView with all the available parents
      * from queried from the database.
      * The ListView is editable.
      * Each ListCell is represented with TextFieldListCell to provide editing
      * option to the end user.
      * On selection of any category from the list, the ListView for the
-     * assigned sub-categories and available sub-categories to assign to this category will be populated.
+     * assigned children and available children to assign to this parent will be populated.
      * User can right-click on any of the ListCell that will pop-up a context menu for
      * further interaction.
      */
@@ -340,7 +329,7 @@ public abstract class SettingsCategorySubCategoryTemplate<P, C> {
         listViewParent.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
 
-        // Show Category title in listviewCategory
+        // Show parent's title in listviewParent
         listViewParent.setCellFactory(new Callback<ListView<P>, ListCell<P>>() {
             @Override
             public ListCell<P> call(ListView<P> categoryListView) {
@@ -485,7 +474,7 @@ public abstract class SettingsCategorySubCategoryTemplate<P, C> {
                         });
 
 
-                        // show available sub-categories and assigned categories
+                        // show available children and assigned parents
                         this.setOnMouseClicked(mouseEvent -> {
                             if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
                                 if (Objects.nonNull(parent) && !empty) {
@@ -517,14 +506,14 @@ public abstract class SettingsCategorySubCategoryTemplate<P, C> {
 
 
     /**
-     * All the available sub-categories will be presented that can be assigned to a selected category.
-     * Method populates the ListView with all the available sub-categories
-     * except for the assigned sub-categories.
-     * End user can double-click on any of the sub-categories which will move
-     * the sub-category to the assigned sub-category.
+     * All the available children will be presented that can be assigned to a selected parent.
+     * Method populates the ListView with all the available children
+     * except for the assigned children.
+     * End user can double-click on any of the children which will move
+     * the child to the assigned children.
      */
     protected void setupCellFactoryListViewAvailableChildren() {
-        // Show SubCategory title in listViewAvailableSubCategory
+        // Show child's title in listViewAvailableChildren
         listViewAvailableChildren.setCellFactory(new Callback<ListView<C>, ListCell<C>>() {
             @Override
             public ListCell<C> call(ListView<C> subCategoryListView) {
@@ -542,7 +531,7 @@ public abstract class SettingsCategorySubCategoryTemplate<P, C> {
                             setText(null);
                         }
 
-                        // double click to assign the sub-category
+                        // double click to assign the child
                         this.setOnMouseClicked(new EventHandler<MouseEvent>() {
                             @Override
                             public void handle(MouseEvent mouseEvent) {
@@ -559,14 +548,14 @@ public abstract class SettingsCategorySubCategoryTemplate<P, C> {
 
 
     /**
-     * All the assigned sub-categories will be presented.
-     * Method populates the ListView with all the assigned sub-categories
-     * except for the un-assigned sub-categories.
-     * End user can double-click on any of the sub-categories which will move
-     * the sub-category to the ListView that contains un-assigned or available sub-categories.
+     * All the assigned children will be presented.
+     * Method populates the ListView with all the assigned children
+     * except for the un-assigned children.
+     * End user can double-click on any of the children which will move
+     * the child to the ListView that contains un-assigned or available children.
      */
     protected void setupCellFactoryListViewAssignedChildren() {
-        // Show SubCategory title in listviewAssignedSubCategory
+        // Show parent title in listviewAssignedChildren
         listViewAssignedChildren.setCellFactory(new Callback<ListView<C>, ListCell<C>>() {
             @Override
             public ListCell<C> call(ListView<C> subCategoryListView) {
@@ -584,7 +573,7 @@ public abstract class SettingsCategorySubCategoryTemplate<P, C> {
                             setText(null);
                         }
 
-                        // double click to un-assign the sub-category
+                        // double click to un-assign the child
                         this.setOnMouseClicked(new EventHandler<MouseEvent>() {
                             @Override
                             public void handle(MouseEvent mouseEvent) {
