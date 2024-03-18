@@ -93,7 +93,7 @@ public class SettingsSubCategoryViewController extends SettingsCategorySubCatego
         // setup the list views
         // setup corresponding list cells
         super.setupCellFactoryListViewParent();
-        setupCellFactoryListViewAvailableCategory();
+        super.setupCellFactoryListViewAvailableChildren();
         setupCellFactoryListViewAssignedCategory();
     }
 
@@ -128,43 +128,6 @@ public class SettingsSubCategoryViewController extends SettingsCategorySubCatego
         saveOrUpdateSubCategory(event, currentSelected.get());
     }
 
-
-    /**
-     * All the available categories will be presented that can be assigned to a selected sub-category.
-     * Method populates the ListView with all the available categories
-     * except for the assigned categories.
-     * End user can double-click on any of the categories which will move
-     * the category to the assigned category.
-     */
-    private void setupCellFactoryListViewAvailableCategory() {
-        // Show Category title in listViewAvailableCategory
-        listViewAvailableCategory.setCellFactory(new Callback<ListView<Category>, ListCell<Category>>() {
-            @Override
-            public ListCell<Category> call(ListView<Category> categoryListView) {
-                return new ListCell<>() {
-                    @Override
-                    protected void updateItem(Category category, boolean empty) {
-                        super.updateItem(category, empty);
-                        if (Objects.nonNull(category) && !empty) {
-                            setText(category.getTitle());
-                        } else {
-                            setText(null);
-                        }
-
-                        // double click to assign the category
-                        this.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                            @Override
-                            public void handle(MouseEvent mouseEvent) {
-                                if (mouseEvent.getClickCount() == 2 && Objects.nonNull(category)) {
-                                    assign(category);
-                                }
-                            }
-                        });
-                    }
-                };
-            }
-        });
-    }
 
     /**
      * All the assigned categories will be presented.

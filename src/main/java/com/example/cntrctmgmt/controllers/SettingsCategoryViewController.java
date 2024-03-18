@@ -96,7 +96,7 @@ public class SettingsCategoryViewController extends SettingsCategorySubCategoryT
 
         // populate list views
         super.setupCellFactoryListViewParent();
-        setupCellFactoryListViewAvailableSubCategory();
+        super.setupCellFactoryListViewAvailableChildren();
         setupCellFactoryListViewAssignedSubCategory();
 
     }
@@ -196,42 +196,7 @@ public class SettingsCategoryViewController extends SettingsCategorySubCategoryT
     }
 
 
-    /**
-     * All the available sub-categories will be presented that can be assigned to a selected category.
-     * Method populates the ListView with all the available sub-categories
-     * except for the assigned sub-categories.
-     * End user can double-click on any of the sub-categories which will move
-     * the sub-category to the assigned sub-category.
-     */
-    private void setupCellFactoryListViewAvailableSubCategory() {
-        // Show SubCategory title in listViewAvailableSubCategory
-        listViewAvailableSubCategory.setCellFactory(new Callback<ListView<SubCategory>, ListCell<SubCategory>>() {
-            @Override
-            public ListCell<SubCategory> call(ListView<SubCategory> subCategoryListView) {
-                return new ListCell<>() {
-                    @Override
-                    protected void updateItem(SubCategory subCategory, boolean empty) {
-                        super.updateItem(subCategory, empty);
-                        if (Objects.nonNull(subCategory) && !empty) {
-                            setText(subCategory.getTitle());
-                        } else {
-                            setText(null);
-                        }
 
-                        // double click to assign the sub-category
-                        this.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                            @Override
-                            public void handle(MouseEvent mouseEvent) {
-                                if (mouseEvent.getClickCount() == 2 && Objects.nonNull(subCategory)) {
-                                    assign(subCategory);
-                                }
-                            }
-                        });
-                    }
-                };
-            }
-        });
-    }
 
     /**
      * All the assigned sub-categories will be presented.

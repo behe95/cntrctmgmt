@@ -492,4 +492,46 @@ public abstract class SettingsCategorySubCategoryTemplate<P, C> {
 
     }
 
+
+    /**
+     * All the available sub-categories will be presented that can be assigned to a selected category.
+     * Method populates the ListView with all the available sub-categories
+     * except for the assigned sub-categories.
+     * End user can double-click on any of the sub-categories which will move
+     * the sub-category to the assigned sub-category.
+     */
+    protected void setupCellFactoryListViewAvailableChildren() {
+        // Show SubCategory title in listViewAvailableSubCategory
+        listViewAvailableChildren.setCellFactory(new Callback<ListView<C>, ListCell<C>>() {
+            @Override
+            public ListCell<C> call(ListView<C> subCategoryListView) {
+                return new ListCell<>() {
+                    @Override
+                    protected void updateItem(C children, boolean empty) {
+                        super.updateItem(children, empty);
+                        if (Objects.nonNull(children) && !empty) {
+                            if (children instanceof SubCategory subCategory) {
+                                setText(subCategory.getTitle());
+                            } else if (children instanceof Category category) {
+                                setText(category.getTitle());
+                            }
+                        } else {
+                            setText(null);
+                        }
+
+                        // double click to assign the sub-category
+                        this.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                            @Override
+                            public void handle(MouseEvent mouseEvent) {
+                                if (mouseEvent.getClickCount() == 2 && Objects.nonNull(children)) {
+                                    assign(children);
+                                }
+                            }
+                        });
+                    }
+                };
+            }
+        });
+    }
+
 }
