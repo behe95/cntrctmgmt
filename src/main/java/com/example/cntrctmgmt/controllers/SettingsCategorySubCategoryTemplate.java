@@ -1,7 +1,5 @@
 package com.example.cntrctmgmt.controllers;
 
-import com.example.cntrctmgmt.constant.responsemessage.EndUserResponseMessage;
-import com.example.cntrctmgmt.constant.responsemessage.ExceptionMessage;
 import com.example.cntrctmgmt.entities.Category;
 import com.example.cntrctmgmt.entities.SubCategory;
 import com.example.cntrctmgmt.exceptions.DuplicateEntityException;
@@ -10,13 +8,22 @@ import com.example.cntrctmgmt.services.CategoryService;
 import com.example.cntrctmgmt.services.SubCategoryService;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.scene.Parent;
+import javafx.event.EventHandler;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldListCell;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.util.Callback;
+import javafx.util.StringConverter;
 import org.springframework.stereotype.Controller;
 
 import java.util.ArrayList;
@@ -46,6 +53,8 @@ public abstract class SettingsCategorySubCategoryTemplate<P, C> {
 
     // List view to display all the categories
     protected ListView<P> listViewParent;
+    protected ListView<C> listViewAvailableChildren;
+    protected ListView<C> listViewAssignedChildren;
 
     protected Button btnAddParent;
     protected Button btnSaveParent;
@@ -63,6 +72,8 @@ public abstract class SettingsCategorySubCategoryTemplate<P, C> {
 
     protected final void initializeListView(ListView<P> listViewParent, ListView<C> listViewAvailableChildren, ListView<C> listViewAssignedChildren) {
         this.listViewParent = listViewParent;
+        this.listViewAvailableChildren = listViewAvailableChildren;
+        this.listViewAssignedChildren = listViewAssignedChildren;
         // populate ListView for all the categories
         listViewParent.setItems(parentObservableList);
         // select the first item for the first time by default
@@ -286,5 +297,199 @@ public abstract class SettingsCategorySubCategoryTemplate<P, C> {
     }
 
     protected abstract P onAddNewParentCreateNewParent();
+
+    /**
+     * All the available categories will be presented.
+     * Method populates the ListView with all the available categories
+     * from queried from the database.
+     * The ListView is editable.
+     * Each ListCell is represented with TextFieldListCell to provide editing
+     * option to the end user.
+     * On selection of any category from the list, the ListView for the
+     * assigned sub-categories and available sub-categories to assign to this category will be populated.
+     * User can right-click on any of the ListCell that will pop-up a context menu for
+     * further interaction.
+     */
+    protected void setupCellFactoryListViewParent() {
+        // make ListView editable
+        listViewParent.setEditable(true);
+        // multiple cell selection from the ListView
+        listViewParent.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+
+        // Show Category title in listviewCategory
+        listViewParent.setCellFactory(new Callback<ListView<P>, ListCell<P>>() {
+            @Override
+            public ListCell<P> call(ListView<P> categoryListView) {
+
+                TextFieldListCell<P> textFieldListCell = new TextFieldListCell<P>() {
+
+                    // Contains text value inside the listcell when in editing state
+                    private StringProperty tempTextProperty = new SimpleStringProperty("");
+
+                    // check if the list-cell editing state is turned off by pressing
+                    // ESCAPE Key or not
+                    boolean isCancelledEditingByEscapeKey = false;
+
+                    // check if the list-cell editing state is turned off by
+                    // pressing Enter key when committed
+                    boolean isCommitedEditingByEnterKey = false;
+
+                    // focused lost
+                    boolean isFocusLost = false;
+
+                    // change listener when focus lost
+                    ChangeListener<? super Boolean> focusLostListener = new ChangeListener<Boolean>() {
+                        @Override
+                        public void changed(ObservableValue<? extends Boolean> observableValue, Boolean wasFocused, Boolean isFocused) {
+                            if (!isFocused) {
+                                cancelEdit();
+                            }
+                        }
+                    };
+
+                    // Temp event handler that handles the key press of list-cell's textfield when editing
+                    EventHandler<KeyEvent> escapeKeyEventHandler = keyEvent -> {
+                        if (keyEvent.getCode().equals(KeyCode.ESCAPE)) {
+                            isCancelledEditingByEscapeKey = true;
+                        }
+                        if (keyEvent.getCode().equals(KeyCode.ENTER)) {
+                            isCommitedEditingByEnterKey = true;
+                        }
+                    };
+
+                    @Override
+                    public void startEdit() {
+                        super.startEdit();
+                        // contains the temp text-field inside the list-cell
+                        if (Objects.nonNull(getGraphic())) {
+                            TextField textField = (TextField) getGraphic();
+                            // binding to capture the edited values
+                            tempTextProperty.bind(textField.textProperty());
+                            textField.addEventHandler(KeyEvent.KEY_PRESSED, escapeKeyEventHandler);
+                            textField.focusedProperty().addListener(focusLostListener);
+                        }
+
+
+                    }
+
+                    @Override
+                    public void cancelEdit() {
+
+                        // cleanup
+                        if (Objects.nonNull(getGraphic()) && getGraphic() instanceof TextField textField) {
+                            textField.focusedProperty().removeListener(focusLostListener);
+                            textField.removeEventHandler(KeyEvent.KEY_PRESSED, escapeKeyEventHandler);
+                        }
+
+
+                        if (!isCancelledEditingByEscapeKey && !isCommitedEditingByEnterKey) {
+                            // commit changes before cancelling
+                            String editedValues = tempTextProperty.get();
+                            setText(editedValues);
+                            P parent = getItem();
+                            if (parent instanceof Category category) {
+                                category.setTitle(editedValues);
+                            } else if (parent instanceof SubCategory subCategory) {
+                                subCategory.setTitle(editedValues);
+                            }
+                            updateItem(parent, false);
+                            commitEdit(parent);
+                            listViewParent.getSelectionModel().clearSelection();
+                            currentSelected.set(null);
+                        }
+
+
+                        if (isCancelledEditingByEscapeKey) {
+                            isCancelledEditingByEscapeKey = false;
+                        }
+
+                        if (isCommitedEditingByEnterKey) {
+                            isCommitedEditingByEnterKey = false;
+                        }
+
+                        /**
+                         * TODO:    if user left a cell blank remove it
+                         */
+//                        if (!isEmpty()
+//                                && Objects.isNull(getItem().getTitle())
+//                                && getItem().getSubCategoryList().size() == 0) {
+//                            availableToBeAssigned.remove(getItem());
+//                            parentObservableList.remove(getItem());
+//                        }
+                        super.cancelEdit();
+
+                    }
+
+                    @Override
+                    public void commitEdit(P parent) {
+                        if (!isEmpty()) {
+                            super.commitEdit(parent);
+                            if (parent instanceof Category category) {
+                                setText(category.getTitle());
+                            } else if (parent instanceof SubCategory subCategory) {
+                                setText(subCategory.getTitle());
+                            }
+                        }
+                    }
+
+                    // convert object to make it compatible for the TextFieldListCell
+                    @Override
+                    public void updateItem(P parent, boolean empty) {
+                        super.updateItem(parent, empty);
+
+
+                        setConverter(new StringConverter<P>() {
+                            @Override
+                            public String toString(P parent) {
+                                if (Objects.nonNull(parent) && parent instanceof Category category) {
+                                    return category.getTitle();
+                                } else if (Objects.nonNull(parent) && parent instanceof SubCategory subCategory) {
+                                    return subCategory.getTitle();
+                                }
+                                return "";
+                            }
+
+                            @Override
+                            public P fromString(String s) {
+                                if (getItem() instanceof Category category) {
+                                    category.setTitle(s);
+                                } else if (getItem() instanceof SubCategory subCategory) {
+                                    subCategory.setTitle(s);
+                                }
+                                return getItem();
+                            }
+                        });
+
+
+                        // show available sub-categories and assigned categories
+                        this.setOnMouseClicked(mouseEvent -> {
+                            if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
+                                if (Objects.nonNull(parent) && !empty) {
+                                    // set currentSelected
+                                    currentSelected.set(getItem());
+                                }
+                            }
+                        });
+                    }
+
+
+                };
+
+
+                textFieldListCell.addEventHandler(MouseEvent.MOUSE_CLICKED, mouseEvent -> {
+                    // show context menu for interacting with the selected list-cell
+                    if (mouseEvent.getButton().equals(MouseButton.SECONDARY)) {
+                        textFieldListCell.setContextMenu(getCustomContextMenu(textFieldListCell));
+                    }
+                });
+
+
+                return textFieldListCell;
+            }
+        });
+
+
+    }
 
 }

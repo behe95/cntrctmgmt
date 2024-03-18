@@ -9,15 +9,11 @@ import com.example.cntrctmgmt.exceptions.DuplicateEntityException;
 import com.example.cntrctmgmt.exceptions.InvalidInputException;
 import com.example.cntrctmgmt.services.CategoryService;
 import com.example.cntrctmgmt.services.SubCategoryService;
-import javafx.beans.InvalidationListener;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -31,8 +27,6 @@ import javafx.util.Callback;
 import javafx.util.StringConverter;
 import org.springframework.stereotype.Controller;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Objects;
 
 /**
@@ -98,7 +92,7 @@ public class SettingsSubCategoryViewController extends SettingsCategorySubCatego
 
         // setup the list views
         // setup corresponding list cells
-        setupCellFactoryListViewSubCategory();
+        super.setupCellFactoryListViewParent();
         setupCellFactoryListViewAvailableCategory();
         setupCellFactoryListViewAssignedCategory();
     }
@@ -134,160 +128,6 @@ public class SettingsSubCategoryViewController extends SettingsCategorySubCatego
         saveOrUpdateSubCategory(event, currentSelected.get());
     }
 
-
-    /**
-     * All the available sub-categories will be presented
-     * The ListView is editable.
-     * Each ListCell is represented with TextFieldListCell to provide editing
-     * option to the end user.
-     * On selection of any sub-category from the list, the ListView for the
-     * assigned categories and available categories to assign to this sub-category will be populated.
-     * User can right-click on any of the ListCell that will pop-up a context menu for
-     * further interaction
-     */
-    private void setupCellFactoryListViewSubCategory() {
-        // make ListView editable
-        listViewSubCategory.setEditable(true);
-        // multiple cell selections from the ListView
-        listViewSubCategory.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-
-        // show sub-category title in listViewSubCategory
-        listViewSubCategory.setCellFactory(new Callback<ListView<SubCategory>, ListCell<SubCategory>>() {
-            @Override
-            public ListCell<SubCategory> call(ListView<SubCategory> subCategoryListView) {
-
-                TextFieldListCell<SubCategory> textFieldListCell = new TextFieldListCell<>() {
-                    // contains text value inside the list cell when in editing state
-                    private StringProperty tempTextProperty = new SimpleStringProperty("");
-
-                    // check if the list-cell editing state is turned off by pressing
-                    // ESCAPE key or not
-                    boolean isCancelledEditingByEscapeKey = false;
-
-                    // check if the list-cel editing state is turned off by pressing
-                    // Enter key when commited
-                    boolean isCommittedEditingByEnterKey = false;
-
-                    // check if focus lost
-                    boolean isFocusLost = false;
-
-                    // change listener for focus lost
-                    ChangeListener<? super Boolean> focusLostListener = new ChangeListener<Boolean>() {
-                        @Override
-                        public void changed(ObservableValue<? extends Boolean> observableValue, Boolean aBoolean, Boolean t1) {
-                            if (!isFocusLost) {
-                                cancelEdit();
-                            }
-                        }
-                    };
-
-                    // Temp event handler that handles the key press of list-cell's textfield when editing
-                    EventHandler<KeyEvent> escapeKeyEventHandler = keyEvent -> {
-                        if (keyEvent.getCode().equals(KeyCode.ESCAPE)) {
-                            isCancelledEditingByEscapeKey = true;
-                        }
-
-                        if (keyEvent.getCode().equals(KeyCode.ENTER)) {
-                            isCommittedEditingByEnterKey = true;
-                        }
-                    };
-
-                    @Override
-                    public void startEdit() {
-                        super.startEdit();
-                        // bind the text inside the textfiled
-                        if (Objects.nonNull(getGraphic())) {
-                            TextField textField = (TextField) getGraphic();
-                            // binding to capture the edited values
-                            tempTextProperty.bind(textField.textProperty());
-                            textField.addEventHandler(KeyEvent.KEY_PRESSED, escapeKeyEventHandler);
-                            textField.focusedProperty().addListener(focusLostListener);
-                        }
-                    }
-
-                    @Override
-                    public void cancelEdit() {
-                        // cleanup
-                        if (Objects.nonNull(getGraphic()) && getGraphic() instanceof TextField textField) {
-                            textField.focusedProperty().removeListener(focusLostListener);
-                            textField.removeEventHandler(KeyEvent.KEY_PRESSED, escapeKeyEventHandler);
-                        }
-
-                        if (!isCancelledEditingByEscapeKey && !isCommittedEditingByEnterKey) {
-                            // commit changes before cancelling
-                            String editedValues = tempTextProperty.get();
-                            setText(editedValues);
-                            SubCategory subCategory = getItem();
-                            subCategory.setTitle(editedValues);
-                            updateItem(subCategory, false);
-                            commitEdit(subCategory);
-                            listViewSubCategory.getSelectionModel().clearSelection();
-                            currentSelected.set(null);
-                        }
-
-                        if (isCancelledEditingByEscapeKey) {
-                            isCancelledEditingByEscapeKey = false;
-                        }
-
-                        if (isCommittedEditingByEnterKey) {
-                            isCommittedEditingByEnterKey = false;
-                        }
-
-                        super.cancelEdit();
-                    }
-
-                    @Override
-                    public void updateItem(SubCategory subCategory, boolean empty) {
-                        super.updateItem(subCategory, empty);
-
-                        // convert object to make it compatible for the TextFieldListCell
-                        // and vice-versa
-                        setConverter(new StringConverter<SubCategory>() {
-                            @Override
-                            public String toString(SubCategory subCategory) {
-                                return Objects.nonNull(subCategory) ? subCategory.getTitle() : "";
-                            }
-
-                            @Override
-                            public SubCategory fromString(String s) {
-                                getItem().setTitle(s);
-                                return getItem();
-                            }
-                        });
-
-
-                        // show available categories and assigned categories
-                        this.setOnMouseClicked(mouseEvent -> {
-                            if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
-                                if (Objects.nonNull(subCategory) && !empty) {
-                                    currentSelected.set(subCategory);
-                                }
-                            }
-                        });
-
-                    }
-
-                    @Override
-                    public void commitEdit(SubCategory subCategory) {
-                        if (!isEmpty()) {
-                            super.commitEdit(subCategory);
-                            setText(subCategory.getTitle());
-                        }
-                    }
-                };
-
-                textFieldListCell.addEventHandler(MouseEvent.MOUSE_CLICKED, mouseEvent -> {
-                    // show context menu for interacting with the selected list-cell
-                    if (mouseEvent.getButton().equals(MouseButton.SECONDARY)) {
-                        textFieldListCell.setContextMenu(getCustomContextMenu(textFieldListCell));
-                    }
-                });
-
-                return textFieldListCell;
-            }
-        });
-
-    }
 
     /**
      * All the available categories will be presented that can be assigned to a selected sub-category.
